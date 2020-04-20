@@ -1,0 +1,17 @@
+/Users/jaredwesner/Development/coviid/coviid-api-core/obj/Debug/netcoreapp2.2/CoviIDApiCore.csprojAssemblyReference.cache
+/Users/jaredwesner/Development/coviid/coviid-api-core/obj/Debug/netcoreapp2.2/CoviIDApiCore.RazorAssemblyInfo.cache
+/Users/jaredwesner/Development/coviid/coviid-api-core/obj/Debug/netcoreapp2.2/CoviIDApiCore.RazorAssemblyInfo.cs
+/Users/jaredwesner/Development/coviid/coviid-api-core/obj/Debug/netcoreapp2.2/CoviIDApiCore.AssemblyInfoInputs.cache
+/Users/jaredwesner/Development/coviid/coviid-api-core/obj/Debug/netcoreapp2.2/CoviIDApiCore.AssemblyInfo.cs
+/Users/jaredwesner/Development/coviid/coviid-api-core/bin/Debug/netcoreapp2.2/Dockerrun.aws.json
+/Users/jaredwesner/Development/coviid/coviid-api-core/bin/Debug/netcoreapp2.2/Properties/launchSettings.json
+/Users/jaredwesner/Development/coviid/coviid-api-core/bin/Debug/netcoreapp2.2/V1/Properties/launchSettings.json
+/Users/jaredwesner/Development/coviid/coviid-api-core/bin/Debug/netcoreapp2.2/appsettings.json
+/Users/jaredwesner/Development/coviid/coviid-api-core/bin/Debug/netcoreapp2.2/CoviIDApiCore.deps.json
+/Users/jaredwesner/Development/coviid/coviid-api-core/bin/Debug/netcoreapp2.2/CoviIDApiCore.runtimeconfig.json
+/Users/jaredwesner/Development/coviid/coviid-api-core/bin/Debug/netcoreapp2.2/CoviIDApiCore.runtimeconfig.dev.json
+/Users/jaredwesner/Development/coviid/coviid-api-core/bin/Debug/netcoreapp2.2/CoviIDApiCore.dll
+/Users/jaredwesner/Development/coviid/coviid-api-core/bin/Debug/netcoreapp2.2/CoviIDApiCore.pdb
+/Users/jaredwesner/Development/coviid/coviid-api-core/obj/Debug/netcoreapp2.2/CoviIDApiCore.RazorTargetAssemblyInfo.cache
+/Users/jaredwesner/Development/coviid/coviid-api-core/obj/Debug/netcoreapp2.2/CoviIDApiCore.dll
+/Users/jaredwesner/Development/coviid/coviid-api-core/obj/Debug/netcoreapp2.2/CoviIDApiCore.pdb
