@@ -1,11 +1,12 @@
-﻿using System.Threading.Tasks;
-using System.Net;
+﻿using System;
+using System.Threading.Tasks;
+
 using CoviIDApiCore.V1.DTOs.Organisation;
 using CoviIDApiCore.V1.Interfaces.Services;
 
 using Microsoft.AspNetCore.Cors;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.AspNetCore.Http;
+using Microsoft.Extensions.Configuration;
 
 namespace CoviIDApiCore.V1.Controllers
 {
@@ -14,16 +15,21 @@ namespace CoviIDApiCore.V1.Controllers
     [ApiController]
     public class OrganisationController : Controller
     {
+        private readonly IConfiguration _configuration;
         private readonly IOrganisationService _organisationService;
 
-        public OrganisationController(IOrganisationService organisationService)
+        public OrganisationController(IOrganisationService organisationService, IConfiguration configuration)
         {
             _organisationService = organisationService;
+            _configuration = configuration;
         }
 
         [HttpPost]
         public async Task<IActionResult> CreateOrganisation([FromBody] CreateOrganisationRequest payload)
         {
+            if (!IsAuthorized(Request.Headers["x-api-key"]))
+                return new UnauthorizedResult();
+
             await _organisationService.CreateAsync(payload);
 
             return new OkResult();
@@ -32,6 +38,9 @@ namespace CoviIDApiCore.V1.Controllers
         [HttpGet("{id}")]
         public async Task<IActionResult> GetOrganisation(string id)
         {
+            if (!IsAuthorized(Request.Headers["x-api-key"]))
+                return new UnauthorizedResult();
+
             var resp = await _organisationService.GetAsync(id);
 
             return StatusCode(resp.Meta.Code, resp);
@@ -40,9 +49,17 @@ namespace CoviIDApiCore.V1.Controllers
         [HttpPut("{id}")]
         public async Task<IActionResult> UpdateCount(string id, [FromBody] UpdateCountRequest payload)
         {
+            if (!IsAuthorized(Request.Headers["x-api-key"]))
+                return new UnauthorizedResult();
+
             var resp = await _organisationService.UpdateCountAsync(id, payload);
 
             return StatusCode(resp.Meta.Code, resp);
+        }
+
+        private bool IsAuthorized(string apiKey)
+        {
+            return string.Equals(apiKey, _configuration.GetValue<string>("Authorization"), StringComparison.Ordinal);
         }
     }
 }
