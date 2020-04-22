@@ -2,7 +2,7 @@
 using System.Net;
 using System.Threading.Tasks;
 using System.Collections.Generic;
-
+using CoviIDApiCore.V1.Constants;
 using CoviIDApiCore.V1.DTOs.Credentials;
 using CoviIDApiCore.V1.DTOs.System;
 using CoviIDApiCore.V1.DTOs.Wallet;
@@ -43,7 +43,7 @@ namespace CoviIDApiCore.V1.Controllers
         public async Task<IActionResult> CreateWallet(WalletParameters walletParameters)
         {
             if (!IsAuthorized(Request.Headers["x-api-key"]))
-                return new UnauthorizedResult();
+                return Unauthorized(Messages.Misc_Unauthorized);
 
             var response = await _walletService.CreateWallet(walletParameters);
 
@@ -55,7 +55,7 @@ namespace CoviIDApiCore.V1.Controllers
         public async Task<IActionResult> CreateCoviIdWallet(CoviIdWalletParameters coviIdWalletParameters)
         {
             if (!IsAuthorized(Request.Headers["x-api-key"]))
-                return new UnauthorizedResult();
+                return Unauthorized(Messages.Misc_Unauthorized);
 
             var response = await _walletService.CreateCoviIdWallet(coviIdWalletParameters);
 
@@ -77,7 +77,7 @@ namespace CoviIDApiCore.V1.Controllers
         public async Task<IActionResult> DeleteWallet(string walletId)
         {
             if (!IsAuthorized(Request.Headers["x-api-key"]))
-                return new UnauthorizedResult();
+                return Unauthorized(Messages.Misc_Unauthorized);
 
             await _walletService.DeleteWallet(walletId);
 
@@ -88,7 +88,7 @@ namespace CoviIDApiCore.V1.Controllers
         public async Task<IActionResult> DeleteWallets(List<WalletParameters> wallets)
         {
             if (!IsAuthorized(Request.Headers["x-api-key"]))
-                return new UnauthorizedResult();
+                return Unauthorized(Messages.Misc_Unauthorized);
 
             await _walletService.DeleteWallets(wallets);
 

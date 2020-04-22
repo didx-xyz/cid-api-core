@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Net;
 using System.Threading.Tasks;
-
+using CoviIDApiCore.V1.Constants;
 using CoviIDApiCore.V1.DTOs.System;
 using CoviIDApiCore.V1.Interfaces.Services;
 
@@ -28,7 +28,7 @@ namespace CoviIDApiCore.V1.Controllers
         public async Task<IActionResult> GetCovidStatus(string walletId)
         {
             if (!IsAuthorized(Request.Headers["x-api-key"]))
-                return new UnauthorizedResult();
+                return Unauthorized(Messages.Misc_Unauthorized);
 
             var response = await _verifyService.GetCredentials(walletId);
 

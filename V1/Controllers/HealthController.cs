@@ -1,4 +1,5 @@
 ﻿using System;
+using CoviIDApiCore.V1.Constants;
 using Microsoft.AspNetCore.Cors;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Configuration;
@@ -21,7 +22,7 @@ namespace CoviIDApiCore.V1.Controllers
         public IActionResult Health()
         {
             if (!IsAuthorized(Request.Headers["x-api-key"]))
-                return new UnauthorizedResult();
+                return Unauthorized(Messages.Misc_Unauthorized);
 
             return new OkResult();
         }

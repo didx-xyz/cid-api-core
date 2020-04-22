@@ -1,6 +1,6 @@
 ﻿using System;
 using System.Threading.Tasks;
-
+using CoviIDApiCore.V1.Constants;
 using CoviIDApiCore.V1.DTOs.Organisation;
 using CoviIDApiCore.V1.Interfaces.Services;
 
@@ -28,7 +28,7 @@ namespace CoviIDApiCore.V1.Controllers
         public async Task<IActionResult> CreateOrganisation([FromBody] CreateOrganisationRequest payload)
         {
             if (!IsAuthorized(Request.Headers["x-api-key"]))
-                return new UnauthorizedResult();
+                return Unauthorized(Messages.Misc_Unauthorized);
 
             await _organisationService.CreateAsync(payload);
 
@@ -39,7 +39,7 @@ namespace CoviIDApiCore.V1.Controllers
         public async Task<IActionResult> GetOrganisation(string id)
         {
             if (!IsAuthorized(Request.Headers["x-api-key"]))
-                return new UnauthorizedResult();
+                return Unauthorized(Messages.Misc_Unauthorized);
 
             var resp = await _organisationService.GetAsync(id);
 
@@ -50,7 +50,7 @@ namespace CoviIDApiCore.V1.Controllers
         public async Task<IActionResult> UpdateCount(string id, [FromBody] UpdateCountRequest payload)
         {
             if (!IsAuthorized(Request.Headers["x-api-key"]))
-                return new UnauthorizedResult();
+                return Unauthorized(Messages.Misc_Unauthorized);
 
             var resp = await _organisationService.UpdateCountAsync(id, payload);
 
