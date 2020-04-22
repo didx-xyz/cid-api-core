@@ -7,6 +7,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.Extensions.Configuration;
+using Hangfire;
 
 namespace CoviIDApiCore.V1.Services
 {
@@ -50,7 +51,7 @@ namespace CoviIDApiCore.V1.Services
             var pictureUrl = await _agencyBroker.UploadFiles(coviIdWalletParameters.PersonalDetials.Picture, response.WalletId);
             coviIdWalletParameters.PersonalDetials.Picture = pictureUrl;
 
-            _ = ContinueProcess(coviIdWalletParameters, pictureUrl, response.WalletId);
+            BackgroundJob.Enqueue(() => ContinueProcess(coviIdWalletParameters, response.WalletId));
 
             var contract = new CoviIdWalletContract
             {
@@ -92,7 +93,7 @@ namespace CoviIDApiCore.V1.Services
         }
 
         #region Private Methods
-        public async Task ContinueProcess(CoviIdWalletParameters coviIdWalletParameters, string pictureUrl, string walletId)
+        public async Task ContinueProcess(CoviIdWalletParameters coviIdWalletParameters, string walletId)
         {
             var connectionParameters = new ConnectionParameters
             {
