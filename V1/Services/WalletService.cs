@@ -68,6 +68,7 @@ namespace CoviIDApiCore.V1.Services
         /// <returns></returns>
         public async Task UpdateWallet(CovidTestCredentialParameters covidTest, string walletId)
         {
+
             // 1. Get credentials
             // 2. Find existing covid credentials
             // 3. issue new credentials.

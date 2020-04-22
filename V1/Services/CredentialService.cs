@@ -51,7 +51,7 @@ namespace CoviIDApiCore.V1.Services
             var credentialOffer = new CredentialOfferParameters
             {
                 ConnectionId = connectionId,
-                DefinitionId = DefinitionIds[Schemas.CovidStatus],
+                DefinitionId = DefinitionIds[Schemas.CovidTest],
                 AutomaticIssuance = false,
                 CredentialValues = new Dictionary<string, string>
                 {
@@ -84,6 +84,5 @@ namespace CoviIDApiCore.V1.Services
             var credentials = await _agencyBroker.SendCredentials(credentialOffer);
             return credentials;
         }
-
     }
 }

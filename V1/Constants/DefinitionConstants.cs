@@ -12,7 +12,7 @@ namespace CoviIDApiCore.V1.Constants
         {
             { Schemas.PersonalDetials, "RYJoQ8UNadGrrfL7PBK8Wm:3:CL:94331:CoviID" },
             { Schemas.Identification, "RYJoQ8UNadGrrfL7PBK8Wm:3:CL:94335:CoviID" },
-            { Schemas.CovidStatus, "" }
+            { Schemas.CovidTest, "RYJoQ8UNadGrrfL7PBK8Wm:3:CL:94366:CoviID" }
 
         };
 
@@ -20,7 +20,7 @@ namespace CoviIDApiCore.V1.Constants
         {
             PersonalDetials,
             Identification,
-            CovidStatus
+            CovidTest
         }
     }
 }
