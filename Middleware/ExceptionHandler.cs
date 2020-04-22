@@ -39,6 +39,10 @@ namespace CoviIDApiCore.Middleware
             {
                 await HandleStreetCredBrokerException(context, e);
             }
+            catch (SendGridException e)
+            {
+                await HandleSendGridException(context, e);
+            }
             catch (Exception e)
             {
                 await HandleUnexpectedException(context, e);
@@ -71,6 +75,20 @@ namespace CoviIDApiCore.Middleware
 
 
         private Task HandleStreetCredBrokerException(HttpContext context, StreetCredBrokerException e)
+        {
+            var statusCode = HttpStatusCode.InternalServerError;
+            context.Response.ContentType = "application/json";
+            context.Response.StatusCode = (int)statusCode;
+            var message = Messages.Misc_ThirdParty;
+
+            #if DEBUG
+            message = e.Message;
+            #endif
+            var rsp = new Response(false, statusCode, message);
+            return context.Response.WriteAsync(JsonConvert.SerializeObject(rsp));
+        }
+
+        private Task HandleSendGridException(HttpContext context, SendGridException e)
         {
             var statusCode = HttpStatusCode.InternalServerError;
             context.Response.ContentType = "application/json";
