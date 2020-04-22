@@ -44,13 +44,13 @@ namespace CoviIDApiCore.V1.Controllers
             return Ok(new Response(response, HttpStatusCode.OK));
         }
 
-        [HttpPut]
-        [Route("{walletId")]
-        public async Task<IActionResult> UpdateWallet(string walletId)
-        {
-            var response = await _walletService.CreateCoviIdWallet(walletId);
-            return Ok(new Response(response, HttpStatusCode.OK));
-        }
+//        [HttpPut]
+//        [Route("{walletId")]
+//        public async Task<IActionResult> UpdateWallet(string walletId)
+//        {
+//            var response = await _walletService.CreateCoviIdWallet(walletId);
+//            return Ok(new Response(response, HttpStatusCode.OK));
+//        }
 
         [HttpDelete]
         [Route("{walletId}")]

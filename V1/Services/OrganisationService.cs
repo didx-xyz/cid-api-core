@@ -51,9 +51,11 @@ namespace CoviIDApiCore.V1.Services
 
             var orgCounter = await _organisationCounterRepository.GetLastByOrganisation(organisation);
 
+            var totalScans = _organisationCounterRepository.Count();
+
             return organisation == default
                 ? new Response(false, HttpStatusCode.NotFound,Messages.Org_NotExists)
-                : new Response(new OrganisationDTO(organisation, orgCounter), HttpStatusCode.OK);
+                : new Response(new OrganisationDTO(organisation, orgCounter, totalScans), HttpStatusCode.OK);
         }
 
         public async Task<Response> UpdateCountAsync(string id, UpdateCountRequest payload)
@@ -71,6 +73,9 @@ namespace CoviIDApiCore.V1.Services
             var lastCount = await _organisationCounterRepository.GetLastByOrganisation(organisation);
 
             balance = lastCount?.Balance ?? 0;
+
+            if(balance < 1 && payload.Movement < 0)
+                return new Response(false, HttpStatusCode.BadRequest, Messages.Org_NegBalance);
 
             var newCount = new OrganisationCounter()
             {
