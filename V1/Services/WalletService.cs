@@ -15,13 +15,17 @@ namespace CoviIDApiCore.V1.Services
         private readonly ICustodianBroker _custodianBroker;
         private readonly IAgencyBroker _agencyBroker;
         private readonly IConnectionService _connectionService;
+        private readonly ICredentialService _credentialService;
         private readonly IConfiguration _configuration;
-        public WalletService(ICustodianBroker custodianBroker, IConnectionService connectionService, IAgencyBroker agencyBroker, IConfiguration configuration)
+        public WalletService(ICustodianBroker custodianBroker, IConnectionService connectionService, IAgencyBroker agencyBroker,
+            IConfiguration configuration,
+            ICredentialService credentialService)
         {
             _custodianBroker = custodianBroker;
             _connectionService = connectionService;
             _agencyBroker = agencyBroker;
             _configuration = configuration;
+            _credentialService = credentialService;
         }
 
         public async Task<List<WalletContract>> GetWallets()
@@ -38,12 +42,13 @@ namespace CoviIDApiCore.V1.Services
         {
             var wallet = new WalletParameters
             {
-                OwnerName = $"{coviIdWalletParameters.Name}-{coviIdWalletParameters.Surname}"
+                OwnerName = $"{coviIdWalletParameters.PersonalDetials.Name}-{coviIdWalletParameters.PersonalDetials.Surname}"
             };
 
             var response = await _custodianBroker.CreateWallet(wallet);
 
-            var pictureUrl = await _agencyBroker.UploadFiles(coviIdWalletParameters.Picture, response.WalletId);
+            var pictureUrl = await _agencyBroker.UploadFiles(coviIdWalletParameters.PersonalDetials.Picture, response.WalletId);
+            coviIdWalletParameters.PersonalDetials.Picture = pictureUrl;
 
             _ = ContinueProcess(coviIdWalletParameters, pictureUrl, response.WalletId);
 
@@ -57,10 +62,19 @@ namespace CoviIDApiCore.V1.Services
             return contract;
         }
 
-        public async Task<WalletContract> UpdateWallet(string walletId)
+        /// <summary>
+        /// This will update the wallet with the newly added covid test results
+        /// </summary>
+        /// <returns></returns>
+        public async Task UpdateWallet(CovidTestCredentialParameters covidTest, string walletId)
         {
+            // 1. Get credentials
+            // 2. Find existing covid credentials
+            // 3. issue new credentials.
+            // 4. revoke the previous ones
+
             //var credentials = await _custodianBroker.GetCredentials(walletId);
-            return null;
+            return;
         }
 
         public async Task DeleteWallet(string walletId)
@@ -77,7 +91,7 @@ namespace CoviIDApiCore.V1.Services
         }
 
         #region Private Methods
-        private async Task ContinueProcess(CoviIdWalletParameters coviIdWalletParameters, string pictureUrl, string walletId)
+        public async Task ContinueProcess(CoviIdWalletParameters coviIdWalletParameters, string pictureUrl, string walletId)
         {
             var connectionParameters = new ConnectionParameters
             {
@@ -87,34 +101,24 @@ namespace CoviIDApiCore.V1.Services
             };
 
             var agentInvitation = await _connectionService.CreateInvitation(connectionParameters);
-
             var custodianConnection = await _connectionService.AcceptInvitation(agentInvitation.Invitation, walletId);
 
-            var credentialOffer = new CredentialOfferParameters
-            {
-                ConnectionId = agentInvitation.ConnectionId,
-                DefinitionId = _configuration.GetValue<string>("DefinitionId"),
-                AutomaticIssuance = false,
-                CredentialValues = new Dictionary<string, string>
-                {
-                    { "Name" , coviIdWalletParameters.Name },
-                    { "Surname" , coviIdWalletParameters.Surname },
-                    { "Picture" , pictureUrl},
-                    { "TelNumber" , coviIdWalletParameters.TelNumber},
-                    { "CovidStatus" , coviIdWalletParameters.CovidTest.CovidStatus.ToString()},
-                    { "TestDate" , coviIdWalletParameters.CovidTest.TestDate.ToString()},
-                    { "ExpiryDate" , coviIdWalletParameters.CovidTest.ExpiryDate.ToString()},
-                }
-            };
-
-            var credentials = await _agencyBroker.SendCredentials(credentialOffer);
+            // Create the set of credentials
+            var personalDetialsCredentials = await _credentialService.CreatePersonalDetials(agentInvitation.ConnectionId, coviIdWalletParameters.PersonalDetials);
+            var covidTestCredentials = await _credentialService.CreateCovidTest(agentInvitation.ConnectionId, coviIdWalletParameters.CovidTest);
+            var identificationCredentials = await _credentialService.CreateIdentification(agentInvitation.ConnectionId, coviIdWalletParameters.Identification);
 
             var userCredentials = await _custodianBroker.GetCredentials(walletId);
+            var offeredCredentials = userCredentials.Where(x => x.State == CredentialsState.Offered);
 
-            var offeredCredentials = userCredentials.FirstOrDefault(x => x.State == CredentialsState.Offered);
-
-            if(offeredCredentials != null)
-                await _custodianBroker.AcceptCredential(walletId, offeredCredentials.CredentialId);
+            if (offeredCredentials != null)
+            {
+                // Accept all the credentials
+                foreach (var offer in offeredCredentials)
+                {
+                    await _custodianBroker.AcceptCredential(walletId, offer.CredentialId);
+                }
+            }
         }
         #endregion
     }

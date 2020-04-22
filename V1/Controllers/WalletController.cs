@@ -46,10 +46,10 @@ namespace CoviIDApiCore.V1.Controllers
 
         [HttpPut]
         [Route("{walletId")]
-        public async Task<IActionResult> UpdateWallet(string walletId)
+        public async Task<IActionResult> UpdateWallet([FromBody] CovidTestCredentialParameters covidTest, string walletId)
         {
-            var response = await _walletService.CreateCoviIdWallet(walletId);
-            return Ok(new Response(response, HttpStatusCode.OK));
+            await _walletService.UpdateWallet(covidTest, walletId);
+            return Ok(new Response(true, HttpStatusCode.OK));
         }
 
         [HttpDelete]
