@@ -49,14 +49,19 @@ namespace CoviIDApiCore.V1.Services
         {
             var organisation = await _organisationRepository.GetAsync(Guid.Parse(id));
 
+            var orgCounter = await _organisationCounterRepository.GetLastByOrganisation(organisation);
+
             return organisation == default
                 ? new Response(false, HttpStatusCode.NotFound,Messages.Org_NotExists)
-                : new Response(organisation, HttpStatusCode.OK);
+                : new Response(new OrganisationDTO(organisation, orgCounter), HttpStatusCode.OK);
         }
 
         public async Task<Response> UpdateCountAsync(string id, UpdateCountRequest payload)
         {
             var balance = 0;
+
+            if(!payload.isValid())
+                return new Response(false, HttpStatusCode.BadRequest, Messages.Org_PayloadInvalid);
 
             var organisation = await _organisationRepository.GetAsync(Guid.Parse(id));
 
@@ -80,7 +85,7 @@ namespace CoviIDApiCore.V1.Services
 
             await _organisationCounterRepository.SaveAsync();
 
-            return new Response();
+            return new Response(true, HttpStatusCode.OK);
         }
     }
 }

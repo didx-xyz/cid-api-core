@@ -19,6 +19,7 @@
 
         #region Organisations
         public static readonly string Org_NotExists = $"Organisation does not exist.";
+        public static readonly string Org_PayloadInvalid = $"Payload is invalid.";
         #endregion
     }
 }
