@@ -127,7 +127,7 @@ namespace CoviIDApiCore
             services.AddTransient<IVerifyService, VerifyService>();
 
             services.AddScoped<IOrganisationService, OrganisationService>();
-            services.AddTransient<IAuthenticationService, AuthenticationService>();
+            services.AddSingleton<IAuthenticationService, AuthenticationService>();
             #endregion
 
             #region Repository Layer

@@ -1,12 +1,10 @@
 ﻿using System.Net;
 using System.Threading.Tasks;
 using System.Collections.Generic;
-
 using CoviIDApiCore.V1.DTOs.Credentials;
 using CoviIDApiCore.V1.DTOs.System;
 using CoviIDApiCore.V1.DTOs.Wallet;
 using CoviIDApiCore.V1.Interfaces.Services;
-
 using Microsoft.AspNetCore.Cors;
 using Microsoft.AspNetCore.Mvc;
 
