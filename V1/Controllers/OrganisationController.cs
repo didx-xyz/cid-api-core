@@ -37,7 +37,7 @@ namespace CoviIDApiCore.V1.Controllers
             return StatusCode(resp.Meta.Code, resp);
         }
 
-        [HttpPut("{id}/{number}")]
+        [HttpPut("{id}")]
         public async Task<IActionResult> UpdateCount(string id, [FromBody] UpdateCountRequest payload)
         {
             var resp = await _organisationService.UpdateCountAsync(id, payload);
