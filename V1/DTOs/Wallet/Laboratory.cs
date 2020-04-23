@@ -1,6 +1,6 @@
 ﻿namespace CoviIDApiCore.V1.DTOs.Wallet
 {
-    public enum Labratory
+    public enum Laboratory
     {
         NHLS = 0
     }

@@ -1,11 +1,8 @@
 using System;
 using System.Net;
 using System.Threading.Tasks;
-
 using Microsoft.AspNetCore.Http;
-
 using Newtonsoft.Json;
-
 using CoviIDApiCore.Exceptions;
 using CoviIDApiCore.V1.Constants;
 using CoviIDApiCore.V1.DTOs.System;
@@ -102,6 +99,9 @@ namespace CoviIDApiCore.Middleware
             context.Response.StatusCode = (int)code;
 
             var message = Messages.Misc_SomethingWentWrong;
+            #if DEBUG
+            message = e.Message;
+            #endif
 
             var rsp = new Response(false, code, message);
             return context.Response.WriteAsync(JsonConvert.SerializeObject(rsp));

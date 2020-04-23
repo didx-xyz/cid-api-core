@@ -48,7 +48,7 @@ namespace CoviIDApiCore.V1.Controllers
         }
 
         [HttpPut]
-        [Route("{walletId")]
+        [Route("{walletId}/coviid")]
         public async Task<IActionResult> UpdateWallet([FromBody] CovidTestCredentialParameters covidTest, string walletId)
         {
             await _walletService.UpdateWallet(covidTest, walletId);

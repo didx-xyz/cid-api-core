@@ -5,10 +5,10 @@ namespace CoviIDApiCore.V1.DTOs.Credentials
 {
     public class CovidTestCredentialParameters
     {
-        public DateTime TestDate { get; set; }
-        public DateTime ExpiryDate { get; set; }
+        public DateTime DateTested { get; set; }
+        internal DateTime DateIssued { get; set; }
         public CovidStatus CovidStatus { get; set; }
-        public Labratory Labratory { get; set; }
+        public Laboratory Laboratory { get; set; }
         public string ReferenceNumber { get; set; }
     }
 }

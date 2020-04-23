@@ -20,24 +20,27 @@ namespace CoviIDApiCore.V1.Services
         }
         
         /// <summary>
-        /// Creates a credentials with the relevant DefinitionID and attribute values.
+        /// Creates a verified person credentials with the relevant DefinitionID and attribute values.
         /// </summary>
         /// <param name="connectionId"></param>
-        /// <param name="personalDetials"></param>
+        /// <param name="personCredential"></param>
         /// <returns></returns>
-        public async Task<CredentialsContract> CreatePersonalDetials(string connectionId, PersonalDetialsCredentialParameters personalDetials)
+        public async Task<CredentialsContract> CreatePerson(string connectionId, PersonCredentialParameters personCredential)
         {
+            // TODO : validate data
             var credentialOffer = new CredentialOfferParameters
             {
                 ConnectionId = connectionId,
-                DefinitionId = DefinitionIds[Schemas.PersonalDetials],
+                DefinitionId = DefinitionIds[Schemas.Personal],
                 AutomaticIssuance = false,
                 CredentialValues = new Dictionary<string, string>
                 {
-                    { "Name" , personalDetials.Name },
-                    { "Surname" , personalDetials.Surname },
-                    { "Picture" , personalDetials.Picture },
-                    { "TelNumber" , personalDetials.TelNumber },
+                    { Attributes.FirstName , personCredential.FirstName },
+                    { Attributes.LastName, personCredential.LastName },
+                    { Attributes.PhotoUrl, personCredential.Photo },
+                    { Attributes.MobileNumber , personCredential.MobileNumber.ToString() },
+                    { Attributes.IdentificationType , personCredential.IdentificationType.ToString() },
+                    { Attributes.IdentificationValue, personCredential.IdentificationValue.ToString() }
                 }
             };
 
@@ -47,7 +50,7 @@ namespace CoviIDApiCore.V1.Services
        
         public async Task<CredentialsContract> CreateCovidTest(string connectionId, CovidTestCredentialParameters covidTestCredential)
         {
-            // TODO add a null check
+            // TODO : validate data
             var credentialOffer = new CredentialOfferParameters
             {
                 ConnectionId = connectionId,
@@ -55,29 +58,11 @@ namespace CoviIDApiCore.V1.Services
                 AutomaticIssuance = false,
                 CredentialValues = new Dictionary<string, string>
                 {
-                    { "ReferenceNumber" , covidTestCredential.ReferenceNumber },
-                    { "Laboratory" , covidTestCredential.Labratory.ToString() },
-                    { "TestDate" , covidTestCredential.TestDate.ToString() },
-                    { "ExpiryDate" , covidTestCredential.ExpiryDate.ToString() },
-                    { "Status" , covidTestCredential.CovidStatus.ToString() },
-                }
-            };
-
-            var credentials = await _agencyBroker.SendCredentials(credentialOffer);
-            return credentials;
-        }
-
-        public async Task<CredentialsContract> CreateIdentification(string connectionId, IdentificationCredentialParameter identification)
-        {
-            var credentialOffer = new CredentialOfferParameters
-            {
-                ConnectionId = connectionId,
-                DefinitionId = DefinitionIds[Schemas.Identification],
-                AutomaticIssuance = false,
-                CredentialValues = new Dictionary<string, string>
-                {
-                    { "Type" , identification.IdentificationType.ToString() },
-                    { "Value" , identification.Identification }
+                    { Attributes.ReferenceNumber , covidTestCredential.ReferenceNumber },
+                    { Attributes.Laboratory , covidTestCredential.Laboratory.ToString() },
+                    { Attributes.DateTested , covidTestCredential.DateTested.ToString() },
+                    { Attributes.DateIssued, covidTestCredential.DateIssued.ToString() },
+                    { Attributes.CovidStatus, covidTestCredential.CovidStatus.ToString() },
                 }
             };
 

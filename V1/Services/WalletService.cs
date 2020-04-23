@@ -43,13 +43,13 @@ namespace CoviIDApiCore.V1.Services
         {
             var wallet = new WalletParameters
             {
-                OwnerName = $"{coviIdWalletParameters.PersonalDetials.Name}-{coviIdWalletParameters.PersonalDetials.Surname}"
+                OwnerName = $"{coviIdWalletParameters.Person.FirstName}-{coviIdWalletParameters.Person.LastName}"
             };
 
             var response = await _custodianBroker.CreateWallet(wallet);
 
-            var pictureUrl = await _agencyBroker.UploadFiles(coviIdWalletParameters.PersonalDetials.Picture, response.WalletId);
-            coviIdWalletParameters.PersonalDetials.Picture = pictureUrl;
+            var pictureUrl = await _agencyBroker.UploadFiles(coviIdWalletParameters.Person.Photo, response.WalletId);
+            coviIdWalletParameters.Person.Photo = pictureUrl;
 
             BackgroundJob.Enqueue(() => ContinueProcess(coviIdWalletParameters, response.WalletId));
 
@@ -80,7 +80,11 @@ namespace CoviIDApiCore.V1.Services
             var custodianConnection = await _connectionService.AcceptInvitation(agentInvitation.Invitation, walletId);
             var offer = await _credentialService.CreateCovidTest(agentInvitation.ConnectionId, covidTest);
             var userCredentials = await _custodianBroker.GetCredentials(walletId);
-            await _custodianBroker.AcceptCredential(walletId, offer.CredentialId);
+
+            string test = "";
+            var thisOffer = userCredentials.FirstOrDefault(c => c.CredentialId == test);
+
+            await _custodianBroker.AcceptCredential(walletId, thisOffer.CredentialId);
 
             return;
         }
@@ -112,9 +116,8 @@ namespace CoviIDApiCore.V1.Services
             var custodianConnection = await _connectionService.AcceptInvitation(agentInvitation.Invitation, walletId);
 
             // Create the set of credentials
-            var personalDetialsCredentials = await _credentialService.CreatePersonalDetials(agentInvitation.ConnectionId, coviIdWalletParameters.PersonalDetials);
+            var personalDetialsCredentials = await _credentialService.CreatePerson(agentInvitation.ConnectionId, coviIdWalletParameters.Person);
             var covidTestCredentials = await _credentialService.CreateCovidTest(agentInvitation.ConnectionId, coviIdWalletParameters.CovidTest);
-            var identificationCredentials = await _credentialService.CreateIdentification(agentInvitation.ConnectionId, coviIdWalletParameters.Identification);
 
             var userCredentials = await _custodianBroker.GetCredentials(walletId);
             var offeredCredentials = userCredentials.Where(x => x.State == CredentialsState.Offered);

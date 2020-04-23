@@ -149,7 +149,7 @@ namespace CoviIDApiCore
             services.AddTransient<IWalletService, WalletService>();
             services.AddTransient<IConnectionService, ConnectionService>();
             services.AddTransient<IVerifyService, VerifyService>();
-
+            services.AddTransient<ICredentialService, CredentialService>();
             services.AddScoped<IOrganisationService, OrganisationService>();
             services.AddSingleton<IAuthenticationService, AuthenticationService>();
             #endregion
