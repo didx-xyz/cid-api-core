@@ -24,4 +24,10 @@ namespace CoviIDApiCore.V1.Constants
             OrganisationWelcome
         }
     }
+
+    public enum UpdateType
+    {
+        Addition,
+        Subtraction
+    }
 }

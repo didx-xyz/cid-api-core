@@ -8,6 +8,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using CoviIDApiCore.V1.Constants;
 
 namespace CoviIDApiCore.V1.Services
 {
@@ -15,14 +16,16 @@ namespace CoviIDApiCore.V1.Services
     {
         private readonly ICustodianBroker _custodianBroker;
         private readonly IAgencyBroker _agencyBroker;
+        private readonly IOrganisationService _organisationService;
 
-        public VerifyService(ICustodianBroker custodianBroker, IAgencyBroker agencyBroker)
+        public VerifyService(ICustodianBroker custodianBroker, IAgencyBroker agencyBroker, IOrganisationService organisationService)
         {
             _custodianBroker = custodianBroker;
             _agencyBroker = agencyBroker;
+            _organisationService = organisationService;
         }
 
-        public async Task<VerifyResult> GetCredentials(string walletId)
+        public async Task<VerifyResult> GetCredentials(string walletId, string organisationId, string deviceIdentifier)
         {
             var credentialList = await _custodianBroker.GetCredentials(walletId);
 
@@ -39,6 +42,9 @@ namespace CoviIDApiCore.V1.Services
             credentials.Values.TryGetValue("CovidStatus", out string covidStatus);
 
             var enumValue = (int)Enum.Parse(typeof(CovidStatus), covidStatus);
+
+            if (!string.IsNullOrEmpty(organisationId))
+                await _organisationService.UpdateCountAsync(organisationId, deviceIdentifier, UpdateType.Addition);
 
             return new VerifyResult
             {
