@@ -108,9 +108,9 @@ namespace CoviIDApiCore.V1.Services
 
             var emailAddress = payload.FormResponse.Answers
                 .FirstOrDefault(t => string.Equals(t.Field.Reference, emailAddressRef, StringComparison.Ordinal))?
-                .Text;
+                .Email;
 
-            var qrCode = "";
+            var qrCode = "TestEmail";
             //TODO: Check receiverEmail for null
             //TODO: Generate QR code
             //TODO: Queueing

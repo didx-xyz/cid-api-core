@@ -6,7 +6,7 @@ namespace CoviIDApiCore.V1.DTOs.SendGrid
     {
         [JsonProperty("personalizations")] public Personalizations[] Personalizations { get; set; }
         [JsonProperty("from")] public SentFrom From { get; set; }
-        [JsonProperty("templateId")] public string TemplateId { get; set; }
+        [JsonProperty("template_Id")] public string TemplateId { get; set; }
     }
 
     public class Personalizations
