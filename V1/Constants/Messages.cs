@@ -6,6 +6,7 @@
         public static readonly string Misc_Success = "Success.";
         public static readonly string Misc_SomethingWentWrong = "Oops! Something went wrong. Please try again later.";
         public static readonly string Misc_ThirdParty = "Third party error.";
+        public static readonly string Misc_Unauthorized = $"Unauthorised.";
         #endregion
 
         #region DbErrors

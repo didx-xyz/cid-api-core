@@ -9,22 +9,28 @@ using Newtonsoft.Json;
 using CoviIDApiCore.Exceptions;
 using CoviIDApiCore.V1.Constants;
 using CoviIDApiCore.V1.DTOs.System;
+using CoviIDApiCore.V1.Interfaces.Services;
 
 namespace CoviIDApiCore.Middleware
 {
     public class ExceptionHandler
     {
         private readonly RequestDelegate _next;
+        private readonly IAuthenticationService _authentication;
 
-        public ExceptionHandler(RequestDelegate next)
+        public ExceptionHandler(RequestDelegate next, IAuthenticationService authentication)
         {
             _next = next;
+            _authentication = authentication;
         }
 
         public async Task Invoke(HttpContext context)
         {
             try
             {
+                if (!_authentication.IsAuthorized(context.Request.Headers["x-api-key"]))
+                    throw new UnauthorizedAccessException();
+
                 await _next(context);
             }
             catch (ValidationException e)
@@ -38,6 +44,10 @@ namespace CoviIDApiCore.Middleware
             catch (StreetCredBrokerException e)
             {
                 await HandleStreetCredBrokerException(context, e);
+            }
+            catch (UnauthorizedAccessException e)
+            {
+                await HandleUnauthorisedException(context, e);
             }
             catch (Exception e)
             {
@@ -92,6 +102,19 @@ namespace CoviIDApiCore.Middleware
             context.Response.StatusCode = (int)code;
 
             var message = Messages.Misc_SomethingWentWrong;
+
+            var rsp = new Response(false, code, message);
+            return context.Response.WriteAsync(JsonConvert.SerializeObject(rsp));
+        }
+
+        private static Task HandleUnauthorisedException(HttpContext context, Exception e)
+        {
+            var code = HttpStatusCode.Unauthorized;
+
+            context.Response.ContentType = "application/json";
+            context.Response.StatusCode = (int)code;
+
+            var message = Messages.Misc_Unauthorized;
 
             var rsp = new Response(false, code, message);
             return context.Response.WriteAsync(JsonConvert.SerializeObject(rsp));
