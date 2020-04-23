@@ -66,39 +66,39 @@ namespace CoviIDApiCore.V1.Services
                 : new Response(new OrganisationDTO(organisation, orgCounter, totalScans), HttpStatusCode.OK);
         }
 
-        public async Task<Response> UpdateCountAsync(string id, UpdateCountRequest payload)
+        public async Task UpdateCountAsync(string id, string deviceId, UpdateType updateType)
         {
             var balance = 0;
-
-            if(!payload.isValid())
-                return new Response(false, HttpStatusCode.BadRequest, Messages.Org_PayloadInvalid);
 
             var organisation = await _organisationRepository.GetAsync(Guid.Parse(id));
 
             if (organisation == default)
-                return new Response(false, HttpStatusCode.NotFound, Messages.Org_NotExists);
+                throw new NotFoundException(Messages.Org_NotExists);
 
             var lastCount = await _organisationCounterRepository.GetLastByOrganisation(organisation);
 
             balance = lastCount?.Balance ?? 0;
 
-            if(balance < 1 && payload.Movement < 0)
-                return new Response(false, HttpStatusCode.BadRequest, Messages.Org_NegBalance);
+            if(balance < 1 && updateType == UpdateType.Subtraction)
+                throw new ValidationException(Messages.Org_NegBalance);
 
             var newCount = new OrganisationCounter()
             {
                 Organisation = organisation,
                 Date = DateTime.UtcNow,
-                Movement = payload.Movement,
-                Balance = balance + payload.Movement,
-                DeviceIdentifier = payload.DeviceIdentifier
+                Movement = updateType == UpdateType.Addition
+                    ? 1
+                    : -1,
+                Balance = updateType == UpdateType.Addition
+                    ? balance + 1
+                    : balance - 1
+                ,
+                DeviceIdentifier = deviceId
             };
 
             await _organisationCounterRepository.AddAsync(newCount);
 
             await _organisationCounterRepository.SaveAsync();
-
-            return new Response(true, HttpStatusCode.OK);
         }
 
         private async Task NotifyOrganisation(string companyName, CreateOrganisationRequest payload, Organisation organisation)
