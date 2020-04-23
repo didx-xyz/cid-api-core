@@ -6,7 +6,7 @@ namespace CoviIDApiCore.V1.Controllers
     [EnableCors("AllowSpecificOrigin")]
     [Route("api/health")]
     [ApiController]
-    public class HealthController
+    public class HealthController : Controller
     {
         [HttpGet]
         public IActionResult Health()
