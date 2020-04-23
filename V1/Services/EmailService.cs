@@ -14,6 +14,8 @@ namespace CoviIDApiCore.V1.Services
         private readonly ISendGridBroker _sendGridBroker;
         private static IConfiguration _configuration;
 
+        private const string _png = "image/png";
+
         public EmailService(ISendGridBroker sendGridBroker, IConfiguration configuration)
         {
             _sendGridBroker = sendGridBroker;
@@ -48,9 +50,18 @@ namespace CoviIDApiCore.V1.Services
                     Subject = ParameterConstants.EmailSubjects[template],
                     TemplateData = new TemplateData()
                     {
-                        CompanyName = name,
-                        QR = qrCode
+                        CompanyName = name
                     }
+                }
+            };
+
+            Attachment[] attachments =
+            {
+                new Attachment()
+                {
+                    Content = qrCode,
+                    FileName = $"{name}.png",
+                    Type = _png
                 }
             };
 
@@ -64,6 +75,7 @@ namespace CoviIDApiCore.V1.Services
             {
                 Personalizations = personalizations,
                 TemplateId = ParameterConstants.TemplateIds[template],
+                Attachments = attachments,
                 From = from
             };
         }

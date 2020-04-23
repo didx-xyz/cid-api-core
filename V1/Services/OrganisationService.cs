@@ -2,7 +2,7 @@
 using System.Linq;
 using System.Net;
 using System.Threading.Tasks;
-
+using CoviIDApiCore.Exceptions;
 using CoviIDApiCore.Models.Database;
 using CoviIDApiCore.V1.Constants;
 using CoviIDApiCore.V1.DTOs.Organisation;
@@ -19,12 +19,14 @@ namespace CoviIDApiCore.V1.Services
         private readonly IOrganisationRepository _organisationRepository;
         private readonly IOrganisationCounterRepository _organisationCounterRepository;
         private readonly IEmailService _emailService;
+        private readonly IQRCodeService _qrCodeService;
 
-        public OrganisationService(IOrganisationRepository organisationRepository, IOrganisationCounterRepository organisationCounterRepository, IEmailService emailService)
+        public OrganisationService(IOrganisationRepository organisationRepository, IOrganisationCounterRepository organisationCounterRepository, IEmailService emailService, IQRCodeService qrCodeService)
         {
             _organisationRepository = organisationRepository;
             _organisationCounterRepository = organisationCounterRepository;
             _emailService = emailService;
+            _qrCodeService = qrCodeService;
         }
 
         public async Task CreateAsync(CreateOrganisationRequest payload)
@@ -99,7 +101,6 @@ namespace CoviIDApiCore.V1.Services
             return new Response(true, HttpStatusCode.OK);
         }
 
-
         private async Task NotifyOrganisation(string companyName, CreateOrganisationRequest payload, Organisation organisation)
         {
             var emailAddressRef = payload.FormResponse.Definition.Fields
@@ -110,11 +111,15 @@ namespace CoviIDApiCore.V1.Services
                 .FirstOrDefault(t => string.Equals(t.Field.Reference, emailAddressRef, StringComparison.Ordinal))?
                 .Email;
 
-            var qrCode = "TestEmail";
-            //TODO: Check receiverEmail for null
-            //TODO: Generate QR code
+            if(string.IsNullOrEmpty(emailAddress))
+                throw new ValidationException(Messages.Org_EmailEmpty);
+
             //TODO: Queueing
-            await _emailService.SendEmail(emailAddress, companyName, qrCode, ParameterConstants.EmailTemplates.OrganisationWelcome);
+            await _emailService.SendEmail(
+                emailAddress,
+                companyName,
+                _qrCodeService.GenerateQRCode(organisation.Id.ToString()),
+                ParameterConstants.EmailTemplates.OrganisationWelcome);
         }
     }
 }
