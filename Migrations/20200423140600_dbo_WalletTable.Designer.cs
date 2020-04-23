@@ -4,14 +4,16 @@ using CoviIDApiCore.Data;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 namespace CoviIDApiCore.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    partial class ApplicationDbContextModelSnapshot : ModelSnapshot
+    [Migration("20200423140600_dbo_WalletTable")]
+    partial class dbo_WalletTable
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -57,7 +59,7 @@ namespace CoviIDApiCore.Migrations
                     b.ToTable("OrganisationCounters");
                 });
 
-            modelBuilder.Entity("CoviIDApiCore.Models.Database.OtpToken", b =>
+            modelBuilder.Entity("CoviIDApiCore.Models.Database.Token", b =>
                 {
                     b.Property<long>("Id")
                         .ValueGeneratedOnAdd()
@@ -79,7 +81,7 @@ namespace CoviIDApiCore.Migrations
 
                     b.HasIndex("WalletId");
 
-                    b.ToTable("OtpTokens");
+                    b.ToTable("Tokens");
                 });
 
             modelBuilder.Entity("CoviIDApiCore.Models.Database.Wallet", b =>
@@ -103,7 +105,7 @@ namespace CoviIDApiCore.Migrations
                         .HasForeignKey("OrganisationId");
                 });
 
-            modelBuilder.Entity("CoviIDApiCore.Models.Database.OtpToken", b =>
+            modelBuilder.Entity("CoviIDApiCore.Models.Database.Token", b =>
                 {
                     b.HasOne("CoviIDApiCore.Models.Database.Wallet", "Wallet")
                         .WithMany("Tokens")

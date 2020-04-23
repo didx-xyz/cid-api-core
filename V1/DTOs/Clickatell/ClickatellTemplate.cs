@@ -1,4 +1,5 @@
-﻿using Newtonsoft.Json;
+﻿using System;
+using Newtonsoft.Json;
 
 namespace CoviIDApiCore.V1.DTOs.Clickatell
 {
@@ -8,7 +9,7 @@ namespace CoviIDApiCore.V1.DTOs.Clickatell
         [JsonProperty("to")] public string[] To { get; set; }
         [JsonProperty("from")] public string From { get; set; }
         [JsonProperty("binary")] public bool Binary { get; set; } = false;
-        [JsonProperty("clientMessageId")] public string ClientMessageId { get; set; }
+        [JsonProperty("clientMessageId")] public Guid ClientMessageId { get; set; }
         [JsonProperty("scheduledDeliveryTime")] public string ScheduledDeliveryTime { get; set; }
         [JsonProperty("userDataHeader")] public string UserDataHeader { get; set; }
         [JsonProperty("validityPeriod")] public int ValidityPeriod { get; set; }

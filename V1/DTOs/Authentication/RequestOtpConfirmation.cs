@@ -11,5 +11,8 @@ namespace CoviIDApiCore.V1.DTOs.Authentication
 
         [Required]
         public int Otp { get; set; }
+
+        [Required]
+        public string WalletId { get; set; }
     }
 }

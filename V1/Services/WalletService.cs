@@ -1,4 +1,5 @@
-﻿using CoviIDApiCore.V1.DTOs.Connection;
+﻿using System;
+using CoviIDApiCore.V1.DTOs.Connection;
 using CoviIDApiCore.V1.DTOs.Credentials;
 using CoviIDApiCore.V1.DTOs.Wallet;
 using CoviIDApiCore.V1.Interfaces.Brokers;
@@ -6,6 +7,8 @@ using CoviIDApiCore.V1.Interfaces.Services;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using CoviIDApiCore.Models.Database;
+using CoviIDApiCore.V1.Interfaces.Repositories;
 using Microsoft.Extensions.Configuration;
 
 namespace CoviIDApiCore.V1.Services
@@ -17,14 +20,17 @@ namespace CoviIDApiCore.V1.Services
         private readonly IConnectionService _connectionService;
         private readonly IConfiguration _configuration;
         private readonly IOtpService _otpService;
+        private readonly IWalletRepository _walletRepository;
 
-        public WalletService(ICustodianBroker custodianBroker, IConnectionService connectionService, IAgencyBroker agencyBroker, IConfiguration configuration, IOtpService otpService)
+        public WalletService(ICustodianBroker custodianBroker, IConnectionService connectionService, IAgencyBroker agencyBroker,
+            IConfiguration configuration, IOtpService otpService, IWalletRepository walletRepository)
         {
             _custodianBroker = custodianBroker;
             _connectionService = connectionService;
             _agencyBroker = agencyBroker;
             _configuration = configuration;
             _otpService = otpService;
+            _walletRepository = walletRepository;
         }
 
         public async Task<List<WalletContract>> GetWallets()
@@ -48,9 +54,11 @@ namespace CoviIDApiCore.V1.Services
 
             var pictureUrl = await _agencyBroker.UploadFiles(coviIdWalletParameters.Picture, response.WalletId);
 
-            _ = ContinueProcess(coviIdWalletParameters, pictureUrl, response.WalletId);
+            await ContinueProcess(coviIdWalletParameters, pictureUrl, response.WalletId);
 
-            await _otpService.GenerateAndSendOtpAsync(coviIdWalletParameters.TelNumber);
+            var newWallet = await SaveNewWalletAsync(response.WalletId);
+
+            await _otpService.GenerateAndSendOtpAsync(coviIdWalletParameters.TelNumber, newWallet);
 
             var contract = new CoviIdWalletContract
             {
@@ -60,6 +68,21 @@ namespace CoviIDApiCore.V1.Services
             };
 
             return contract;
+        }
+
+        private async Task<Wallet> SaveNewWalletAsync(string walletId)
+        {
+            var newWallet = new Wallet()
+            {
+                WalletIdentifier = walletId,
+                CreatedAt = DateTime.UtcNow
+            };
+
+            await _walletRepository.AddAsync(newWallet);
+
+            await _walletRepository.SaveAsync();
+
+            return newWallet;
         }
 
         public async Task<WalletContract> UpdateWallet(string walletId)

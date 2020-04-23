@@ -137,7 +137,8 @@ namespace CoviIDApiCore
             #region Repository Layer
             services.AddScoped<IOrganisationRepository, OrganisationRepository>();
             services.AddScoped<IOrganisationCounterRepository, OrganisationCounterRepository>();
-            services.AddScoped<ITokenRepository, TokenRepository>();
+            services.AddScoped<IOtpTokenRepository, OtpTokenRepository>();
+            services.AddScoped<IWalletRepository, WalletRepository>();
             #endregion
 
             #region Broker Layer
@@ -159,8 +160,8 @@ namespace CoviIDApiCore
             var streetCredCredentials = new StreetCredCredentials();
             _configuration.Bind(nameof(StreetCredCredentials), streetCredCredentials);
 
-            var clickatellCredentials = new ClickatellCrendentials();
-            _configuration.Bind(nameof(ClickatellCrendentials), clickatellCredentials);
+            var clickatellCredentials = new ClickatellCredentials();
+            _configuration.Bind(nameof(ClickatellCredentials), clickatellCredentials);
 
             services.AddHttpClient<IAgencyBroker, AgencyBroker>(client =>
             {
@@ -189,7 +190,7 @@ namespace CoviIDApiCore
             services.AddHttpClient<IClickatellBroker, ClickatellBroker>(client =>
                 {
                     client.BaseAddress = new Uri(clickatellCredentials.BaseUrl);
-                    client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue(clickatellCredentials.Key);
+                    client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer",clickatellCredentials.Key);
                     client.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue(_applicationJson));
                 }
             );
