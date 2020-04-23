@@ -57,6 +57,27 @@ namespace CoviIDApiCore.Migrations
                     b.ToTable("OrganisationCounters");
                 });
 
+            modelBuilder.Entity("CoviIDApiCore.Models.Database.Token", b =>
+                {
+                    b.Property<long>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
+
+                    b.Property<int>("Code");
+
+                    b.Property<DateTime>("CreatedAt");
+
+                    b.Property<DateTime>("ExpireAt");
+
+                    b.Property<string>("MobileNumber");
+
+                    b.Property<bool>("isUsed");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("Tokens");
+                });
+
             modelBuilder.Entity("CoviIDApiCore.Models.Database.OrganisationCounter", b =>
                 {
                     b.HasOne("CoviIDApiCore.Models.Database.Organisation", "Organisation")

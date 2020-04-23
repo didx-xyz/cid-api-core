@@ -8,6 +8,13 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <Compile Remove="Migrations\20200423102855_dbo_OtpTable.cs" />
+    <Compile Remove="Migrations\20200423102855_dbo_OtpTable.Designer.cs" />
+    <Compile Remove="Migrations\20200423103439_dbo_OtpTable.cs" />
+    <Compile Remove="Migrations\20200423103439_dbo_OtpTable.Designer.cs" />
+  </ItemGroup>
+
+  <ItemGroup>
     <Content Remove="appsettings.Development.json" />
     <Content Remove="appsettings.Local.json" />
   </ItemGroup>

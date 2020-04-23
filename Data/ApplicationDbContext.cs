@@ -7,6 +7,7 @@ namespace CoviIDApiCore.Data
     {
         public DbSet<Organisation> Organisations { get; set; }
         public DbSet<OrganisationCounter> OrganisationCounters { get; set; }
+        public DbSet<Token> Tokens { get; set; }
 
         public ApplicationDbContext(DbContextOptions<ApplicationDbContext> options) : base(options)
         {

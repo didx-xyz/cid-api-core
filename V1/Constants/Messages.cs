@@ -29,5 +29,9 @@
         #region QRCode
         public static readonly string QR_Failed = $"QR code generation failed.";
         #endregion
+
+        #region Attributes
+        public const string Mobile_NumberInvalid = "The mobile number entered is invalid.";
+        #endregion
     }
 }

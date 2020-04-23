@@ -10,8 +10,8 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace CoviIDApiCore.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    [Migration("20200423102855_dbo_OtpTable")]
-    partial class dbo_OtpTable
+    [Migration("20200423103709_dbo_TokenTable")]
+    partial class dbo_TokenTable
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
@@ -57,6 +57,27 @@ namespace CoviIDApiCore.Migrations
                     b.HasIndex("OrganisationId");
 
                     b.ToTable("OrganisationCounters");
+                });
+
+            modelBuilder.Entity("CoviIDApiCore.Models.Database.Token", b =>
+                {
+                    b.Property<long>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
+
+                    b.Property<int>("Code");
+
+                    b.Property<DateTime>("CreatedAt");
+
+                    b.Property<DateTime>("ExpireAt");
+
+                    b.Property<string>("MobileNumber");
+
+                    b.Property<bool>("isUsed");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("Tokens");
                 });
 
             modelBuilder.Entity("CoviIDApiCore.Models.Database.OrganisationCounter", b =>
