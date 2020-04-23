@@ -21,9 +21,9 @@ namespace CoviIDApiCore.V1.Controllers
 
         [HttpGet]
         [Route("{walletId}/covid-credentials")]
-        public async Task<IActionResult> GetCovidStatus(string walletId)
+        public async Task<IActionResult> GetCovidStatus(string walletId, string organisationId, string deviceIdentifier)
         {
-            var response = await _verifyService.GetCredentials(walletId);
+            var response = await _verifyService.GetCredentials(walletId, organisationId, deviceIdentifier);
             return Ok(new Response(response, HttpStatusCode.OK));
         }
     }

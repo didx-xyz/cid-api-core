@@ -1,6 +1,8 @@
 ﻿using System.Threading.Tasks;
 using System.Net;
+using CoviIDApiCore.V1.Constants;
 using CoviIDApiCore.V1.DTOs.Organisation;
+using CoviIDApiCore.V1.DTOs.System;
 using CoviIDApiCore.V1.Interfaces.Services;
 
 using Microsoft.AspNetCore.Cors;
@@ -37,12 +39,13 @@ namespace CoviIDApiCore.V1.Controllers
             return StatusCode(resp.Meta.Code, resp);
         }
 
-        [HttpPut("{id}")]
-        public async Task<IActionResult> UpdateCount(string id, [FromBody] UpdateCountRequest payload)
+        [HttpPut("subtract/{id}")]
+        public async Task<IActionResult> UpdateCount(string id, string deviceIdentifier)
         {
-            var resp = await _organisationService.UpdateCountAsync(id, payload);
+            await _organisationService.UpdateCountAsync(id, deviceIdentifier, UpdateType.Subtraction);
 
-            return StatusCode(resp.Meta.Code, resp);
+            return StatusCode(StatusCodes.Status200OK,
+                new Response(true, HttpStatusCode.OK, Messages.Misc_Success));
         }
     }
 }

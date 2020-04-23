@@ -4,4 +4,10 @@
     {
         public static readonly string CompanyName = "Company Name";
     }
+
+    public enum UpdateType
+    {
+        Addition,
+        Subtraction
+    }
 }
