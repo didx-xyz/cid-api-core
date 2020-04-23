@@ -1,5 +1,7 @@
 ﻿﻿using Microsoft.EntityFrameworkCore;
 using System;
+ using System.Linq;
+ using System.Threading.Tasks;
  using CoviIDApiCore.Data;
  using CoviIDApiCore.Models.Database;
  using CoviIDApiCore.V1.Interfaces.Repositories;
@@ -15,6 +17,17 @@ using System;
         {
             _context = context;
             _dbSet = _context.Tokens;
+        }
+
+        public async Task<int> GetUnusedByMobileNumber(string mobileNumber)
+        {
+            return await _dbSet
+                .Where(t => string.Equals(t.MobileNumber, mobileNumber, StringComparison.Ordinal))
+                .Where(t => !t.isUsed)
+                .Where(t => t.ExpireAt < DateTime.UtcNow)
+                .Select(t => t.Code)
+                .SingleOrDefaultAsync();
+
         }
     }
 }

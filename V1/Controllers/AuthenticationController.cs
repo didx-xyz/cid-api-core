@@ -1,6 +1,10 @@
-﻿using System.Threading.Tasks;
+﻿using System.Net;
+using System.Threading.Tasks;
+using CoviIDApiCore.V1.Constants;
 using CoviIDApiCore.V1.DTOs.Authentication;
+using CoviIDApiCore.V1.DTOs.System;
 using CoviIDApiCore.V1.Interfaces.Services;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 
 namespace CoviIDApiCore.V1.Controllers
@@ -19,7 +23,8 @@ namespace CoviIDApiCore.V1.Controllers
         {
             await _otpService.ConfirmOtpAsync(payload);
 
-            return Ok();
+            return StatusCode(StatusCodes.Status200OK,
+                new Response(true, HttpStatusCode.OK, Messages.Misc_Success));
         }
     }
 }
