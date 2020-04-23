@@ -31,7 +31,6 @@ namespace CoviIDApiCore.V1.Services
         /// <returns></returns>
         public async Task<CredentialsContract> CreatePerson(string connectionId, PersonCredentialParameters personCredential)
         {
-            // TODO : validate data
             var credentialOffer = new CredentialOfferParameters
             {
                 ConnectionId = connectionId,
@@ -54,7 +53,6 @@ namespace CoviIDApiCore.V1.Services
        
         public async Task<CredentialsContract> CreateCovidTest(string connectionId, CovidTestCredentialParameters covidTestCredential)
         {
-            // TODO : validate data
             covidTestCredential.DateIssued = DateTime.UtcNow;
             var credentialOffer = new CredentialOfferParameters
             {
