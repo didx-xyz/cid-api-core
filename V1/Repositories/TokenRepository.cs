@@ -19,15 +19,13 @@ using System;
             _dbSet = _context.Tokens;
         }
 
-        public async Task<int> GetUnusedByMobileNumber(string mobileNumber)
+        public async Task<Token> GetUnusedByMobileNumber(string mobileNumber)
         {
             return await _dbSet
                 .Where(t => string.Equals(t.MobileNumber, mobileNumber, StringComparison.Ordinal))
                 .Where(t => !t.isUsed)
-                .Where(t => t.ExpireAt < DateTime.UtcNow)
-                .Select(t => t.Code)
-                .SingleOrDefaultAsync();
-
+                .OrderByDescending(t => t.CreatedAt)
+                .FirstOrDefaultAsync();
         }
     }
 }

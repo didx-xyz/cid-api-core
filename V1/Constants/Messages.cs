@@ -30,6 +30,12 @@
         public static readonly string QR_Failed = $"QR code generation failed.";
         #endregion
 
+        #region Tokens
+        public static readonly string Token_OTPNotExist = $"OTP could not be found.";
+        public static readonly string Token_OTPExpired = $"OTP has expired.";
+        public static readonly string Token_OTPFailed = $"OTP is invalid.";
+        #endregion
+
         #region Attributes
         public const string Mobile_NumberInvalid = "The mobile number entered is invalid.";
         #endregion

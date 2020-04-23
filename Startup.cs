@@ -131,17 +131,20 @@ namespace CoviIDApiCore
             services.AddScoped<IEmailService, EmailService>();
             services.AddSingleton<IAuthenticationService, AuthenticationService>();
             services.AddTransient<IQRCodeService, QRCodeService>();
+            services.AddScoped<IOtpService, OtpService>();
             #endregion
 
             #region Repository Layer
             services.AddScoped<IOrganisationRepository, OrganisationRepository>();
             services.AddScoped<IOrganisationCounterRepository, OrganisationCounterRepository>();
+            services.AddScoped<ITokenRepository, TokenRepository>();
             #endregion
 
             #region Broker Layer
             services.AddTransient<IAgencyBroker, AgencyBroker>();
             services.AddTransient<ICustodianBroker, CustodianBroker>();
             services.AddTransient<ISendGridBroker, SendGridBroker>();
+            services.AddTransient<IClickatellBroker, ClickatellBroker>();
             #endregion
         }
 
