@@ -128,6 +128,7 @@ namespace CoviIDApiCore
 
             services.AddScoped<IOrganisationService, OrganisationService>();
             services.AddScoped<IEmailService, EmailService>();
+            services.AddSingleton<IAuthenticationService, AuthenticationService>();
             services.AddTransient<IQRCodeService, QRCodeService>();
             #endregion
 
