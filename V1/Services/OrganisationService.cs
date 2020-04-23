@@ -2,14 +2,12 @@
 using System.Linq;
 using System.Net;
 using System.Threading.Tasks;
-
 using CoviIDApiCore.Models.Database;
 using CoviIDApiCore.V1.Constants;
 using CoviIDApiCore.V1.DTOs.Organisation;
 using CoviIDApiCore.V1.DTOs.System;
 using CoviIDApiCore.V1.Interfaces.Repositories;
 using CoviIDApiCore.V1.Interfaces.Services;
-
 using Newtonsoft.Json;
 
 namespace CoviIDApiCore.V1.Services
@@ -54,7 +52,7 @@ namespace CoviIDApiCore.V1.Services
             var totalScans = _organisationCounterRepository.Count();
 
             return organisation == default
-                ? new Response(false, HttpStatusCode.NotFound,Messages.Org_NotExists)
+                ? new Response(false, HttpStatusCode.NotFound, Messages.Org_NotExists)
                 : new Response(new OrganisationDTO(organisation, orgCounter, totalScans), HttpStatusCode.OK);
         }
 
@@ -62,7 +60,7 @@ namespace CoviIDApiCore.V1.Services
         {
             var balance = 0;
 
-            if(!payload.isValid())
+            if (!payload.isValid())
                 return new Response(false, HttpStatusCode.BadRequest, Messages.Org_PayloadInvalid);
 
             var organisation = await _organisationRepository.GetAsync(Guid.Parse(id));
@@ -74,7 +72,7 @@ namespace CoviIDApiCore.V1.Services
 
             balance = lastCount?.Balance ?? 0;
 
-            if(balance < 1 && payload.Movement < 0)
+            if (balance < 1 && payload.Movement < 0)
                 return new Response(false, HttpStatusCode.BadRequest, Messages.Org_NegBalance);
 
             var newCount = new OrganisationCounter()

@@ -1,14 +1,12 @@
 ﻿using System.Net;
 using System.Threading.Tasks;
-
 using CoviIDApiCore.V1.DTOs.System;
 using CoviIDApiCore.V1.Interfaces.Services;
-
 using Microsoft.AspNetCore.Mvc;
 
 namespace CoviIDApiCore.V1.Controllers
 {
-    [Route("api/verifier/")]
+    [Route("api/verifier")]
     [ApiController]
     public class VerifierController : ControllerBase
     {

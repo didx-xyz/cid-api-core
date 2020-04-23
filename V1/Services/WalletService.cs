@@ -69,13 +69,19 @@ namespace CoviIDApiCore.V1.Services
         /// <returns></returns>
         public async Task UpdateWallet(CovidTestCredentialParameters covidTest, string walletId)
         {
+            var connectionParameters = new ConnectionParameters
+            {
+                ConnectionId = "", // Leave blank for auto generation
+                Multiparty = false,
+                Name = "CoviID", // This is the Agent name
+            };
 
-            // 1. Get credentials
-            // 2. Find existing covid credentials
-            // 3. issue new credentials.
-            // 4. revoke the previous ones
+            var agentInvitation = await _connectionService.CreateInvitation(connectionParameters);
+            var custodianConnection = await _connectionService.AcceptInvitation(agentInvitation.Invitation, walletId);
+            var offer = await _credentialService.CreateCovidTest(agentInvitation.ConnectionId, covidTest);
+            var userCredentials = await _custodianBroker.GetCredentials(walletId);
+            await _custodianBroker.AcceptCredential(walletId, offer.CredentialId);
 
-            //var credentials = await _custodianBroker.GetCredentials(walletId);
             return;
         }
 
