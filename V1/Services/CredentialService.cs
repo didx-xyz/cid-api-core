@@ -1,6 +1,10 @@
-﻿using CoviIDApiCore.V1.DTOs.Credentials;
+﻿using CoviIDApiCore.Exceptions;
+using CoviIDApiCore.Helpers;
+using CoviIDApiCore.V1.Constants;
+using CoviIDApiCore.V1.DTOs.Credentials;
 using CoviIDApiCore.V1.Interfaces.Brokers;
 using CoviIDApiCore.V1.Interfaces.Services;
+using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using static CoviIDApiCore.V1.Constants.DefinitionConstants;
@@ -35,12 +39,12 @@ namespace CoviIDApiCore.V1.Services
                 AutomaticIssuance = false,
                 CredentialValues = new Dictionary<string, string>
                 {
-                    { Attributes.FirstName , personCredential.FirstName },
-                    { Attributes.LastName, personCredential.LastName },
+                    { Attributes.FirstName , personCredential.FirstName.ValidateLength() },
+                    { Attributes.LastName, personCredential.LastName.ValidateLength() },
                     { Attributes.PhotoUrl, personCredential.Photo },
-                    { Attributes.MobileNumber , personCredential.MobileNumber.ToString() },
+                    { Attributes.MobileNumber , personCredential.MobileNumber.ValidateMobileNumber().ToString() },
                     { Attributes.IdentificationType , personCredential.IdentificationType.ToString() },
-                    { Attributes.IdentificationValue, personCredential.IdentificationValue.ToString() }
+                    { Attributes.IdentificationValue, personCredential.IdentificationValue.ValidateIdentification(personCredential.IdentificationType) }
                 }
             };
 
@@ -51,6 +55,7 @@ namespace CoviIDApiCore.V1.Services
         public async Task<CredentialsContract> CreateCovidTest(string connectionId, CovidTestCredentialParameters covidTestCredential)
         {
             // TODO : validate data
+            covidTestCredential.DateIssued = DateTime.UtcNow;
             var credentialOffer = new CredentialOfferParameters
             {
                 ConnectionId = connectionId,
@@ -58,9 +63,9 @@ namespace CoviIDApiCore.V1.Services
                 AutomaticIssuance = false,
                 CredentialValues = new Dictionary<string, string>
                 {
-                    { Attributes.ReferenceNumber , covidTestCredential.ReferenceNumber },
+                    { Attributes.ReferenceNumber , covidTestCredential.ReferenceNumber.ValidateLength() },
                     { Attributes.Laboratory , covidTestCredential.Laboratory.ToString() },
-                    { Attributes.DateTested , covidTestCredential.DateTested.ToString() },
+                    { Attributes.DateTested , covidTestCredential.DateTested.ValidateIsInPast().ToString() },
                     { Attributes.DateIssued, covidTestCredential.DateIssued.ToString() },
                     { Attributes.CovidStatus, covidTestCredential.CovidStatus.ToString() },
                 }
@@ -69,5 +74,15 @@ namespace CoviIDApiCore.V1.Services
             var credentials = await _agencyBroker.SendCredentials(credentialOffer);
             return credentials;
         }
+
+        private void ValidateLength(string item)
+        {
+            if (item.Length < 2 || item.Length > 255)
+            {
+                throw new ValidationException(Messages.Val_Length);
+            }
+            return;
+        }
+
     }
 }

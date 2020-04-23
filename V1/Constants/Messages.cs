@@ -24,5 +24,15 @@
         public static readonly string Org_NegBalance = $"Balance can not be less than 0.";
 
         #endregion
+
+        #region Validation
+        public static readonly string Val_Length = $"Invalid length.";
+        public static readonly string Val_MobileNumber = $"Invalid mobile number.";
+        public static readonly string Val_Identification = $"Invalid Identification number.";
+        public static readonly string Val_DateInPast = $"Invalid Date, date must be in the past";
+
+        
+
+        #endregion
     }
 }
