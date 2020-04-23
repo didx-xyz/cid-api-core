@@ -1,0 +1,12 @@
+﻿using System;
+
+namespace CoviIDApiCore.Models.Database
+{
+    public class Otp : BaseModel<long>
+    {
+        public int Code { get; set; }
+        public string MobileNumber { get; set; }
+        public DateTime CreatedAt { get; set; }
+        public DateTime ExpireAt { get; set; }
+    }
+}
