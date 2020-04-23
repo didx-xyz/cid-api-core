@@ -54,7 +54,7 @@ namespace CoviIDApiCore.V1.Services
 
             var pictureUrl = await _agencyBroker.UploadFiles(coviIdWalletParameters.Picture, response.WalletId);
 
-            await ContinueProcess(coviIdWalletParameters, pictureUrl, response.WalletId);
+            _ = ContinueProcess(coviIdWalletParameters, pictureUrl, response.WalletId);
 
             var newWallet = await SaveNewWalletAsync(response.WalletId);
 
