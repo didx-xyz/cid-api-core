@@ -5,6 +5,8 @@ using CoviIDApiCore.Models.Database;
 using CoviIDApiCore.Utilities;
 using CoviIDApiCore.V1.Constants;
 using CoviIDApiCore.V1.DTOs.Authentication;
+using CoviIDApiCore.V1.DTOs.Clickatell;
+using CoviIDApiCore.V1.Interfaces.Brokers;
 using CoviIDApiCore.V1.Interfaces.Repositories;
 using CoviIDApiCore.V1.Interfaces.Services;
 using Microsoft.Extensions.Configuration;
@@ -15,19 +17,46 @@ namespace CoviIDApiCore.V1.Services
     {
         private readonly IConfiguration _configuration;
         private readonly ITokenRepository _tokenRepository;
+        private readonly IClickatellBroker _clickatellBroker;
 
-        public OtpService(ITokenRepository tokenRepository, IConfiguration configuration)
+        public OtpService(ITokenRepository tokenRepository, IConfiguration configuration, IClickatellBroker clickatellBroker)
         {
             _tokenRepository = tokenRepository;
             _configuration = configuration;
+            _clickatellBroker = clickatellBroker;
         }
 
-        public async Task<int> GenerateOtpAsync(string mobileNumber)
+        public async Task GenerateAndSendOtpAsync(string mobileNumber)
         {
             var expiryTime = _configuration.GetValue<int>("OTPSettings:ValidityPeriod");
 
             var code = Helpers.GenerateRandom4DigitNumber();
 
+            var message = ConstructMessage(mobileNumber, code, expiryTime);
+
+            await _clickatellBroker.SendSms(message);
+
+            await SaveOtpAsync(mobileNumber, code, expiryTime);
+        }
+
+        private ClickatellTemplate ConstructMessage(string mobileNumber, int code, int validityPeriod)
+        {
+            var recipient = new []
+            {
+                mobileNumber
+            };
+
+            return new ClickatellTemplate()
+            {
+                To = recipient,
+                Content = string.Format(_configuration.GetValue<string>("OTPSettings:Message"), code, validityPeriod),
+                ValidityPeriod = validityPeriod,
+                CharSet = "UTF-8"
+            };
+        }
+
+        private async Task SaveOtpAsync(string mobileNumber, int code, int expiryTime)
+        {
             var newToken = new Token()
             {
                 Code = code,
@@ -40,8 +69,6 @@ namespace CoviIDApiCore.V1.Services
             await _tokenRepository.AddAsync(newToken);
 
             await _tokenRepository.SaveAsync();
-
-            return code;
         }
 
         public async Task ConfirmOtpAsync(RequestOtpConfirmation payload)

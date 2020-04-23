@@ -16,12 +16,15 @@ namespace CoviIDApiCore.V1.Services
         private readonly IAgencyBroker _agencyBroker;
         private readonly IConnectionService _connectionService;
         private readonly IConfiguration _configuration;
-        public WalletService(ICustodianBroker custodianBroker, IConnectionService connectionService, IAgencyBroker agencyBroker, IConfiguration configuration)
+        private readonly IOtpService _otpService;
+
+        public WalletService(ICustodianBroker custodianBroker, IConnectionService connectionService, IAgencyBroker agencyBroker, IConfiguration configuration, IOtpService otpService)
         {
             _custodianBroker = custodianBroker;
             _connectionService = connectionService;
             _agencyBroker = agencyBroker;
             _configuration = configuration;
+            _otpService = otpService;
         }
 
         public async Task<List<WalletContract>> GetWallets()
@@ -46,6 +49,8 @@ namespace CoviIDApiCore.V1.Services
             var pictureUrl = await _agencyBroker.UploadFiles(coviIdWalletParameters.Picture, response.WalletId);
 
             _ = ContinueProcess(coviIdWalletParameters, pictureUrl, response.WalletId);
+
+            await _otpService.GenerateAndSendOtpAsync(coviIdWalletParameters.TelNumber);
 
             var contract = new CoviIdWalletContract
             {

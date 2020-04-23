@@ -5,7 +5,7 @@ namespace CoviIDApiCore.V1.Interfaces.Services
 {
     public interface IOtpService
     {
-        Task<int> GenerateOtpAsync(string mobileNumber);
+        Task GenerateAndSendOtpAsync(string mobileNumber);
         Task ConfirmOtpAsync(RequestOtpConfirmation payload);
     }
 }
