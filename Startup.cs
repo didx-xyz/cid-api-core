@@ -30,6 +30,7 @@ namespace CoviIDApiCore
     {
         private readonly IConfiguration _configuration;
         private readonly string _environment, _connectionString, _applicationName;
+        private const string _applicationJson = "application/json";
 
         public Startup(IConfiguration configuration)
         {
@@ -155,9 +156,11 @@ namespace CoviIDApiCore
             var streetCredCredentials = new StreetCredCredentials();
             _configuration.Bind(nameof(StreetCredCredentials), streetCredCredentials);
 
+            var clickatellCredentials = new ClickatellCrendentials();
+            _configuration.Bind(nameof(ClickatellCrendentials), clickatellCredentials);
+
             services.AddHttpClient<IAgencyBroker, AgencyBroker>(client =>
             {
-                
                 client.BaseAddress = new Uri(agencyApiBaseUrl);
                 client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", streetCredCredentials.AuthorizationToken);
                 client.DefaultRequestHeaders.Add("X-Streetcred-Subscription-Key", streetCredCredentials.SubscriptionKey);
@@ -176,6 +179,15 @@ namespace CoviIDApiCore
                 {
                     client.BaseAddress = new Uri(sendGridCredentials.BaseUrl);
                     client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", sendGridCredentials.Key);
+                    client.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue(_applicationJson));
+                }
+            );
+
+            services.AddHttpClient<IClickatellBroker, ClickatellBroker>(client =>
+                {
+                    client.BaseAddress = new Uri(clickatellCredentials.BaseUrl);
+                    client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue(clickatellCredentials.Key);
+                    client.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue(_applicationJson));
                 }
             );
         }
