@@ -6,6 +6,7 @@
         public static readonly string Misc_Success = "Success.";
         public static readonly string Misc_SomethingWentWrong = "Oops! Something went wrong. Please try again later.";
         public static readonly string Misc_ThirdParty = "Third party error.";
+        public static readonly string Misc_Unauthorized = $"Unauthorised.";
         #endregion
 
         #region DbErrors
@@ -22,6 +23,11 @@
         public static readonly string Org_PayloadInvalid = $"Payload is invalid.";
         public static readonly string Org_NegBalance = $"Balance can not be less than 0.";
 
+        public static readonly string Org_EmailEmpty = $"Organisation email is empty.";
+        #endregion
+
+        #region QRCode
+        public static readonly string QR_Failed = $"QR code generation failed.";
         #endregion
     }
 }

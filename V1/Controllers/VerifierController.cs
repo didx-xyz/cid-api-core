@@ -24,6 +24,7 @@ namespace CoviIDApiCore.V1.Controllers
         public async Task<IActionResult> GetCovidStatus(string walletId, string organisationId, string deviceIdentifier)
         {
             var response = await _verifyService.GetCredentials(walletId, organisationId, deviceIdentifier);
+
             return Ok(new Response(response, HttpStatusCode.OK));
         }
     }

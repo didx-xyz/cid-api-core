@@ -1,5 +1,5 @@
 ﻿using System.Threading.Tasks;
-using System.Net;
+
 using CoviIDApiCore.V1.Constants;
 using CoviIDApiCore.V1.DTOs.Organisation;
 using CoviIDApiCore.V1.DTOs.System;
@@ -7,7 +7,7 @@ using CoviIDApiCore.V1.Interfaces.Services;
 
 using Microsoft.AspNetCore.Cors;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.AspNetCore.Http;
+
 
 namespace CoviIDApiCore.V1.Controllers
 {

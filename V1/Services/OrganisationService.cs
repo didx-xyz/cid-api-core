@@ -18,24 +18,30 @@ namespace CoviIDApiCore.V1.Services
     {
         private readonly IOrganisationRepository _organisationRepository;
         private readonly IOrganisationCounterRepository _organisationCounterRepository;
+        private readonly IEmailService _emailService;
+        private readonly IQRCodeService _qrCodeService;
 
-        public OrganisationService(IOrganisationRepository organisationRepository, IOrganisationCounterRepository organisationCounterRepository)
+        public OrganisationService(IOrganisationRepository organisationRepository, IOrganisationCounterRepository organisationCounterRepository, IEmailService emailService, IQRCodeService qrCodeService)
         {
             _organisationRepository = organisationRepository;
             _organisationCounterRepository = organisationCounterRepository;
+            _emailService = emailService;
+            _qrCodeService = qrCodeService;
         }
 
         public async Task CreateAsync(CreateOrganisationRequest payload)
         {
             var companyNameRef = payload.FormResponse.Definition.Fields
-                .FirstOrDefault(t => t.Title == ParameterConstants.CompanyName)?
+                .FirstOrDefault(t => string.Equals(t.Title, ParameterConstants.CompanyName, StringComparison.Ordinal))?
                 .Reference;
+
+            var companyName = payload.FormResponse.Answers
+                .FirstOrDefault(t => string.Equals(t.Field.Reference, companyNameRef, StringComparison.Ordinal))?
+                .Text;
 
             var organisation = new Organisation()
             {
-                Name = payload.FormResponse.Answers
-                    .FirstOrDefault(t => string.Equals(t.Field.Reference, companyNameRef, StringComparison.Ordinal))?
-                    .Text,
+                Name = companyName,
                 Payload = JsonConvert.SerializeObject(payload),
                 CreatedAt = DateTime.UtcNow
             };
@@ -43,6 +49,8 @@ namespace CoviIDApiCore.V1.Services
             await _organisationRepository.AddAsync(organisation);
 
             await _organisationRepository.SaveAsync();
+
+            await NotifyOrganisation(companyName, payload, organisation);
         }
 
         public async Task<Response> GetAsync(string id)
@@ -91,6 +99,27 @@ namespace CoviIDApiCore.V1.Services
             await _organisationCounterRepository.AddAsync(newCount);
 
             await _organisationCounterRepository.SaveAsync();
+        }
+
+        private async Task NotifyOrganisation(string companyName, CreateOrganisationRequest payload, Organisation organisation)
+        {
+            var emailAddressRef = payload.FormResponse.Definition.Fields
+                .FirstOrDefault(t => string.Equals(t.Title, ParameterConstants.EmailAdress, StringComparison.Ordinal))?
+                .Reference;
+
+            var emailAddress = payload.FormResponse.Answers
+                .FirstOrDefault(t => string.Equals(t.Field.Reference, emailAddressRef, StringComparison.Ordinal))?
+                .Email;
+
+            if(string.IsNullOrEmpty(emailAddress))
+                throw new ValidationException(Messages.Org_EmailEmpty);
+
+            //TODO: Queueing
+            await _emailService.SendEmail(
+                emailAddress,
+                companyName,
+                _qrCodeService.GenerateQRCode(organisation.Id.ToString()),
+                ParameterConstants.EmailTemplates.OrganisationWelcome);
         }
     }
 }
