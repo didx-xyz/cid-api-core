@@ -370,4 +370,4 @@ obj/
 *.orig
 
 #TestController
-TestController.cs
+*/Controllers/TestController.cs
