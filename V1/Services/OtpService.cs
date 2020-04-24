@@ -31,7 +31,7 @@ namespace CoviIDApiCore.V1.Services
         {
             var expiryTime = _configuration.GetValue<int>("OTPSettings:ValidityPeriod");
 
-            var code = Helpers.GenerateRandom4DigitNumber();
+            var code = Utilities.Helpers.GenerateRandom4DigitNumber();
 
             var message = ConstructMessage(mobileNumber, code, expiryTime, wallet);
 

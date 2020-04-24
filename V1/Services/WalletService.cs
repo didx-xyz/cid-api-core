@@ -22,6 +22,8 @@ namespace CoviIDApiCore.V1.Services
         private readonly IConnectionService _connectionService;
         private readonly ICredentialService _credentialService;
         private readonly IConfiguration _configuration;
+        private readonly IOtpService _otpService;
+        private readonly IWalletRepository _walletRepository;
         
         public WalletService(ICustodianBroker custodianBroker, IConnectionService connectionService, IAgencyBroker agencyBroker,
             IConfiguration configuration, IOtpService otpService, IWalletRepository walletRepository,
@@ -60,7 +62,7 @@ namespace CoviIDApiCore.V1.Services
 
             var newWallet = await SaveNewWalletAsync(response.WalletId);
 
-            await _otpService.GenerateAndSendOtpAsync(coviIdWalletParameters.TelNumber, newWallet);
+            await _otpService.GenerateAndSendOtpAsync(coviIdWalletParameters.Person.MobileNumber.ToString(), newWallet);
             
             BackgroundJob.Enqueue(() => ContinueProcess(coviIdWalletParameters, response.WalletId));
 
