@@ -12,7 +12,6 @@ namespace CoviIDApiCore.V1.Constants
         {
             { Schemas.Personal, "CmeqY4MWWSky5XUJppXtwn:3:CL:94569:Verified Person" },
             { Schemas.CovidTest, "CmeqY4MWWSky5XUJppXtwn:3:CL:94574:Covid Test" }
-
         };
 
         public enum Schemas
@@ -24,17 +23,12 @@ namespace CoviIDApiCore.V1.Constants
 
         public class Attributes
         {
-
-            //"schemaId": "CmeqY4MWWSky5XUJppXtwn:2:Covid Test:1.6",
-            //"definitionId": "CmeqY4MWWSky5XUJppXtwn:3:CL:94574:Covid Test"
             // Covid Test Schema
             public static readonly string ReferenceNumber = "testReferenceNumber";
             public static readonly string Laboratory = "issuedLaboratory";
             public static readonly string DateTested = "dateTested";
             public static readonly string DateIssued = "dateIssued";
             public static readonly string CovidStatus = "covidStatus";
-            //"schemaId": "CmeqY4MWWSky5XUJppXtwn:2:Verified Person:1.5",
-            //"definitionId": "CmeqY4MWWSky5XUJppXtwn:3:CL:94569:Verified Person"
             // Verifier Person Schema
             public static readonly string FirstName = "firstName";
             public static readonly string LastName = "lastName";
