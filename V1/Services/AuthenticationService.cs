@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Threading.Tasks;
 using CoviIDApiCore.V1.Interfaces.Services;
 using Microsoft.Extensions.Configuration;
 

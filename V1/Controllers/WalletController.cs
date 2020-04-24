@@ -47,13 +47,13 @@ namespace CoviIDApiCore.V1.Controllers
             return Ok(new Response(response, HttpStatusCode.OK));
         }
 
-//        [HttpPut]
-//        [Route("{walletId")]
-//        public async Task<IActionResult> UpdateWallet(string walletId)
-//        {
-//            var response = await _walletService.CreateCoviIdWallet(walletId);
-//            return Ok(new Response(response, HttpStatusCode.OK));
-//        }
+        [HttpPut]
+        [Route("{walletId}/coviid")]
+        public async Task<IActionResult> UpdateWallet([FromBody] CovidTestCredentialParameters covidTest, string walletId)
+        {
+            await _walletService.UpdateWallet(covidTest, walletId);
+            return Ok(new Response(true, HttpStatusCode.OK));
+        }
 
         [HttpDelete]
         [Route("{walletId}")]
