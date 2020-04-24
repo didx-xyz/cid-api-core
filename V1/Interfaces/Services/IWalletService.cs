@@ -13,5 +13,6 @@ namespace CoviIDApiCore.V1.Interfaces.Services
         Task UpdateWallet(CovidTestCredentialParameters covidTest, string walletId);
         Task DeleteWallet(string walletId);
         Task DeleteWallets(List<WalletParameters> wallets);
+        Task AddCredentialsToWallet(CovidTestCredentialParameters covidTest, PersonCredentialParameters person,string walletId);
     }
 }

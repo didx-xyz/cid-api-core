@@ -64,8 +64,6 @@ namespace CoviIDApiCore.V1.Services
 
             await _otpService.GenerateAndSendOtpAsync(coviIdWalletParameters.Person.MobileNumber.ToString(), newWallet);
             
-            BackgroundJob.Enqueue(() => ContinueProcess(coviIdWalletParameters, response.WalletId));
-
             var contract = new CoviIdWalletContract
             {
                 CovidStatusUrl = $"{_configuration.GetValue<string>("CoviIDBaseUrl")}/api/verifier/{response.WalletId}/covid-credentials",
@@ -130,7 +128,7 @@ namespace CoviIDApiCore.V1.Services
         }
 
         #region Private Methods
-        public async Task ContinueProcess(CoviIdWalletParameters coviIdWalletParameters, string walletId)
+        public async Task AddCredentialsToWallet(CovidTestCredentialParameters covidTest, PersonCredentialParameters person, string walletId)
         {
             var connectionParameters = new ConnectionParameters
             {
@@ -143,10 +141,11 @@ namespace CoviIDApiCore.V1.Services
             var custodianConnection = await _connectionService.AcceptInvitation(agentInvitation.Invitation, walletId);
 
             // Create the set of credentials
-            var personalDetialsCredentials = await _credentialService.CreatePerson(agentInvitation.ConnectionId, coviIdWalletParameters.Person);
-            if (coviIdWalletParameters.CovidTest != null)
+            var personalDetialsCredentials = await _credentialService.CreatePerson(agentInvitation.ConnectionId, person);
+
+            if (covidTest != null)
             {
-                var covidTestCredentials = await _credentialService.CreateCovidTest(agentInvitation.ConnectionId, coviIdWalletParameters.CovidTest);
+                var covidTestCredentials = await _credentialService.CreateCovidTest(agentInvitation.ConnectionId, covidTest);
             }
 
             var userCredentials = await _custodianBroker.GetCredentials(walletId);
