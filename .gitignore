@@ -368,3 +368,6 @@ obj/
 
 # Merge Conflicts
 *.orig
+
+#TestController
+TestController.cs

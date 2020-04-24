@@ -9,6 +9,8 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace CoviIDApiCore.V1.Controllers
 {
+    [ApiController]
+    [Route("api/auth")]
     public class AuthenticationController : Controller
     {
         private readonly IOtpService _otpService;

@@ -190,7 +190,7 @@ namespace CoviIDApiCore
             services.AddHttpClient<IClickatellBroker, ClickatellBroker>(client =>
                 {
                     client.BaseAddress = new Uri(clickatellCredentials.BaseUrl);
-                    client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer",clickatellCredentials.Key);
+                    client.DefaultRequestHeaders.TryAddWithoutValidation("Authorization",clickatellCredentials.Key);
                     client.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue(_applicationJson));
                 }
             );

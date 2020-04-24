@@ -49,6 +49,10 @@ namespace CoviIDApiCore.Middleware
             {
                 await HandleSendGridException(context, e);
             }
+            catch (ClickatellException e)
+            {
+                await HandleClickatellException(context, e);
+            }
             catch (QRException e)
             {
                 await HandleQRException(context, e);
@@ -116,6 +120,20 @@ namespace CoviIDApiCore.Middleware
             return context.Response.WriteAsync(JsonConvert.SerializeObject(rsp));
         }
 
+        private Task HandleClickatellException(HttpContext context, ClickatellException e)
+        {
+            var statusCode = HttpStatusCode.InternalServerError;
+            context.Response.ContentType = "application/json";
+            context.Response.StatusCode = (int)statusCode;
+            var message = Messages.Misc_ThirdParty;
+
+            #if DEBUG
+            message = e.Message;
+            #endif
+            var rsp = new Response(false, statusCode, message);
+            return context.Response.WriteAsync(JsonConvert.SerializeObject(rsp));
+        }
+
         private static Task HandleUnexpectedException(HttpContext context, Exception e)
         {
             var code = HttpStatusCode.InternalServerError;
@@ -141,7 +159,7 @@ namespace CoviIDApiCore.Middleware
             var rsp = new Response(false, code, message);
             return context.Response.WriteAsync(JsonConvert.SerializeObject(rsp));
         }
-        
+
         private static Task HandleUnauthorisedException(HttpContext context, Exception e)
         {
             var code = HttpStatusCode.Unauthorized;

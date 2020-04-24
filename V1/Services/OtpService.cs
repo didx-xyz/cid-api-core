@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Globalization;
 using System.Threading.Tasks;
 using CoviIDApiCore.Exceptions;
 using CoviIDApiCore.Models.Database;
@@ -49,13 +50,7 @@ namespace CoviIDApiCore.V1.Services
             return new ClickatellTemplate()
             {
                 To = recipient,
-                From = "+2776508650",
-                Content = string.Format(_configuration.GetValue<string>("OTPSettings:Message"), code.ToString(), validityPeriod.ToString()),
-                ValidityPeriod = validityPeriod,
-                ClientMessageId = wallet.Id,
-                ScheduledDeliveryTime = null,
-                UserDataHeader = "test",
-                CharSet = "UTF-8"
+                Content = string.Format(_configuration.GetValue<string>("OTPSettings:Message"), code.ToString(), validityPeriod.ToString())
             };
         }
 
@@ -80,12 +75,14 @@ namespace CoviIDApiCore.V1.Services
         {
             var token = await _otpTokenRepository.GetUnusedByWalletIdAndMobileNumber(payload.WalletId, payload.MobileNumber);
 
-            if(token == default || token.ExpireAt >= DateTime.UtcNow || token.Code != payload.Otp)
+            if(token == default || token.ExpireAt <= DateTime.UtcNow || token.Code != payload.Otp)
                 throw new ValidationException(Messages.Token_OTPNotExist);
 
             token.isUsed = true;
 
             _otpTokenRepository.Update(token);
+
+            await _otpTokenRepository.SaveAsync();
         }
     }
 }

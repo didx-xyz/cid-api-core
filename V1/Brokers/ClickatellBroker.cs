@@ -11,7 +11,6 @@ namespace CoviIDApiCore.V1.Brokers
     {
         private readonly HttpClient _httpClient;
         private static readonly string _sendPartialRoot = UrlConstants.PartialRoutes[UrlConstants.Routes.ClickatellSend];
-        private static readonly string _statusPartialRoot = UrlConstants.PartialRoutes[UrlConstants.Routes.ClickatellStatus];
 
         public ClickatellBroker(HttpClient httpClient)
         {
@@ -24,16 +23,6 @@ namespace CoviIDApiCore.V1.Brokers
 
             if(!response.IsSuccessStatusCode)
                 throw new ClickatellException(await response.Content.ReadAsStringAsync());
-        }
-
-        public async Task<string> GetStatus(string messageId)
-        {
-            var response = await _httpClient.GetAsync(string.Format(_statusPartialRoot, messageId));
-
-            if(!response.IsSuccessStatusCode)
-                throw new ClickatellException(await response.Content.ReadAsStringAsync());
-
-            return await response.Content.ReadAsStringAsync();
         }
     }
 }
