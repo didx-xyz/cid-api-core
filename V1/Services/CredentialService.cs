@@ -40,7 +40,7 @@ namespace CoviIDApiCore.V1.Services
                 {
                     { Attributes.FirstName , personCredential.FirstName.ValidateLength() },
                     { Attributes.LastName, personCredential.LastName.ValidateLength() },
-                    { Attributes.PhotoUrl, personCredential.Photo },
+                    { Attributes.Photo, personCredential.Photo },
                     { Attributes.MobileNumber , personCredential.MobileNumber.ValidateMobileNumber().ToString() },
                     { Attributes.IdentificationType , personCredential.IdentificationType.ToString() },
                     { Attributes.IdentificationValue, personCredential.IdentificationValue.ValidateIdentification(personCredential.IdentificationType) }

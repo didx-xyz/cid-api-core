@@ -32,7 +32,7 @@ namespace CoviIDApiCore.V1.Constants
             // Verifier Person Schema
             public static readonly string FirstName = "firstName";
             public static readonly string LastName = "lastName";
-            public static readonly string PhotoUrl = "photo";
+            public static readonly string Photo = "photo";
             public static readonly string MobileNumber = "mobileNumber";
             public static readonly string IdentificationType = "identificationType";
             public static readonly string IdentificationValue = "identificationValue";
