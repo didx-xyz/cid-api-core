@@ -1,4 +1,4 @@
-﻿namespace CoviIDApiCore.V1.DTOs.Wallet
+﻿namespace CoviIDApiCore.V1.DTOs.Credentials
 {
     public enum IdentificationTypes
     {

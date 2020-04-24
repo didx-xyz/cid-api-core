@@ -36,6 +36,13 @@
         public static readonly string Token_OTPFailed = $"OTP is invalid.";
         #endregion
 
+        #region Validation
+        public static readonly string Val_Length = $"Invalid length.";
+        public static readonly string Val_MobileNumber = $"Invalid mobile number.";
+        public static readonly string Val_Identification = $"Invalid Identification number.";
+        public static readonly string Val_DateInPast = $"Invalid Date, date must be in the past";
+        #endregion
+
         #region Attributes
         public const string Mobile_NumberInvalid = "The mobile number entered is invalid.";
         #endregion

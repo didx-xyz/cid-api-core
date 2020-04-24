@@ -8,7 +8,5 @@
         /// </summary>
         public string Picture { get; set; }
         public string WalletId { get; set; }
-        public string ConnectionId { get; set; }
-        public string UserConnectionId { get; set; }    
     }
 }
