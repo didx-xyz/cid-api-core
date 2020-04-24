@@ -72,15 +72,5 @@ namespace CoviIDApiCore.V1.Services
             var credentials = await _agencyBroker.SendCredentials(credentialOffer);
             return credentials;
         }
-
-        private void ValidateLength(string item)
-        {
-            if (item.Length < 2 || item.Length > 255)
-            {
-                throw new ValidationException(Messages.Val_Length);
-            }
-            return;
-        }
-
     }
 }

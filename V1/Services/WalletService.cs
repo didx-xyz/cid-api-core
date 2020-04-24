@@ -8,6 +8,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.Extensions.Configuration;
 using Hangfire;
+using static CoviIDApiCore.V1.Constants.DefinitionConstants;
 
 namespace CoviIDApiCore.V1.Services
 {
@@ -81,8 +82,7 @@ namespace CoviIDApiCore.V1.Services
             var offer = await _credentialService.CreateCovidTest(agentInvitation.ConnectionId, covidTest);
             var userCredentials = await _custodianBroker.GetCredentials(walletId);
 
-            string test = "";
-            var thisOffer = userCredentials.FirstOrDefault(c => c.CredentialId == test);
+            var thisOffer = userCredentials.FirstOrDefault(c => c.State == CredentialsState.Requested && c.DefinitionId == DefinitionIds[Schemas.CovidTest]);
 
             await _custodianBroker.AcceptCredential(walletId, thisOffer.CredentialId);
 
@@ -117,7 +117,10 @@ namespace CoviIDApiCore.V1.Services
 
             // Create the set of credentials
             var personalDetialsCredentials = await _credentialService.CreatePerson(agentInvitation.ConnectionId, coviIdWalletParameters.Person);
-            var covidTestCredentials = await _credentialService.CreateCovidTest(agentInvitation.ConnectionId, coviIdWalletParameters.CovidTest);
+            if (coviIdWalletParameters.CovidTest != null)
+            {
+                var covidTestCredentials = await _credentialService.CreateCovidTest(agentInvitation.ConnectionId, coviIdWalletParameters.CovidTest);
+            }
 
             var userCredentials = await _custodianBroker.GetCredentials(walletId);
             var offeredCredentials = userCredentials.Where(x => x.State == CredentialsState.Offered);
@@ -130,6 +133,7 @@ namespace CoviIDApiCore.V1.Services
                     await _custodianBroker.AcceptCredential(walletId, offer.CredentialId);
                 }
             }
+            return;
         }
         #endregion
     }

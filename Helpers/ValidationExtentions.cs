@@ -16,10 +16,10 @@ namespace CoviIDApiCore.Helpers
             throw new ValidationException(Messages.Val_Length);
         }
 
-        public static int ValidateMobileNumber(this int num)
+        public static long ValidateMobileNumber(this long num)
         {
             var lenght = num.ToString().Length;
-            if (lenght > 10 && lenght < 16)
+            if (lenght > 9 && lenght < 16)
             {
                 return num;
             }
@@ -46,7 +46,8 @@ namespace CoviIDApiCore.Helpers
 
         public static DateTime ValidateIsInPast(this DateTime date)
         {
-            if (date > DateTime.Today)
+            var test = new DateTime();
+            if (date > DateTime.Today && date == test)
                 throw new ValidationException(Messages.Val_DateInPast);
 
             return date;
