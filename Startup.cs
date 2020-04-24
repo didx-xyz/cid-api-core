@@ -151,7 +151,9 @@ namespace CoviIDApiCore
             services.AddTransient<IVerifyService, VerifyService>();
             services.AddTransient<ICredentialService, CredentialService>();
             services.AddScoped<IOrganisationService, OrganisationService>();
+            services.AddScoped<IEmailService, EmailService>();
             services.AddSingleton<IAuthenticationService, AuthenticationService>();
+            services.AddTransient<IQRCodeService, QRCodeService>();
             #endregion
 
             #region Repository Layer
@@ -162,6 +164,7 @@ namespace CoviIDApiCore
             #region Broker Layer
             services.AddTransient<IAgencyBroker, AgencyBroker>();
             services.AddTransient<ICustodianBroker, CustodianBroker>();
+            services.AddTransient<ISendGridBroker, SendGridBroker>();
             #endregion
         }
 
@@ -170,6 +173,8 @@ namespace CoviIDApiCore
             var agencyApiBaseUrl = _configuration.GetConnectionString("AgencyApiBaseUrl");
             var custodianApiBaseUrl = _configuration.GetConnectionString("CustodianApiBaseUrl");
             var tenantId = _configuration.GetValue<string>("TenantId");
+            var sendGridCredentials = new SendGridCredentials();
+            _configuration.Bind(nameof(SendGridCredentials), sendGridCredentials);
 
             var streetCredCredentials = new StreetCredCredentials();
             _configuration.Bind(nameof(StreetCredCredentials), streetCredCredentials);
@@ -190,6 +195,13 @@ namespace CoviIDApiCore
                 client.DefaultRequestHeaders.Add("X-Streetcred-Subscription-Key", streetCredCredentials.SubscriptionKey);
                 client.DefaultRequestHeaders.Add("X-Streetcred-Tenant-Id", tenantId);
             });
+
+            services.AddHttpClient<ISendGridBroker, SendGridBroker>(client =>
+                {
+                    client.BaseAddress = new Uri(sendGridCredentials.BaseUrl);
+                    client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", sendGridCredentials.Key);
+                }
+            );
         }
 
         private void ConfigureSwagger(IServiceCollection services)

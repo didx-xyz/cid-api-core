@@ -23,6 +23,11 @@
         public static readonly string Org_PayloadInvalid = $"Payload is invalid.";
         public static readonly string Org_NegBalance = $"Balance can not be less than 0.";
 
+        public static readonly string Org_EmailEmpty = $"Organisation email is empty.";
+        #endregion
+
+        #region QRCode
+        public static readonly string QR_Failed = $"QR code generation failed.";
         #endregion
 
         #region Validation
