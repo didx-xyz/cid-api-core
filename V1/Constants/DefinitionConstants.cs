@@ -7,6 +7,8 @@ namespace CoviIDApiCore.V1.Constants
         #region Strings
         public static readonly string CompanyName = "Company Name";
         public static readonly string EmailAdress = "Email Address";
+        public static readonly string AgentName = "CoviID";
+        #endregion
 
         public class Attributes
         {
@@ -24,7 +26,6 @@ namespace CoviIDApiCore.V1.Constants
             public static readonly string IdentificationType = "identificationType";
             public static readonly string IdentificationValue = "identificationValue";
         }
-        #endregion
 
         public static Dictionary<EmailTemplates, string> TemplateIds = new Dictionary<EmailTemplates, string>
         {

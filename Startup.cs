@@ -163,6 +163,7 @@ namespace CoviIDApiCore
             services.AddScoped<IOrganisationCounterRepository, OrganisationCounterRepository>();
             services.AddScoped<IOtpTokenRepository, OtpTokenRepository>();
             services.AddScoped<IWalletRepository, WalletRepository>();
+            services.AddScoped<ICovidTestRepository, CovidTestRepository>();
             #endregion
 
             #region Broker Layer

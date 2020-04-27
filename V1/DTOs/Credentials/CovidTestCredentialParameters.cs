@@ -1,5 +1,4 @@
-﻿using CoviIDApiCore.V1.DTOs.Wallet;
-using System;
+﻿using System;
 
 namespace CoviIDApiCore.V1.DTOs.Credentials
 {
@@ -10,5 +9,6 @@ namespace CoviIDApiCore.V1.DTOs.Credentials
         public CovidStatus CovidStatus { get; set; }
         public Laboratory Laboratory { get; set; }
         public string ReferenceNumber { get; set; }
+        public bool HasConsent { get; set; }
     }
 }
