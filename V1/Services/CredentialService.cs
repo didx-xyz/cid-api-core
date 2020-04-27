@@ -2,7 +2,6 @@
 using CoviIDApiCore.Models.Database;
 using CoviIDApiCore.V1.DTOs.Connection;
 using CoviIDApiCore.V1.DTOs.Credentials;
-using CoviIDApiCore.V1.DTOs.Wallet;
 using CoviIDApiCore.V1.Interfaces.Brokers;
 using CoviIDApiCore.V1.Interfaces.Repositories;
 using CoviIDApiCore.V1.Interfaces.Services;
@@ -188,9 +187,11 @@ namespace CoviIDApiCore.V1.Services
                     PermissionGrantedAt = DateTime.Now,
                     ReferenceNumber = covidTestParameters.ReferenceNumber,
                     WalletId = walletId,
-                    CredentialIndicator = CredentialIndicator.Added
+                    CredentialIndicator = CredentialIndicator.Added.ToString()
                 };
                 await _covidTestRepository.AddAsync(covidTest);
+                await _covidTestRepository.SaveAsync();
+
             }
             return;
         }

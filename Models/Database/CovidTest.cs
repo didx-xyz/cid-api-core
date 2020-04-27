@@ -1,5 +1,4 @@
 ﻿using CoviIDApiCore.V1.DTOs.Credentials;
-using CoviIDApiCore.V1.DTOs.Wallet;
 using System;
 
 namespace CoviIDApiCore.Models.Database
@@ -14,7 +13,7 @@ namespace CoviIDApiCore.Models.Database
         /// <summary>
         /// Idicates the credential progress
         /// </summary>
-        public CredentialIndicator CredentialIndicator { get; set; }
+        public string CredentialIndicator { get; set; }
         public DateTime DateTested { get; set; }
         internal DateTime DateIssued { get; set; }
         public CovidStatus CovidStatus { get; set; }
