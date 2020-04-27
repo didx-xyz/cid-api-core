@@ -8,6 +8,7 @@ namespace CoviIDApiCore.V1.Constants
         public static readonly string CompanyName = "Company Name";
         public static readonly string EmailAdress = "Email Address";
         public static readonly string OrganisationEndpoint = "/api/organisation";
+        public static readonly string AgentName = "CoviID";
         #endregion
 
         public static Dictionary<EmailTemplates, string> TemplateIds = new Dictionary<EmailTemplates, string>
@@ -38,7 +39,6 @@ namespace CoviIDApiCore.V1.Constants
         public enum Schemas
         {
             Person,
-            Identification,
             CovidTest
         }
 

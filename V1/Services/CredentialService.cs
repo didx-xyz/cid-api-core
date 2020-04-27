@@ -2,6 +2,7 @@
 using CoviIDApiCore.Models.Database;
 using CoviIDApiCore.V1.DTOs.Connection;
 using CoviIDApiCore.V1.DTOs.Credentials;
+using CoviIDApiCore.V1.DTOs.Wallet;
 using CoviIDApiCore.V1.Interfaces.Brokers;
 using CoviIDApiCore.V1.Interfaces.Repositories;
 using CoviIDApiCore.V1.Interfaces.Services;
@@ -87,13 +88,14 @@ namespace CoviIDApiCore.V1.Services
             }
             return credentials;
         }
+
         public async Task CreatePersonAndCovidTestCredentials(CovidTestCredentialParameters covidTest, PersonCredentialParameters person, string walletId)
         {
             var connectionParameters = new ConnectionParameters
             {
                 ConnectionId = "", // Leave blank for auto generation
                 Multiparty = false,
-                Name = "CoviID", // This is the Agent name
+                Name = AgentName
             };
 
             var agentInvitation = await _connectionService.CreateInvitation(connectionParameters);
@@ -117,6 +119,61 @@ namespace CoviIDApiCore.V1.Services
             return;
         }
 
+        public async Task<CoviIDCredentialContract> GetCoviIDCredentials(string walletId)
+        {
+            var allCredentials = await _custodianBroker.GetCredentials(walletId);
+            var offeredCredentials = allCredentials.Where(x => x.State == CredentialsState.Requested).ToList();
+
+            var verifiedPerson = offeredCredentials.FirstOrDefault(p => p.DefinitionId == DefinitionIds[Schemas.Person]);
+            var covidTest = offeredCredentials.Where(c => c.DefinitionId == DefinitionIds[Schemas.CovidTest])
+                .OrderBy(c => c.Values.TryGetValue(Attributes.DateIssued, out var dateIssued)).ToList().FirstOrDefault();
+
+            if (verifiedPerson != null)
+            {
+                //TODO: Optimize
+                verifiedPerson.Values.TryGetValue(Attributes.FirstName, out string firstName);
+                verifiedPerson.Values.TryGetValue(Attributes.LastName, out string lastName);
+                verifiedPerson.Values.TryGetValue(Attributes.Photo, out string photo);
+                verifiedPerson.Values.TryGetValue(Attributes.MobileNumber, out string mobileNumber);
+                verifiedPerson.Values.TryGetValue(Attributes.IdentificationType, out string identificationTypeStr);
+                verifiedPerson.Values.TryGetValue(Attributes.IdentificationValue, out string identificationValue);
+
+                covidTest.Values.TryGetValue(Attributes.ReferenceNumber, out string referenceNumber);
+                covidTest.Values.TryGetValue(Attributes.Laboratory, out string laboratoryStr);
+                covidTest.Values.TryGetValue(Attributes.DateTested, out string dateTested);
+                covidTest.Values.TryGetValue(Attributes.DateIssued, out string dateIssued);
+                covidTest.Values.TryGetValue(Attributes.CovidStatus, out string covidStatusStr);
+
+
+                var laboratory = (Laboratory)Enum.Parse(typeof(Laboratory), laboratoryStr);
+                var identificationTypes = (IdentificationTypes)Enum.Parse(typeof(IdentificationTypes), identificationTypeStr);
+                var covidStatus = (CovidStatus)Enum.Parse(typeof(CovidStatus), covidStatusStr);
+
+
+                return new CoviIDCredentialContract
+                {
+                    CovidTestCredentials = new CovidTestCredentialParameters
+                    {
+                        DateIssued = DateTime.Parse(dateIssued),
+                        DateTested = DateTime.Parse(dateTested),
+                        Laboratory = laboratory,
+                        ReferenceNumber = referenceNumber,
+                        CovidStatus = covidStatus,
+                    },
+                    PersonCredentials = new PersonCredentialParameters
+                    {
+                        FirstName = firstName,
+                        LastName = lastName,
+                        IdentificationType = identificationTypes,
+                        IdentificationValue = identificationValue,
+                        MobileNumber = long.Parse(mobileNumber),
+                        Photo = photo
+                    }
+                };
+            }
+            //TODO : throw exception/handle
+            return null;
+        }
         private async void StoreCoviIDCredentials(CovidTestCredentialParameters covidTestParameters, string walletId)
         {
             if (covidTestParameters.HasConsent)
