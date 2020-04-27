@@ -3,6 +3,6 @@
     public class RequestResendOtp
     {
         public string WalletId { get; set; }
-        public int MobileNumber { get; set; }
+        public long MobileNumber { get; set; }
     }
 }
