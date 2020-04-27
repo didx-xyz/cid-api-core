@@ -9,7 +9,6 @@ using CoviIDApiCore.V1.DTOs.Organisation;
 using CoviIDApiCore.V1.DTOs.System;
 using CoviIDApiCore.V1.Interfaces.Repositories;
 using CoviIDApiCore.V1.Interfaces.Services;
-
 using Newtonsoft.Json;
 
 namespace CoviIDApiCore.V1.Services
@@ -62,7 +61,7 @@ namespace CoviIDApiCore.V1.Services
             var totalScans = _organisationCounterRepository.Count();
 
             return organisation == default
-                ? new Response(false, HttpStatusCode.NotFound,Messages.Org_NotExists)
+                ? new Response(false, HttpStatusCode.NotFound, Messages.Org_NotExists)
                 : new Response(new OrganisationDTO(organisation, orgCounter, totalScans), HttpStatusCode.OK);
         }
 

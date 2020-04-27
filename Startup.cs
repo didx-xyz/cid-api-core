@@ -24,6 +24,8 @@ using CoviIDApiCore.V1.Interfaces.Repositories;
 using CoviIDApiCore.V1.Interfaces.Services;
 using CoviIDApiCore.V1.Repositories;
 using CoviIDApiCore.V1.Services;
+using Hangfire;
+using Hangfire.SqlServer;
 
 namespace CoviIDApiCore
 {
@@ -45,6 +47,7 @@ namespace CoviIDApiCore
         {
             ConfigureCORS(services);
             ConfigureSwagger(services);
+            ConfigureHangfire(services);
 
             services.AddMvc()
                 .SetCompatibilityVersion(CompatibilityVersion.Version_2_2)
@@ -67,8 +70,9 @@ namespace CoviIDApiCore
 
         public void Configure(IApplicationBuilder app, IHostingEnvironment env)
         {
-            if (env.IsDevelopment() || env.IsEnvironment("Local"))
+            if (!env.IsProduction())
             {
+                app.UseHangfireDashboard();
                 app.UseDeveloperExceptionPage();
                 app.UseSwagger();              
                 app.UseSwaggerUI(swagger =>
@@ -105,6 +109,26 @@ namespace CoviIDApiCore
                     options => options.EnableRetryOnFailure())
             );
         }
+        private void ConfigureHangfire(IServiceCollection services)
+        {
+            services.AddHangfire(configuration => configuration
+            .SetDataCompatibilityLevel(CompatibilityLevel.Version_170)
+            .UseSimpleAssemblyNameTypeSerializer()
+            .UseRecommendedSerializerSettings()
+            .UseSqlServerStorage(_configuration.GetConnectionString("HangfireConnection"),
+                new SqlServerStorageOptions
+                {
+                    CommandBatchMaxTimeout = TimeSpan.FromMinutes(5),
+                    SlidingInvisibilityTimeout = TimeSpan.FromMinutes(5),
+                    QueuePollInterval = TimeSpan.Zero,
+                    UseRecommendedIsolationLevel = true,
+                    UsePageLocksOnDequeue = true,
+                    DisableGlobalLocks = true,
+                }));
+
+            // This adds the processing server as IHostedService
+            services.AddHangfireServer();
+        }
 
         private void ConfigureCORS(IServiceCollection services)
         {
@@ -126,7 +150,7 @@ namespace CoviIDApiCore
             services.AddTransient<IWalletService, WalletService>();
             services.AddTransient<IConnectionService, ConnectionService>();
             services.AddTransient<IVerifyService, VerifyService>();
-
+            services.AddTransient<ICredentialService, CredentialService>();
             services.AddScoped<IOrganisationService, OrganisationService>();
             services.AddScoped<IEmailService, EmailService>();
             services.AddSingleton<IAuthenticationService, AuthenticationService>();
