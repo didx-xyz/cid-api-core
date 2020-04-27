@@ -75,6 +75,10 @@ namespace CoviIDApiCore.V1.Services
             };
 
             var credentials = await _agencyBroker.SendCredentials(credentialOffer);
+            if (covidTestCredential.HasConsent)
+            {
+                // store information in DB to be verified at a later stage.
+            }
             return credentials;
         }
         public async Task CreatePersonAndCovidTestCredentials(CovidTestCredentialParameters covidTest, PersonCredentialParameters person, string walletId)
