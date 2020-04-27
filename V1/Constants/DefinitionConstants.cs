@@ -12,8 +12,7 @@ namespace CoviIDApiCore.V1.Constants
 
         public static Dictionary<EmailTemplates, string> TemplateIds = new Dictionary<EmailTemplates, string>
         {
-            { EmailTemplates.OrganisationWelcome, "d-5ceb0422ddfd4850b361255bcc30fde2" } //TODO: When Sendgrid account is fixed we need to switch this
-            //{ EmailTemplates.OrganisationWelcome, "d-4907d7c6ce1943f692c5b91d2612a7b6" }
+            { EmailTemplates.OrganisationWelcome, "d-5ceb0422ddfd4850b361255bcc30fde2" }
         };
 
         public static Dictionary<EmailTemplates, string> EmailSubjects = new Dictionary<EmailTemplates, string>

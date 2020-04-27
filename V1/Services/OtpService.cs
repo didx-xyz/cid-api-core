@@ -26,8 +26,9 @@ namespace CoviIDApiCore.V1.Services
         private readonly IConnectionService _connectionService;
         private readonly ICredentialService _credentialService;
         private readonly ICustodianBroker _custodianBroker;
+        private readonly IWalletRepository _walletRepository;
 
-        public OtpService(IOtpTokenRepository tokenRepository, IConfiguration configuration, IClickatellBroker clickatellBroker, ICustodianBroker custodianBroker, ICredentialService credentialService, IConnectionService connectionService)
+        public OtpService(IOtpTokenRepository tokenRepository, IConfiguration configuration, IClickatellBroker clickatellBroker, ICustodianBroker custodianBroker, ICredentialService credentialService, IConnectionService connectionService, IWalletRepository walletRepository)
         {
             _otpTokenRepository = tokenRepository;
             _configuration = configuration;
@@ -35,6 +36,7 @@ namespace CoviIDApiCore.V1.Services
             _custodianBroker = custodianBroker;
             _credentialService = credentialService;
             _connectionService = connectionService;
+            _walletRepository = walletRepository;
         }
 
         public async Task GenerateAndSendOtpAsync(string mobileNumber, Wallet wallet)
@@ -48,6 +50,16 @@ namespace CoviIDApiCore.V1.Services
             await _clickatellBroker.SendSms(message);
 
             await SaveOtpAsync(mobileNumber, code, expiryTime, wallet);
+        }
+
+        public async Task ResendOtp(RequestResendOtp payload)
+        {
+            var wallet = await _walletRepository.GetByWalletIdentifier(payload.WalletId);
+
+            if(wallet == default)
+                throw new NotFoundException();
+
+            await GenerateAndSendOtpAsync(payload.MobileNumber.ToString(), wallet);
         }
 
         private ClickatellTemplate ConstructMessage(string mobileNumber, int code, int validityPeriod, Wallet wallet)
