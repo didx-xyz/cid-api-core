@@ -8,6 +8,23 @@ namespace CoviIDApiCore.V1.Constants
         public static readonly string CompanyName = "Company Name";
         public static readonly string EmailAdress = "Email Address";
         public static readonly string OrganisationEndpoint = "/api/organisation";
+
+        public class Attributes
+        {
+            // Covid Test Schema
+            public static readonly string ReferenceNumber = "testReferenceNumber";
+            public static readonly string Laboratory = "issuedLaboratory";
+            public static readonly string DateTested = "dateTested";
+            public static readonly string DateIssued = "dateIssued";
+            public static readonly string CovidStatus = "covidStatus";
+            // Verifier Person Schema
+            public static readonly string FirstName = "firstName";
+            public static readonly string LastName = "lastName";
+            public static readonly string Photo = "photo";
+            public static readonly string MobileNumber = "mobileNumber";
+            public static readonly string IdentificationType = "identificationType";
+            public static readonly string IdentificationValue = "identificationValue";
+        }
         #endregion
 
         public static Dictionary<EmailTemplates, string> TemplateIds = new Dictionary<EmailTemplates, string>
@@ -39,23 +56,6 @@ namespace CoviIDApiCore.V1.Constants
         {
             Person,
             CovidTest
-        }
-
-        public class Attributes
-        {
-            // Covid Test Schema
-            public static readonly string ReferenceNumber = "testReferenceNumber";
-            public static readonly string Laboratory = "issuedLaboratory";
-            public static readonly string DateTested = "dateTested";
-            public static readonly string DateIssued = "dateIssued";
-            public static readonly string CovidStatus = "covidStatus";
-            // Verifier Person Schema
-            public static readonly string FirstName = "firstName";
-            public static readonly string LastName = "lastName";
-            public static readonly string Photo = "photo";
-            public static readonly string MobileNumber = "mobileNumber";
-            public static readonly string IdentificationType = "identificationType";
-            public static readonly string IdentificationValue = "identificationValue";
         }
     }
 
