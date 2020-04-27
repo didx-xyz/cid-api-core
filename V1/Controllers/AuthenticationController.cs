@@ -28,5 +28,14 @@ namespace CoviIDApiCore.V1.Controllers
             return StatusCode(StatusCodes.Status200OK,
                 new Response(true, HttpStatusCode.OK, Messages.Misc_Success));
         }
+
+        [HttpPost("otp/resend")]
+        public async Task<IActionResult> ResendOtp([FromBody] RequestResendOtp payload)
+        {
+            await _otpService.ResendOtp(payload);
+
+            return StatusCode(StatusCodes.Status200OK,
+                new Response(true, HttpStatusCode.OK, Messages.Misc_Success));
+        }
     }
 }
