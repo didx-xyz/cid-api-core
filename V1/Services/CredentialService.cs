@@ -119,19 +119,23 @@ namespace CoviIDApiCore.V1.Services
 
         private async void StoreCoviIDCredentials(CovidTestCredentialParameters covidTestParameters, string walletId)
         {
-            var covidTest = new CovidTest
+            if (covidTestParameters.HasConsent)
             {
-                CovidStatus = covidTestParameters.CovidStatus,
-                DateIssued = covidTestParameters.DateIssued,
-                DateTested = covidTestParameters.DateTested,
-                HasConsent = covidTestParameters.HasConsent,
-                Laboratory = covidTestParameters.Laboratory,
-                PermissionGrantedAt = DateTime.Now,
-                ReferenceNumber = covidTestParameters.ReferenceNumber,
-                WalletId = walletId,
-                CredentialsVerified = false
-            };
-            await _covidTestRepository.AddAsync(covidTest);
+                var covidTest = new CovidTest
+                {
+                    CovidStatus = covidTestParameters.CovidStatus,
+                    DateIssued = covidTestParameters.DateIssued,
+                    DateTested = covidTestParameters.DateTested,
+                    HasConsent = covidTestParameters.HasConsent,
+                    Laboratory = covidTestParameters.Laboratory,
+                    PermissionGrantedAt = DateTime.Now,
+                    ReferenceNumber = covidTestParameters.ReferenceNumber,
+                    WalletId = walletId,
+                    CredentialIndicator = CredentialIndicator.Added
+                };
+                await _covidTestRepository.AddAsync(covidTest);
+            }
+            return;
         }
     }
 }
