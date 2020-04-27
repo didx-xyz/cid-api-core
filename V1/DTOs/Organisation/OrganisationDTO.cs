@@ -6,6 +6,7 @@ namespace CoviIDApiCore.V1.DTOs.Organisation
     {
         public string Id { get; set; }
         public int? Balance { get; set; }
+        public string Name { get; set; }
         public int Total { get; set; }
 
         public OrganisationDTO()
@@ -17,6 +18,7 @@ namespace CoviIDApiCore.V1.DTOs.Organisation
         {
             Id = organisation.Id.ToString();
             Balance = orgCounter?.Balance ?? 0;
+            Name = organisation.Name;
             Total = total;
         }
     }
