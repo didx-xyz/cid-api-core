@@ -40,7 +40,7 @@ namespace CoviIDApiCore.V1.Controllers
 
         [HttpPost]
         [Route("coviid")]
-        public async Task<IActionResult> CreateCoviIdWallet(CoviIdWalletParameters coviIdWalletParameters)
+        public async Task<IActionResult> CreateCoviIdWallet([FromBody] CoviIdWalletParameters coviIdWalletParameters)
         {
             var response = await _walletService.CreateCoviIdWallet(coviIdWalletParameters);
 
