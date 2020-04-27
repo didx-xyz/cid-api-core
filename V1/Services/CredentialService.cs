@@ -187,7 +187,7 @@ namespace CoviIDApiCore.V1.Services
                     PermissionGrantedAt = DateTime.Now,
                     ReferenceNumber = covidTestParameters.ReferenceNumber,
                     WalletId = walletId,
-                    CredentialIndicator = CredentialIndicator.Added.ToString()
+                    CredentialIndicator = CredentialIndicator.Added
                 };
                 await _covidTestRepository.AddAsync(covidTest);
                 await _covidTestRepository.SaveAsync();
