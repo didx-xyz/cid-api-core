@@ -31,7 +31,7 @@ namespace CoviIDApiCore.V1.Services
         public async Task CreateAsync(CreateOrganisationRequest payload)
         {
             var companyNameRef = payload.FormResponse.Definition.Fields
-                .FirstOrDefault(t => string.Equals(t.Title, ParameterConstants.CompanyName, StringComparison.Ordinal))?
+                .FirstOrDefault(t => string.Equals(t.Title, DefinitionConstants.CompanyName, StringComparison.Ordinal))?
                 .Reference;
 
             var companyName = payload.FormResponse.Answers
@@ -103,7 +103,7 @@ namespace CoviIDApiCore.V1.Services
         private async Task NotifyOrganisation(string companyName, CreateOrganisationRequest payload, Organisation organisation)
         {
             var emailAddressRef = payload.FormResponse.Definition.Fields
-                .FirstOrDefault(t => string.Equals(t.Title, ParameterConstants.EmailAdress, StringComparison.Ordinal))?
+                .FirstOrDefault(t => string.Equals(t.Title, DefinitionConstants.EmailAdress, StringComparison.Ordinal))?
                 .Reference;
 
             var emailAddress = payload.FormResponse.Answers
@@ -118,7 +118,7 @@ namespace CoviIDApiCore.V1.Services
                 emailAddress,
                 companyName,
                 _qrCodeService.GenerateQRCode(organisation.Id.ToString()),
-                ParameterConstants.EmailTemplates.OrganisationWelcome);
+                DefinitionConstants.EmailTemplates.OrganisationWelcome);
         }
     }
 }

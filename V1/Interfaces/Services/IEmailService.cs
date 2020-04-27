@@ -7,6 +7,6 @@ namespace CoviIDApiCore.V1.Interfaces.Services
 {
     public interface IEmailService
     {
-        Task<Response> SendEmail(string receiverEmail, string receiverName, string qrCode, ParameterConstants.EmailTemplates template);
+        Task<Response> SendEmail(string receiverEmail, string receiverName, string qrCode, DefinitionConstants.EmailTemplates template);
     }
 }

@@ -21,6 +21,8 @@ namespace CoviIDApiCore.V1.Interfaces.Repositories
 
         Task<int> SaveAsync();
 
+        void Update(TEntity entity);
+
         int Count();
     }
 }

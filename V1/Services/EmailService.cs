@@ -22,7 +22,7 @@ namespace CoviIDApiCore.V1.Services
             _configuration = configuration;
         }
 
-        public async Task<Response> SendEmail(string receiverEmail, string receiverName, string qrCode, ParameterConstants.EmailTemplates template)
+        public async Task<Response> SendEmail(string receiverEmail, string receiverName, string qrCode, DefinitionConstants.EmailTemplates template)
         {
             var message = ConstructMessage(receiverEmail, receiverName, qrCode, template);
 
@@ -31,7 +31,7 @@ namespace CoviIDApiCore.V1.Services
             return new Response(true, HttpStatusCode.OK);
         }
 
-        private static SendGridTemplate ConstructMessage(string email, string name, string qrCode, ParameterConstants.EmailTemplates template)
+        private static SendGridTemplate ConstructMessage(string email, string name, string qrCode, DefinitionConstants.EmailTemplates template)
         {
             SendTo[] recipient =
             {
@@ -47,7 +47,7 @@ namespace CoviIDApiCore.V1.Services
                 new Personalizations()
                 {
                     To = recipient,
-                    Subject = ParameterConstants.EmailSubjects[template],
+                    Subject = DefinitionConstants.EmailSubjects[template],
                     TemplateData = new TemplateData()
                     {
                         CompanyName = name
@@ -74,7 +74,7 @@ namespace CoviIDApiCore.V1.Services
             return new SendGridTemplate()
             {
                 Personalizations = personalizations,
-                TemplateId = ParameterConstants.TemplateIds[template],
+                TemplateId = DefinitionConstants.TemplateIds[template],
                 Attachments = attachments,
                 From = from
             };

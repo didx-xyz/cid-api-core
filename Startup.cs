@@ -32,6 +32,7 @@ namespace CoviIDApiCore
     {
         private readonly IConfiguration _configuration;
         private readonly string _environment, _connectionString, _applicationName;
+        private const string _applicationJson = "application/json";
 
         public Startup(IConfiguration configuration)
         {
@@ -154,17 +155,21 @@ namespace CoviIDApiCore
             services.AddScoped<IEmailService, EmailService>();
             services.AddSingleton<IAuthenticationService, AuthenticationService>();
             services.AddTransient<IQRCodeService, QRCodeService>();
+            services.AddScoped<IOtpService, OtpService>();
             #endregion
 
             #region Repository Layer
             services.AddScoped<IOrganisationRepository, OrganisationRepository>();
             services.AddScoped<IOrganisationCounterRepository, OrganisationCounterRepository>();
+            services.AddScoped<IOtpTokenRepository, OtpTokenRepository>();
+            services.AddScoped<IWalletRepository, WalletRepository>();
             #endregion
 
             #region Broker Layer
             services.AddTransient<IAgencyBroker, AgencyBroker>();
             services.AddTransient<ICustodianBroker, CustodianBroker>();
             services.AddTransient<ISendGridBroker, SendGridBroker>();
+            services.AddTransient<IClickatellBroker, ClickatellBroker>();
             #endregion
         }
 
@@ -179,9 +184,11 @@ namespace CoviIDApiCore
             var streetCredCredentials = new StreetCredCredentials();
             _configuration.Bind(nameof(StreetCredCredentials), streetCredCredentials);
 
+            var clickatellCredentials = new ClickatellCredentials();
+            _configuration.Bind(nameof(ClickatellCredentials), clickatellCredentials);
+
             services.AddHttpClient<IAgencyBroker, AgencyBroker>(client =>
             {
-                
                 client.BaseAddress = new Uri(agencyApiBaseUrl);
                 client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", streetCredCredentials.AuthorizationToken);
                 client.DefaultRequestHeaders.Add("X-Streetcred-Subscription-Key", streetCredCredentials.SubscriptionKey);
@@ -200,6 +207,15 @@ namespace CoviIDApiCore
                 {
                     client.BaseAddress = new Uri(sendGridCredentials.BaseUrl);
                     client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", sendGridCredentials.Key);
+                    client.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue(_applicationJson));
+                }
+            );
+
+            services.AddHttpClient<IClickatellBroker, ClickatellBroker>(client =>
+                {
+                    client.BaseAddress = new Uri(clickatellCredentials.BaseUrl);
+                    client.DefaultRequestHeaders.TryAddWithoutValidation("Authorization",clickatellCredentials.Key);
+                    client.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue(_applicationJson));
                 }
             );
         }

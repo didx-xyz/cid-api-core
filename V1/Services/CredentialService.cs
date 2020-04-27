@@ -1,6 +1,5 @@
-﻿using CoviIDApiCore.Exceptions;
-using CoviIDApiCore.Helpers;
-using CoviIDApiCore.V1.Constants;
+﻿using CoviIDApiCore.Helpers;
+using CoviIDApiCore.V1.DTOs.Connection;
 using CoviIDApiCore.V1.DTOs.Credentials;
 using CoviIDApiCore.V1.DTOs.Wallet;
 using CoviIDApiCore.V1.Interfaces.Brokers;
@@ -21,6 +20,7 @@ namespace CoviIDApiCore.V1.Services
     {
         private readonly IAgencyBroker _agencyBroker;
         private readonly ICustodianBroker _custodianBroker;
+        
         public CredentialService(IAgencyBroker agencyBroker, ICustodianBroker custodianBroker)
         {
             _agencyBroker = agencyBroker;

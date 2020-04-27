@@ -18,7 +18,7 @@ namespace CoviIDApiCore.V1.Services
 
             var binaryData = qrCode.ToPngBinaryData();
 
-            return $"data:image/png;base64, {Convert.ToBase64String(binaryData)}";
+            return $"{Convert.ToBase64String(binaryData)}";
         }
     }
 }

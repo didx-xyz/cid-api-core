@@ -4,14 +4,16 @@ using CoviIDApiCore.Data;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 namespace CoviIDApiCore.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    partial class ApplicationDbContextModelSnapshot : ModelSnapshot
+    [Migration("20200423103709_dbo_TokenTable")]
+    partial class dbo_TokenTable
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -57,7 +59,7 @@ namespace CoviIDApiCore.Migrations
                     b.ToTable("OrganisationCounters");
                 });
 
-            modelBuilder.Entity("CoviIDApiCore.Models.Database.OtpToken", b =>
+            modelBuilder.Entity("CoviIDApiCore.Models.Database.Token", b =>
                 {
                     b.Property<long>("Id")
                         .ValueGeneratedOnAdd()
@@ -71,29 +73,11 @@ namespace CoviIDApiCore.Migrations
 
                     b.Property<string>("MobileNumber");
 
-                    b.Property<Guid?>("WalletId");
-
                     b.Property<bool>("isUsed");
 
                     b.HasKey("Id");
 
-                    b.HasIndex("WalletId");
-
-                    b.ToTable("OtpTokens");
-                });
-
-            modelBuilder.Entity("CoviIDApiCore.Models.Database.Wallet", b =>
-                {
-                    b.Property<Guid>("Id")
-                        .ValueGeneratedOnAdd();
-
-                    b.Property<DateTime>("CreatedAt");
-
-                    b.Property<string>("WalletIdentifier");
-
-                    b.HasKey("Id");
-
-                    b.ToTable("Wallets");
+                    b.ToTable("Tokens");
                 });
 
             modelBuilder.Entity("CoviIDApiCore.Models.Database.OrganisationCounter", b =>
@@ -101,13 +85,6 @@ namespace CoviIDApiCore.Migrations
                     b.HasOne("CoviIDApiCore.Models.Database.Organisation", "Organisation")
                         .WithMany("Counter")
                         .HasForeignKey("OrganisationId");
-                });
-
-            modelBuilder.Entity("CoviIDApiCore.Models.Database.OtpToken", b =>
-                {
-                    b.HasOne("CoviIDApiCore.Models.Database.Wallet", "Wallet")
-                        .WithMany("Tokens")
-                        .HasForeignKey("WalletId");
                 });
 #pragma warning restore 612, 618
         }

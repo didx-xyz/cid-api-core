@@ -1,4 +1,5 @@
-﻿using CoviIDApiCore.V1.DTOs.Connection;
+﻿using System;
+using CoviIDApiCore.V1.DTOs.Connection;
 using CoviIDApiCore.V1.DTOs.Credentials;
 using CoviIDApiCore.V1.DTOs.Wallet;
 using CoviIDApiCore.V1.Interfaces.Brokers;
@@ -6,6 +7,8 @@ using CoviIDApiCore.V1.Interfaces.Services;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using CoviIDApiCore.Models.Database;
+using CoviIDApiCore.V1.Interfaces.Repositories;
 using Microsoft.Extensions.Configuration;
 using Hangfire;
 using static CoviIDApiCore.V1.Constants.DefinitionConstants;
@@ -19,8 +22,11 @@ namespace CoviIDApiCore.V1.Services
         private readonly IConnectionService _connectionService;
         private readonly ICredentialService _credentialService;
         private readonly IConfiguration _configuration;
+        private readonly IOtpService _otpService;
+        private readonly IWalletRepository _walletRepository;
+        
         public WalletService(ICustodianBroker custodianBroker, IConnectionService connectionService, IAgencyBroker agencyBroker,
-            IConfiguration configuration,
+            IConfiguration configuration, IOtpService otpService, IWalletRepository walletRepository,
             ICredentialService credentialService)
         {
             _custodianBroker = custodianBroker;
@@ -28,6 +34,8 @@ namespace CoviIDApiCore.V1.Services
             _agencyBroker = agencyBroker;
             _configuration = configuration;
             _credentialService = credentialService;
+            _otpService = otpService;
+            _walletRepository = walletRepository;
         }
 
         public async Task<List<WalletContract>> GetWallets()
@@ -44,16 +52,17 @@ namespace CoviIDApiCore.V1.Services
         {
             var wallet = new WalletParameters
             {
-                OwnerName = $"{coviIdWalletParameters.Person.FirstName}-{coviIdWalletParameters.Person.LastName}"
+                OwnerName = $"{coviIdWalletParameters.FirstName}-{coviIdWalletParameters.LastName}"
             };
 
             var response = await _custodianBroker.CreateWallet(wallet);
 
-            var pictureUrl = await _agencyBroker.UploadFiles(coviIdWalletParameters.Person.Photo, response.WalletId);
-            coviIdWalletParameters.Person.Photo = pictureUrl;
+            var pictureUrl = await _agencyBroker.UploadFiles(coviIdWalletParameters.Photo, response.WalletId);
 
-            BackgroundJob.Enqueue(() => ContinueProcess(coviIdWalletParameters, response.WalletId));
+            var newWallet = await SaveNewWalletAsync(response.WalletId);
 
+            await _otpService.GenerateAndSendOtpAsync(coviIdWalletParameters.MobileNumber.ToString(), newWallet);
+            
             var contract = new CoviIdWalletContract
             {
                 CovidStatusUrl = $"{_configuration.GetValue<string>("CoviIDBaseUrl")}/api/verifier/{response.WalletId}/covid-credentials",
@@ -62,6 +71,21 @@ namespace CoviIDApiCore.V1.Services
             };
 
             return contract;
+        }
+
+        private async Task<Wallet> SaveNewWalletAsync(string walletId)
+        {
+            var newWallet = new Wallet()
+            {
+                WalletIdentifier = walletId,
+                CreatedAt = DateTime.UtcNow
+            };
+
+            await _walletRepository.AddAsync(newWallet);
+
+            await _walletRepository.SaveAsync();
+
+            return newWallet;
         }
 
         /// <summary>
@@ -105,40 +129,5 @@ namespace CoviIDApiCore.V1.Services
                 await _custodianBroker.DeleteWallet(wallet.WalletId);
             }
         }
-
-        #region Private Methods
-        public async Task ContinueProcess(CoviIdWalletParameters coviIdWalletParameters, string walletId)
-        {
-            var connectionParameters = new ConnectionParameters
-            {
-                ConnectionId = "", // Leave blank for auto generation
-                Multiparty = false,
-                Name = "CoviID", // This is the Agent name
-            };
-
-            var agentInvitation = await _connectionService.CreateInvitation(connectionParameters);
-            var custodianConnection = await _connectionService.AcceptInvitation(agentInvitation.Invitation, walletId);
-
-            // Create the set of credentials
-            var personalDetialsCredentials = await _credentialService.CreatePerson(agentInvitation.ConnectionId, coviIdWalletParameters.Person);
-            if (coviIdWalletParameters.CovidTest != null)
-            {
-                var covidTestCredentials = await _credentialService.CreateCovidTest(agentInvitation.ConnectionId, coviIdWalletParameters.CovidTest);
-            }
-
-            var userCredentials = await _custodianBroker.GetCredentials(walletId);
-            var offeredCredentials = userCredentials.Where(x => x.State == CredentialsState.Offered);
-
-            if (offeredCredentials != null)
-            {
-                // Accept all the credentials
-                foreach (var offer in offeredCredentials)
-                {
-                    await _custodianBroker.AcceptCredential(walletId, offer.CredentialId);
-                }
-            }
-            return;
-        }
-        #endregion
     }
 }
