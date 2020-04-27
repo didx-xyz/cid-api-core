@@ -103,7 +103,7 @@ namespace CoviIDApiCore.V1.Services
 
             var agentInvitation = await _connectionService.CreateInvitation(connectionParameters);
             var custodianConnection = await _connectionService.AcceptInvitation(agentInvitation.Invitation, walletId);
-            var offer = await _credentialService.CreateCovidTest(agentInvitation.ConnectionId, covidTest);
+            var offer = await _credentialService.CreateCovidTest(agentInvitation.ConnectionId, covidTest, walletId);
             var userCredentials = await _custodianBroker.GetCredentials(walletId);
 
             var thisOffer = userCredentials.FirstOrDefault(c => c.State == CredentialsState.Offered && c.DefinitionId == DefinitionIds[Schemas.CovidTest]);

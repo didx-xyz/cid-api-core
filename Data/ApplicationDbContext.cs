@@ -9,7 +9,8 @@ namespace CoviIDApiCore.Data
         public DbSet<OrganisationCounter> OrganisationCounters { get; set; }
         public DbSet<OtpToken> OtpTokens { get; set; }
         public DbSet<Wallet> Wallets { get; set; }
-
+        public DbSet<CovidTest> CovidTests { get; set; }
+        
         public ApplicationDbContext(DbContextOptions<ApplicationDbContext> options) : base(options)
         {
         }
