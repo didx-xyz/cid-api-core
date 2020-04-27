@@ -4,6 +4,26 @@ namespace CoviIDApiCore.V1.Constants
 {
     public class DefinitionConstants
     {
+        #region Strings
+        public static readonly string CompanyName = "Company Name";
+        public static readonly string EmailAdress = "Email Address";
+        #endregion
+
+        public static Dictionary<EmailTemplates, string> TemplateIds = new Dictionary<EmailTemplates, string>
+        {
+            { EmailTemplates.OrganisationWelcome, "d-5ceb0422ddfd4850b361255bcc30fde2" }
+        };
+
+        public static Dictionary<EmailTemplates, string> EmailSubjects = new Dictionary<EmailTemplates, string>
+        {
+            { EmailTemplates.OrganisationWelcome, "Welcome to the Covi-ID platform!" }
+        };
+
+        public enum EmailTemplates
+        {
+            OrganisationWelcome
+        }
+
         /// <summary>
         /// Pass in the selected schema and retrieve the corresponding definition Id
         /// This is added here to save costs to Streetcred API
@@ -37,5 +57,11 @@ namespace CoviIDApiCore.V1.Constants
             public static readonly string IdentificationType = "identificationType";
             public static readonly string IdentificationValue = "identificationValue";
         }
+    }
+
+    public enum UpdateType
+    {
+        Addition,
+        Subtraction
     }
 }
