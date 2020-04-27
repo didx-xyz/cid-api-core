@@ -1,19 +1,13 @@
 ﻿using System;
-using System.Globalization;
-using System.Linq;
 using System.Threading.Tasks;
 using CoviIDApiCore.Exceptions;
 using CoviIDApiCore.Models.Database;
-using CoviIDApiCore.Utilities;
 using CoviIDApiCore.V1.Constants;
 using CoviIDApiCore.V1.DTOs.Authentication;
 using CoviIDApiCore.V1.DTOs.Clickatell;
-using CoviIDApiCore.V1.DTOs.Connection;
-using CoviIDApiCore.V1.DTOs.Credentials;
 using CoviIDApiCore.V1.Interfaces.Brokers;
 using CoviIDApiCore.V1.Interfaces.Repositories;
 using CoviIDApiCore.V1.Interfaces.Services;
-using Hangfire;
 using Microsoft.Extensions.Configuration;
 
 namespace CoviIDApiCore.V1.Services
