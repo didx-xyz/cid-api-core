@@ -34,13 +34,13 @@ namespace CoviIDApiCore.V1.Services
             var credentialOffer = new CredentialOfferParameters
             {
                 ConnectionId = connectionId,
-                DefinitionId = DefinitionIds[Schemas.Personal],
+                DefinitionId = DefinitionIds[Schemas.Person],
                 AutomaticIssuance = false,
                 CredentialValues = new Dictionary<string, string>
                 {
                     { Attributes.FirstName , personCredential.FirstName.ValidateLength() },
                     { Attributes.LastName, personCredential.LastName.ValidateLength() },
-                    { Attributes.PhotoUrl, personCredential.Photo },
+                    { Attributes.Photo, personCredential.Photo },
                     { Attributes.MobileNumber , personCredential.MobileNumber.ValidateMobileNumber().ToString() },
                     { Attributes.IdentificationType , personCredential.IdentificationType.ToString() },
                     { Attributes.IdentificationValue, personCredential.IdentificationValue.ValidateIdentification(personCredential.IdentificationType) }

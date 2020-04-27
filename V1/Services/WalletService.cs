@@ -107,9 +107,13 @@ namespace CoviIDApiCore.V1.Services
             var offer = await _credentialService.CreateCovidTest(agentInvitation.ConnectionId, covidTest);
             var userCredentials = await _custodianBroker.GetCredentials(walletId);
 
-            var thisOffer = userCredentials.FirstOrDefault(c => c.State == CredentialsState.Requested && c.DefinitionId == DefinitionIds[Schemas.CovidTest]);
+            var thisOffer = userCredentials.FirstOrDefault(c => c.State == CredentialsState.Offered && c.DefinitionId == DefinitionIds[Schemas.CovidTest]);
+            if (thisOffer != null)
+            {
+                await _custodianBroker.AcceptCredential(walletId, thisOffer.CredentialId);
 
-            await _custodianBroker.AcceptCredential(walletId, thisOffer.CredentialId);
+            }
+            // TODO : Throw exception
 
             return;
         }
