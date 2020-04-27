@@ -83,7 +83,8 @@ namespace CoviIDApiCore.V1.Services
             var offeredCredentials = allCredentials.Where(x => x.State == CredentialsState.Requested).ToList();
 
             var verifiedPerson = offeredCredentials.FirstOrDefault(p => p.DefinitionId == DefinitionIds[Schemas.Person]);
-            var covidTest = offeredCredentials.FirstOrDefault(p => p.DefinitionId == DefinitionIds[Schemas.CovidTest]);
+            var covidTest = offeredCredentials.Where(c => c.DefinitionId == DefinitionIds[Schemas.CovidTest])
+                .OrderBy(c => c.Values.TryGetValue(Attributes.DateIssued, out var dateIssued)).ToList().FirstOrDefault();
 
             if (verifiedPerson != null)
             {
