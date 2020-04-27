@@ -129,41 +129,5 @@ namespace CoviIDApiCore.V1.Services
                 await _custodianBroker.DeleteWallet(wallet.WalletId);
             }
         }
-
-        #region Private Methods
-        public async Task AddCredentialsToWallet(CovidTestCredentialParameters covidTest, PersonCredentialParameters person, string walletId)
-        {
-            var connectionParameters = new ConnectionParameters
-            {
-                ConnectionId = "", // Leave blank for auto generation
-                Multiparty = false,
-                Name = "CoviID", // This is the Agent name
-            };
-
-            var agentInvitation = await _connectionService.CreateInvitation(connectionParameters);
-            var custodianConnection = await _connectionService.AcceptInvitation(agentInvitation.Invitation, walletId);
-
-            // Create the set of credentials
-            var personalDetialsCredentials = await _credentialService.CreatePerson(agentInvitation.ConnectionId, person);
-
-            if (covidTest != null)
-            {
-                var covidTestCredentials = await _credentialService.CreateCovidTest(agentInvitation.ConnectionId, covidTest);
-            }
-
-            var userCredentials = await _custodianBroker.GetCredentials(walletId);
-            var offeredCredentials = userCredentials.Where(x => x.State == CredentialsState.Offered);
-
-            if (offeredCredentials != null)
-            {
-                // Accept all the credentials
-                foreach (var offer in offeredCredentials)
-                {
-                    await _custodianBroker.AcceptCredential(walletId, offer.CredentialId);
-                }
-            }
-            return;
-        }
-        #endregion
     }
 }

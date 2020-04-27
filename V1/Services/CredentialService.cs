@@ -1,11 +1,11 @@
-﻿using CoviIDApiCore.Exceptions;
-using CoviIDApiCore.Helpers;
-using CoviIDApiCore.V1.Constants;
+﻿using CoviIDApiCore.Helpers;
+using CoviIDApiCore.V1.DTOs.Connection;
 using CoviIDApiCore.V1.DTOs.Credentials;
 using CoviIDApiCore.V1.Interfaces.Brokers;
 using CoviIDApiCore.V1.Interfaces.Services;
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Threading.Tasks;
 using static CoviIDApiCore.V1.Constants.DefinitionConstants;
 
@@ -18,9 +18,14 @@ namespace CoviIDApiCore.V1.Services
     public class CredentialService : ICredentialService
     {
         private readonly IAgencyBroker _agencyBroker;
-        public CredentialService(IAgencyBroker agencyBroker)
+        private readonly ICustodianBroker _custodianBroker;
+        private readonly IConnectionService _connectionService;
+
+        public CredentialService(IAgencyBroker agencyBroker, ICustodianBroker custodianBroker, IConnectionService connectionService)
         {
             _agencyBroker = agencyBroker;
+            _custodianBroker = custodianBroker;
+            _connectionService = connectionService;
         }
         
         /// <summary>
@@ -71,6 +76,39 @@ namespace CoviIDApiCore.V1.Services
 
             var credentials = await _agencyBroker.SendCredentials(credentialOffer);
             return credentials;
+        }
+        public async Task CreatePersonAndCovidTestCredentials(CovidTestCredentialParameters covidTest, PersonCredentialParameters person, string walletId)
+        {
+            var connectionParameters = new ConnectionParameters
+            {
+                ConnectionId = "", // Leave blank for auto generation
+                Multiparty = false,
+                Name = "CoviID", // This is the Agent name
+            };
+
+            var agentInvitation = await _connectionService.CreateInvitation(connectionParameters);
+            var custodianConnection = await _connectionService.AcceptInvitation(agentInvitation.Invitation, walletId);
+
+            // Create the set of credentials
+            var personalDetialsCredentials = await CreatePerson(agentInvitation.ConnectionId, person);
+
+            if (covidTest != null)
+            {
+                var covidTestCredentials = await CreateCovidTest(agentInvitation.ConnectionId, covidTest);
+            }
+
+            var userCredentials = await _custodianBroker.GetCredentials(walletId);
+            var offeredCredentials = userCredentials.Where(x => x.State == CredentialsState.Offered);
+
+            if (offeredCredentials != null)
+            {
+                // Accept all the credentials
+                foreach (var offer in offeredCredentials)
+                {
+                    await _custodianBroker.AcceptCredential(walletId, offer.CredentialId);
+                }
+            }
+            return;
         }
     }
 }

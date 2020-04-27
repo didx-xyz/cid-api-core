@@ -7,5 +7,6 @@ namespace CoviIDApiCore.V1.Interfaces.Services
     {
         Task<CredentialsContract> CreatePerson(string connectionId, PersonCredentialParameters personalDetials);
         Task<CredentialsContract> CreateCovidTest(string connectionId, CovidTestCredentialParameters covidTestCredential);
+        Task CreatePersonAndCovidTestCredentials(CovidTestCredentialParameters covidTest, PersonCredentialParameters person, string walletId);
     }
 }
