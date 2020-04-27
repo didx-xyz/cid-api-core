@@ -20,7 +20,8 @@ namespace CoviIDApiCore.V1.Services
         private readonly ICredentialService _credentialService;
         private readonly IWalletRepository _walletRepository;
 
-        public OtpService(IOtpTokenRepository tokenRepository, IConfiguration configuration, IClickatellBroker clickatellBroker, ICustodianBroker custodianBroker, ICredentialService credentialService, IWalletRepository walletRepository)
+        public OtpService(IOtpTokenRepository tokenRepository, IConfiguration configuration, IClickatellBroker clickatellBroker, 
+            ICredentialService credentialService, IWalletRepository walletRepository)
         {
             _otpTokenRepository = tokenRepository;
             _configuration = configuration;
