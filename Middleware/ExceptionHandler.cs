@@ -25,7 +25,7 @@ namespace CoviIDApiCore.Middleware
         {
             try
             {
-                if (!_authentication.IsAuthorized(context.Request.Headers["x-api-key"]))
+                if (!_authentication.IsAuthorized(context.Request.Headers["x-api-key"]) && context.Request.Path != DefinitionConstants.OrganisationEndpoint)
                     throw new UnauthorizedAccessException();
 
                 await _next(context);

@@ -7,6 +7,7 @@ namespace CoviIDApiCore.V1.Constants
         #region Strings
         public static readonly string CompanyName = "Company Name";
         public static readonly string EmailAdress = "Email Address";
+        public static readonly string OrganisationEndpoint = "/api/organisation";
         #endregion
 
         public static Dictionary<EmailTemplates, string> TemplateIds = new Dictionary<EmailTemplates, string>
