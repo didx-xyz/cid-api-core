@@ -17,7 +17,6 @@ namespace CoviIDApiCore.V1.Constants
         public enum Schemas
         {
             Person,
-            Identification,
             CovidTest
         }
 

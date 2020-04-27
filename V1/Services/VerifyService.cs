@@ -17,42 +17,30 @@ namespace CoviIDApiCore.V1.Services
         private readonly ICustodianBroker _custodianBroker;
         private readonly IAgencyBroker _agencyBroker;
         private readonly IOrganisationService _organisationService;
+        private readonly ICredentialService _credentialService;
 
-        public VerifyService(ICustodianBroker custodianBroker, IAgencyBroker agencyBroker, IOrganisationService organisationService)
+        public VerifyService(ICustodianBroker custodianBroker, IAgencyBroker agencyBroker, IOrganisationService organisationService, ICredentialService credentialService)
         {
             _custodianBroker = custodianBroker;
             _agencyBroker = agencyBroker;
             _organisationService = organisationService;
+            _credentialService = credentialService;
         }
 
         public async Task<VerifyResult> GetCredentials(string walletId, string organisationId, string deviceIdentifier)
         {
-            var credentialList = await _custodianBroker.GetCredentials(walletId);
-
-            // todo get where it was the last test taken
-            var credentials = credentialList.FirstOrDefault(x => x.State == CredentialsState.Requested);
-
-            if (credentials == null)
-                return null;
-
-            //TODO: Optimize
-            credentials.Values.TryGetValue("Picture", out string picture);
-            credentials.Values.TryGetValue("Name", out string name);
-            credentials.Values.TryGetValue("Surname", out string surname);
-            credentials.Values.TryGetValue("CovidStatus", out string covidStatus);
-
-            var enumValue = (int)Enum.Parse(typeof(CovidStatus), covidStatus);
+            var coviIDCredentials = await _credentialService.GetCoviIDCredentials(walletId);
 
             if (!string.IsNullOrEmpty(organisationId))
                 await _organisationService.UpdateCountAsync(organisationId, deviceIdentifier, UpdateType.Addition);
 
             return new VerifyResult
             {
-                Picture = picture,
-                Name = name,
-                Surname = surname,
-                Status = enumValue,
-                CovidStatus = covidStatus
+                Picture = coviIDCredentials.PersonCredentials.Photo,
+                Name = coviIDCredentials.PersonCredentials.FirstName,
+                Surname = coviIDCredentials.PersonCredentials.LastName,
+                Status = (int)coviIDCredentials.CovidTestCredentials.CovidStatus,
+                CovidStatus = coviIDCredentials.CovidTestCredentials.CovidStatus.ToString()
             };
         }
 
