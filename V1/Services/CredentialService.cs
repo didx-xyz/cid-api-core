@@ -1,6 +1,7 @@
 ﻿using CoviIDApiCore.Helpers;
 using CoviIDApiCore.V1.DTOs.Connection;
 using CoviIDApiCore.V1.DTOs.Credentials;
+using CoviIDApiCore.V1.DTOs.Wallet;
 using CoviIDApiCore.V1.Interfaces.Brokers;
 using CoviIDApiCore.V1.Interfaces.Services;
 using System;
@@ -19,7 +20,7 @@ namespace CoviIDApiCore.V1.Services
     {
         private readonly IAgencyBroker _agencyBroker;
         private readonly ICustodianBroker _custodianBroker;
-        private readonly IConnectionService _connectionService;
+        public CredentialService(IAgencyBroker agencyBroker, ICustodianBroker custodianBroker)
 
         public CredentialService(IAgencyBroker agencyBroker, ICustodianBroker custodianBroker, IConnectionService connectionService)
         {
@@ -27,7 +28,7 @@ namespace CoviIDApiCore.V1.Services
             _custodianBroker = custodianBroker;
             _connectionService = connectionService;
         }
-        
+
         /// <summary>
         /// Creates a verified person credentials with the relevant DefinitionID and attribute values.
         /// </summary>
@@ -55,7 +56,7 @@ namespace CoviIDApiCore.V1.Services
             var credentials = await _agencyBroker.SendCredentials(credentialOffer);
             return credentials;
         }
-       
+
         public async Task<CredentialsContract> CreateCovidTest(string connectionId, CovidTestCredentialParameters covidTestCredential)
         {
             covidTestCredential.DateIssued = DateTime.UtcNow;
@@ -77,38 +78,61 @@ namespace CoviIDApiCore.V1.Services
             var credentials = await _agencyBroker.SendCredentials(credentialOffer);
             return credentials;
         }
-        public async Task CreatePersonAndCovidTestCredentials(CovidTestCredentialParameters covidTest, PersonCredentialParameters person, string walletId)
+
+        public async Task<CoviIDCredentialContract> GetCoviIDCredentials(string walletId)
         {
-            var connectionParameters = new ConnectionParameters
+            var allCredentials = await _custodianBroker.GetCredentials(walletId);
+            var offeredCredentials = allCredentials.Where(x => x.State == CredentialsState.Requested).ToList();
+
+            var verifiedPerson = offeredCredentials.FirstOrDefault(p => p.DefinitionId == DefinitionIds[Schemas.Person]);
+            var covidTest = offeredCredentials.Where(c => c.DefinitionId == DefinitionIds[Schemas.CovidTest])
+                .OrderBy(c => c.Values.TryGetValue(Attributes.DateIssued, out var dateIssued)).ToList().FirstOrDefault();
+
+            if (verifiedPerson != null)
             {
-                ConnectionId = "", // Leave blank for auto generation
-                Multiparty = false,
-                Name = "CoviID", // This is the Agent name
-            };
+                //TODO: Optimize
+                verifiedPerson.Values.TryGetValue(Attributes.FirstName, out string firstName);
+                verifiedPerson.Values.TryGetValue(Attributes.LastName, out string lastName);
+                verifiedPerson.Values.TryGetValue(Attributes.Photo, out string photo);
+                verifiedPerson.Values.TryGetValue(Attributes.MobileNumber, out string mobileNumber);
+                verifiedPerson.Values.TryGetValue(Attributes.IdentificationType, out string identificationTypeStr);
+                verifiedPerson.Values.TryGetValue(Attributes.IdentificationValue, out string identificationValue);
 
-            var agentInvitation = await _connectionService.CreateInvitation(connectionParameters);
-            var custodianConnection = await _connectionService.AcceptInvitation(agentInvitation.Invitation, walletId);
+                covidTest.Values.TryGetValue(Attributes.ReferenceNumber, out string referenceNumber);
+                covidTest.Values.TryGetValue(Attributes.Laboratory, out string laboratoryStr);
+                covidTest.Values.TryGetValue(Attributes.DateTested, out string dateTested);
+                covidTest.Values.TryGetValue(Attributes.DateIssued, out string dateIssued);
+                covidTest.Values.TryGetValue(Attributes.CovidStatus, out string covidStatusStr);
 
-            // Create the set of credentials
-            var personalDetialsCredentials = await CreatePerson(agentInvitation.ConnectionId, person);
 
-            if (covidTest != null)
-            {
-                var covidTestCredentials = await CreateCovidTest(agentInvitation.ConnectionId, covidTest);
-            }
+                var laboratory = (Laboratory)Enum.Parse(typeof(Laboratory), laboratoryStr);
+                var identificationTypes = (IdentificationTypes)Enum.Parse(typeof(IdentificationTypes), identificationTypeStr);
+                var covidStatus = (CovidStatus)Enum.Parse(typeof(CovidStatus), covidStatusStr);
 
-            var userCredentials = await _custodianBroker.GetCredentials(walletId);
-            var offeredCredentials = userCredentials.Where(x => x.State == CredentialsState.Offered);
 
-            if (offeredCredentials != null)
-            {
-                // Accept all the credentials
-                foreach (var offer in offeredCredentials)
+                return new CoviIDCredentialContract
                 {
-                    await _custodianBroker.AcceptCredential(walletId, offer.CredentialId);
-                }
+                    CovidTestCredentials = new CovidTestCredentialParameters
+                    {
+                        DateIssued = DateTime.Parse(dateIssued),
+                        DateTested = DateTime.Parse(dateTested),
+                        Laboratory = laboratory,
+                        ReferenceNumber = referenceNumber,
+                        CovidStatus = covidStatus,
+                    },
+                    PersonCredentials = new PersonCredentialParameters
+                    {
+                        FirstName = firstName,
+                        LastName = lastName,
+                        IdentificationType = identificationTypes,
+                        IdentificationValue = identificationValue,
+                        MobileNumber = long.Parse(mobileNumber),
+                        Photo = photo
+                    }
+                };
             }
-            return;
+            //TODO : throw exception/handle
+            return null;
         }
     }
 }
