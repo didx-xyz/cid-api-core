@@ -34,7 +34,7 @@ namespace CoviIDApiCore.V1.Services
             var credentialOffer = new CredentialOfferParameters
             {
                 ConnectionId = connectionId,
-                DefinitionId = DefinitionIds[Schemas.Personal],
+                DefinitionId = DefinitionIds[Schemas.Person],
                 AutomaticIssuance = false,
                 CredentialValues = new Dictionary<string, string>
                 {

@@ -10,13 +10,13 @@ namespace CoviIDApiCore.V1.Constants
         /// </summary>
         public static Dictionary<Schemas, string> DefinitionIds = new Dictionary<Schemas, string>
         {
-            { Schemas.Personal, "CmeqY4MWWSky5XUJppXtwn:3:CL:94569:Verified Person" },
-            { Schemas.CovidTest, "CmeqY4MWWSky5XUJppXtwn:3:CL:94574:Covid Test" }
+            { Schemas.Person, "RYJoQ8UNadGrrfL7PBK8Wm:3:CL:95145:Verified Person" },
+            { Schemas.CovidTest, "RYJoQ8UNadGrrfL7PBK8Wm:3:CL:94574:Covid Test" }
         };
 
         public enum Schemas
         {
-            Personal,
+            Person,
             Identification,
             CovidTest
         }
