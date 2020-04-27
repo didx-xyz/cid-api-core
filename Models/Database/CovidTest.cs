@@ -13,7 +13,7 @@ namespace CoviIDApiCore.Models.Database
         /// <summary>
         /// Idicates the credential progress
         /// </summary>
-        public string CredentialIndicator { get; set; }
+        public CredentialIndicator CredentialIndicator { get; set; }
         public DateTime DateTested { get; set; }
         internal DateTime DateIssued { get; set; }
         public CovidStatus CovidStatus { get; set; }
