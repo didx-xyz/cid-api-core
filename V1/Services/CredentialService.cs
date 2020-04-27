@@ -20,13 +20,11 @@ namespace CoviIDApiCore.V1.Services
     {
         private readonly IAgencyBroker _agencyBroker;
         private readonly ICustodianBroker _custodianBroker;
+        
         public CredentialService(IAgencyBroker agencyBroker, ICustodianBroker custodianBroker)
-
-        public CredentialService(IAgencyBroker agencyBroker, ICustodianBroker custodianBroker, IConnectionService connectionService)
         {
             _agencyBroker = agencyBroker;
             _custodianBroker = custodianBroker;
-            _connectionService = connectionService;
         }
 
         /// <summary>
