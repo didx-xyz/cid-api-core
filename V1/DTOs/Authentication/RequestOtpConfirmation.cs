@@ -1,5 +1,4 @@
 ﻿using System.ComponentModel.DataAnnotations;
-using CoviIDApiCore.V1.Constants;
 using CoviIDApiCore.V1.DTOs.Credentials;
 
 namespace CoviIDApiCore.V1.DTOs.Authentication

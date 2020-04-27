@@ -52,17 +52,16 @@ namespace CoviIDApiCore.V1.Services
         {
             var wallet = new WalletParameters
             {
-                OwnerName = $"{coviIdWalletParameters.Person.FirstName}-{coviIdWalletParameters.Person.LastName}"
+                OwnerName = $"{coviIdWalletParameters.FirstName}-{coviIdWalletParameters.LastName}"
             };
 
             var response = await _custodianBroker.CreateWallet(wallet);
 
-            var pictureUrl = await _agencyBroker.UploadFiles(coviIdWalletParameters.Person.Photo, response.WalletId);
-            coviIdWalletParameters.Person.Photo = pictureUrl;
+            var pictureUrl = await _agencyBroker.UploadFiles(coviIdWalletParameters.Photo, response.WalletId);
 
             var newWallet = await SaveNewWalletAsync(response.WalletId);
 
-            await _otpService.GenerateAndSendOtpAsync(coviIdWalletParameters.Person.MobileNumber.ToString(), newWallet);
+            await _otpService.GenerateAndSendOtpAsync(coviIdWalletParameters.MobileNumber.ToString(), newWallet);
             
             var contract = new CoviIdWalletContract
             {
