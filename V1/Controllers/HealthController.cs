@@ -12,9 +12,13 @@ namespace CoviIDApiCore.V1.Controllers
         [HttpGet]
         public IActionResult Health()
         {
-            throw new Exception("test"); //TODO: Remove after testing
-
             return new OkResult();
+        }
+
+        [HttpGet("sentry")]
+        public IActionResult SentryTest()
+        {
+            throw new Exception("Sentry Test Exception");
         }
     }
 }
