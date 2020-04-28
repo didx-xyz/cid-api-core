@@ -56,13 +56,14 @@ namespace CoviIDApiCore.V1.Services
         {
             var organisation = await _organisationRepository.GetAsync(Guid.Parse(id));
 
+            if(organisation == default)
+                return new Response(false, HttpStatusCode.NotFound, Messages.Org_NotExists);
+
             var orgCounter = await _organisationCounterRepository.GetLastByOrganisation(organisation);
 
             var totalScans = _organisationCounterRepository.Count();
 
-            return organisation == default
-                ? new Response(false, HttpStatusCode.NotFound, Messages.Org_NotExists)
-                : new Response(new OrganisationDTO(organisation, orgCounter, totalScans), HttpStatusCode.OK);
+            return new Response(new OrganisationDTO(organisation, orgCounter, totalScans), HttpStatusCode.OK);
         }
 
         public async Task UpdateCountAsync(string id, string deviceId, UpdateType updateType)
