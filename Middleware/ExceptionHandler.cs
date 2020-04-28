@@ -7,6 +7,7 @@ using CoviIDApiCore.Exceptions;
 using CoviIDApiCore.V1.Constants;
 using CoviIDApiCore.V1.DTOs.System;
 using CoviIDApiCore.V1.Interfaces.Services;
+using Sentry;
 
 namespace CoviIDApiCore.Middleware
 {
@@ -91,6 +92,8 @@ namespace CoviIDApiCore.Middleware
 
         private Task HandleStreetCredBrokerException(HttpContext context, StreetCredBrokerException e)
         {
+            SentrySdk.CaptureException(e);
+
             var statusCode = HttpStatusCode.InternalServerError;
             context.Response.ContentType = "application/json";
             context.Response.StatusCode = (int)statusCode;
@@ -105,6 +108,8 @@ namespace CoviIDApiCore.Middleware
 
         private Task HandleSendGridException(HttpContext context, SendGridException e)
         {
+            SentrySdk.CaptureException(e);
+
             var statusCode = HttpStatusCode.InternalServerError;
             context.Response.ContentType = "application/json";
             context.Response.StatusCode = (int)statusCode;
@@ -119,6 +124,8 @@ namespace CoviIDApiCore.Middleware
 
         private Task HandleClickatellException(HttpContext context, ClickatellException e)
         {
+            SentrySdk.CaptureException(e);
+
             var statusCode = HttpStatusCode.InternalServerError;
             context.Response.ContentType = "application/json";
             context.Response.StatusCode = (int)statusCode;
@@ -133,6 +140,8 @@ namespace CoviIDApiCore.Middleware
 
         private static Task HandleUnexpectedException(HttpContext context, Exception e)
         {
+            SentrySdk.CaptureException(e);
+
             var code = HttpStatusCode.InternalServerError;
 
             context.Response.ContentType = "application/json";
@@ -149,6 +158,8 @@ namespace CoviIDApiCore.Middleware
 
         private static Task HandleQRException(HttpContext context, Exception e)
         {
+            SentrySdk.CaptureException(e);
+
             var code = HttpStatusCode.InternalServerError;
 
             context.Response.ContentType = "application/json";
