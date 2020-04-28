@@ -25,6 +25,7 @@ using CoviIDApiCore.V1.Repositories;
 using CoviIDApiCore.V1.Services;
 using Hangfire;
 using Hangfire.SqlServer;
+using Sentry;
 
 namespace CoviIDApiCore
 {
@@ -41,6 +42,8 @@ namespace CoviIDApiCore
             Console.WriteLine($"Environment: {_environment}");
             _configuration = configuration;
             _connectionString = _configuration.GetConnectionString("DefaultConnection");
+
+            ConfigureSentry();
         }
 
         public void ConfigureServices(IServiceCollection services)
@@ -65,7 +68,6 @@ namespace CoviIDApiCore
             ConfigureDatabaseContext(services);
             ConfigureDependecyInjection(services);
             ConfigureHttpClients(services);
-
         }        
 
         public void Configure(IApplicationBuilder app, IHostingEnvironment env)
@@ -255,6 +257,17 @@ namespace CoviIDApiCore
                         "Unauthorised")));
                 }
             });
+        }
+
+        private void ConfigureSentry()
+        {
+            var url = _configuration?.GetSection("Sentry")?.GetSection("Url").Value ?? throw new Exception("Failed to setup sentry.");
+            SentrySdk.Init(
+                x =>
+                {
+                    x.Environment = _environment;
+                    x.Dsn = new Dsn(url);
+                });
         }
         #endregion Private Configuration Methods
     }
