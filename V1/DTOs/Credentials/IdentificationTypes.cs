@@ -2,7 +2,7 @@
 {
     public enum IdentificationTypes
     {
-        IdenitificationDocument = 0,
+        IdentificationDocument = 0,
         Passport = 1
     }
 }

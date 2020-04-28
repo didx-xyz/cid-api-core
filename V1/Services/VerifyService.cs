@@ -8,6 +8,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using CoviIDApiCore.Exceptions;
 using CoviIDApiCore.V1.Constants;
 
 namespace CoviIDApiCore.V1.Services
@@ -29,18 +30,21 @@ namespace CoviIDApiCore.V1.Services
 
         public async Task<VerifyResult> GetCredentials(string walletId, string organisationId, string deviceIdentifier)
         {
-            var coviIDCredentials = await _credentialService.GetCoviIDCredentials(walletId);
+            var coviIdCredentials = await _credentialService.GetCoviIDCredentials(walletId);
 
+            if(coviIdCredentials == default)
+                throw new NotFoundException();
+            
             if (!string.IsNullOrEmpty(organisationId))
                 await _organisationService.UpdateCountAsync(organisationId, deviceIdentifier, UpdateType.Addition);
 
             return new VerifyResult
             {
-                Picture = coviIDCredentials.PersonCredentials.Photo,
-                Name = coviIDCredentials.PersonCredentials.FirstName,
-                Surname = coviIDCredentials.PersonCredentials.LastName,
-                Status = (int)coviIDCredentials.CovidTestCredentials.CovidStatus,
-                CovidStatus = coviIDCredentials.CovidTestCredentials.CovidStatus.ToString()
+                Picture = coviIdCredentials.PersonCredentials.Photo,
+                Name = coviIdCredentials.PersonCredentials.FirstName,
+                Surname = coviIdCredentials.PersonCredentials.LastName,
+                Status = (int)coviIdCredentials.CovidTestCredentials.CovidStatus,
+                CovidStatus = coviIdCredentials.CovidTestCredentials.CovidStatus.ToString()
             };
         }
 

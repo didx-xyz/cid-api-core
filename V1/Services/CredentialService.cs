@@ -120,6 +120,8 @@ namespace CoviIDApiCore.V1.Services
 
         public async Task<CoviIDCredentialContract> GetCoviIDCredentials(string walletId)
         {
+            var testCredentials = new CovidTestCredentialParameters();
+
             var allCredentials = await _custodianBroker.GetCredentials(walletId);
             var offeredCredentials = allCredentials.Where(x => x.State == CredentialsState.Requested).ToList();
 
@@ -137,33 +139,33 @@ namespace CoviIDApiCore.V1.Services
                 verifiedPerson.Values.TryGetValue(Attributes.IdentificationType, out string identificationTypeStr);
                 verifiedPerson.Values.TryGetValue(Attributes.IdentificationValue, out string identificationValue);
 
-                covidTest.Values.TryGetValue(Attributes.ReferenceNumber, out string referenceNumber);
-                covidTest.Values.TryGetValue(Attributes.Laboratory, out string laboratoryStr);
-                covidTest.Values.TryGetValue(Attributes.DateTested, out string dateTested);
-                covidTest.Values.TryGetValue(Attributes.DateIssued, out string dateIssued);
-                covidTest.Values.TryGetValue(Attributes.CovidStatus, out string covidStatusStr);
+                if (covidTest != null)
+                {
+                    covidTest.Values.TryGetValue(Attributes.ReferenceNumber, out string referenceNumber);
+                    covidTest.Values.TryGetValue(Attributes.Laboratory, out string laboratoryStr);
+                    covidTest.Values.TryGetValue(Attributes.DateTested, out string dateTested);
+                    covidTest.Values.TryGetValue(Attributes.DateIssued, out string dateIssued);
+                    covidTest.Values.TryGetValue(Attributes.CovidStatus, out string covidStatusStr);
 
 
-                var laboratory = (Laboratory)Enum.Parse(typeof(Laboratory), laboratoryStr);
-                var identificationTypes = (IdentificationTypes)Enum.Parse(typeof(IdentificationTypes), identificationTypeStr);
-                var covidStatus = (CovidStatus)Enum.Parse(typeof(CovidStatus), covidStatusStr);
+                    var laboratory = (Laboratory)Enum.Parse(typeof(Laboratory), laboratoryStr);
+                    var covidStatus = (CovidStatus)Enum.Parse(typeof(CovidStatus), covidStatusStr);
 
+                    testCredentials.DateIssued = DateTime.Parse(dateIssued);
+                    testCredentials.DateTested = DateTime.Parse(dateTested);
+                    testCredentials.Laboratory = laboratory;
+                    testCredentials.ReferenceNumber = referenceNumber;
+                    testCredentials.CovidStatus = covidStatus;
+                }
 
                 return new CoviIDCredentialContract
                 {
-                    CovidTestCredentials = new CovidTestCredentialParameters
-                    {
-                        DateIssued = DateTime.Parse(dateIssued),
-                        DateTested = DateTime.Parse(dateTested),
-                        Laboratory = laboratory,
-                        ReferenceNumber = referenceNumber,
-                        CovidStatus = covidStatus,
-                    },
+                    CovidTestCredentials = testCredentials,
                     PersonCredentials = new PersonCredentialParameters
                     {
                         FirstName = firstName,
                         LastName = lastName,
-                        IdentificationType = identificationTypes,
+                        IdentificationType = (IdentificationTypes)Enum.Parse(typeof(IdentificationTypes), identificationTypeStr),
                         IdentificationValue = identificationValue,
                         MobileNumber = long.Parse(mobileNumber),
                         Photo = photo
