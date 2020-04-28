@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Cors;
+﻿using System;
+using Microsoft.AspNetCore.Cors;
 using Microsoft.AspNetCore.Mvc;
 
 namespace CoviIDApiCore.V1.Controllers
@@ -11,6 +12,8 @@ namespace CoviIDApiCore.V1.Controllers
         [HttpGet]
         public IActionResult Health()
         {
+            throw new Exception("test"); //TODO: Remove after testing
+
             return new OkResult();
         }
     }
