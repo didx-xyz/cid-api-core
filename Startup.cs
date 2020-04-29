@@ -76,7 +76,7 @@ namespace CoviIDApiCore
             {
                 app.UseHangfireDashboard();
                 app.UseDeveloperExceptionPage();
-                app.UseSwagger();              
+                app.UseSwagger();
                 app.UseSwaggerUI(swagger =>
                 {
                     swagger.SwaggerEndpoint("/swagger/v1/swagger.json", $"Cov-ID Core {_applicationName}");
@@ -85,22 +85,20 @@ namespace CoviIDApiCore
             }
             else
                 app.UseHsts();
-            
+
             app.UseCors("AllowSpecificOrigin");
             app.UseAuthentication();
             ConfigureDefaultResponses(app);
             app.UseMiddleware<ExceptionHandler>();
             app.UseHttpsRedirection();
             app.UseMvc();
-        }       
+        }
 
         #region Private Configuration Methods
 
         private void ConfigureDatabaseContext(IServiceCollection services)
         {
-            var connectionString = _configuration.GetConnectionString("DefaultConnection");
-
-            var connection = new SqlConnectionStringBuilder(connectionString)
+            var connection = new SqlConnectionStringBuilder(_connectionString)
             {
                 ConnectRetryInterval = 3,
                 MinPoolSize = 3
@@ -137,7 +135,8 @@ namespace CoviIDApiCore
             services.AddCors(options =>
             {
                 options.AddPolicy("AllowSpecificOrigin",
-                    builder => {
+                    builder =>
+                    {
                         builder
                         .AllowAnyOrigin()
                         .AllowAnyHeader()
@@ -217,7 +216,7 @@ namespace CoviIDApiCore
             services.AddHttpClient<IClickatellBroker, ClickatellBroker>(client =>
                 {
                     client.BaseAddress = new Uri(clickatellCredentials.BaseUrl);
-                    client.DefaultRequestHeaders.TryAddWithoutValidation("Authorization",clickatellCredentials.Key);
+                    client.DefaultRequestHeaders.TryAddWithoutValidation("Authorization", clickatellCredentials.Key);
                     client.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue(_applicationJson));
                 }
             );
@@ -253,7 +252,7 @@ namespace CoviIDApiCore
                 if (context.HttpContext.Response.StatusCode == (int)HttpStatusCode.Unauthorized)
                 {
                     await context.HttpContext.Response.WriteAsync(
-                        JsonConvert.SerializeObject(new V1.DTOs.System.Response(false, HttpStatusCode.Unauthorized, 
+                        JsonConvert.SerializeObject(new V1.DTOs.System.Response(false, HttpStatusCode.Unauthorized,
                         "Unauthorised")));
                 }
             });

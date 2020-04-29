@@ -56,7 +56,7 @@ namespace CoviIDApiCore.V1.Services
         {
             var organisation = await _organisationRepository.GetAsync(Guid.Parse(id));
 
-            if(organisation == default)
+            if (organisation == default)
                 return new Response(false, HttpStatusCode.NotFound, Messages.Org_NotExists);
 
             var orgCounter = await _organisationCounterRepository.GetLastByOrganisation(organisation);
@@ -79,7 +79,7 @@ namespace CoviIDApiCore.V1.Services
 
             balance = lastCount?.Balance ?? 0;
 
-            if(balance < 1 && updateType == UpdateType.Subtraction)
+            if (balance < 1 && updateType == UpdateType.Subtraction)
                 throw new ValidationException(Messages.Org_NegBalance);
 
             var newCount = new OrganisationCounter()
@@ -111,7 +111,7 @@ namespace CoviIDApiCore.V1.Services
                 .FirstOrDefault(t => string.Equals(t.Field.Reference, emailAddressRef, StringComparison.Ordinal))?
                 .Email;
 
-            if(string.IsNullOrEmpty(emailAddress))
+            if (string.IsNullOrEmpty(emailAddress))
                 throw new ValidationException(Messages.Org_EmailEmpty);
 
             //TODO: Queueing
