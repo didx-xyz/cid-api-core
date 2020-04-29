@@ -40,8 +40,13 @@ namespace CoviIDApiCore
             _applicationName = Assembly.GetExecutingAssembly().GetName().Name;
             _environment = Environment.GetEnvironmentVariable("ASPNETCORE_ENVIRONMENT") ?? "Local";
             Console.WriteLine($"Environment: {_environment}");
-            _configuration = configuration;
             _connectionString = _configuration.GetConnectionString("DefaultConnection");
+            _environment = "Development";
+            _configuration = new ConfigurationBuilder()
+                .SetBasePath(Directory.GetCurrentDirectory())
+                .AddJsonFile($"appsettings.json", optional: false, reloadOnChange: true)
+                .AddEnvironmentVariables()
+                .Build();
 
             ConfigureSentry();
         }
