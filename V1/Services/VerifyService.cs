@@ -27,7 +27,7 @@ namespace CoviIDApiCore.V1.Services
 
             var covidStatus = coviIdCredentials.CovidTestCredentials.CovidStatus;
 
-            if (!string.IsNullOrEmpty(organisationId) && covidStatus == CovidStatus.Positive)
+            if (!string.IsNullOrEmpty(organisationId) && covidStatus != CovidStatus.Positive)
                 await _organisationService.UpdateCountAsync(organisationId, deviceIdentifier, UpdateType.Addition);
 
             return new VerifyResult
