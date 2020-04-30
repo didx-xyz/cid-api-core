@@ -115,7 +115,6 @@ namespace CoviIDApiCore.V1.Brokers
             if (response.IsSuccessStatusCode)
                 return response;
 
-            //TODO: log the broker response
             var message = await response.Content.ReadAsStringAsync();
             throw new StreetCredBrokerException($"{message} Broker status code: {response.StatusCode}");
         }
