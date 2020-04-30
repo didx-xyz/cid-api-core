@@ -52,7 +52,7 @@ namespace CoviIDApiCore.V1.Services
         {
             var wallet = new WalletParameters
             {
-                OwnerName = $"{coviIdWalletParameters.FirstName}-{coviIdWalletParameters.LastName}"
+                OwnerName = $"{coviIdWalletParameters.FirstName.Trim()}-{coviIdWalletParameters.LastName.Trim()}"
             };
 
             var response = await _custodianBroker.CreateWallet(wallet);
