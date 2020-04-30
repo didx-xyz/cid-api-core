@@ -30,7 +30,7 @@ namespace CoviIDApiCore.Helpers
         {
             if (identificationType == IdentificationTypes.Passport)
             {
-                if (value.Length > 8 && value.Length < 19)
+                if (value.Length > 6)
                 {
                     return value;
                 }
