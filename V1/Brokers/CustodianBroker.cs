@@ -93,7 +93,7 @@ namespace CoviIDApiCore.V1.Brokers
         public async Task AcceptVerification(string walletId, string verificationId)
         {
             var response = await _httpClient.GetAsync($"{_partialRoot}{walletId}/verifications/{verificationId}/autoSelect");
-            
+
             response = await ValidateResponse(response);
             return;
         }
