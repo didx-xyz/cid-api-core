@@ -68,20 +68,16 @@ This product was ultimately designed to give the user control over their data. O
 
 In the project directory:
 
-### 1. `npm install`
-
-Install all the needed packages inside the project directory.
-
-### 2. App Settings
+### 1. App Settings
 
 Make a file called `appsettings.json`
 
 Copy the content out of the `appsettings.example.json` and fill in the needed information
 
-### 3. Get `.NET` up
+### 2. Get `.NET` up
 
 Download the latest `.NET` Core SDK
-* [`.NET` Core 3.1 SDK](https://github.com/dotnet/core/blob/master/release-notes/3.1/README.md)
+* [`.NET` Core 2.2 SDK](https://github.com/dotnet/core/blob/master/release-notes/2.2/README.md)
 
 `.NET` Core Releases and Daily Builds
 * [.NET Core released builds](https://github.com/dotnet/core/blob/master/release-notes/README.md)
