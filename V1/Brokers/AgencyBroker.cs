@@ -31,29 +31,21 @@ namespace CoviIDApiCore.V1.Brokers
         public async Task<string> UploadFiles(string file, string fileName)
         {
             var base64Array = Convert.FromBase64String(file);
-            var filePath = Path.Combine($"{Environment.CurrentDirectory}/upload-images/{fileName}.png");
-            File.WriteAllBytes(filePath, base64Array);
 
-            if (filePath.IsAppropriateSize())
+            var multipartContent = new MultipartFormDataContent
             {
-                var multipartContent = new MultipartFormDataContent
                 {
-                    {
-                        new ByteArrayContent(File.ReadAllBytes(filePath)),
-                        "uploadedFiles", Path.GetFileName(filePath)
-                    },
-                    {new StringContent(fileName), "filename"},
-                    {new StringContent("image/png"), "contentType"}
-                };
+                    new ByteArrayContent(base64Array),
+                    "uploadedFiles", Path.GetFileName(fileName)
+                },
+                {new StringContent(fileName), "filename"},
+                {new StringContent("image/png"), "contentType"}
+            };
 
-                var response = await _httpClient.PostAsync($"{partialRoot}/common/upload", multipartContent);
-                response = await ValidateResponse(response);
-                File.Delete(filePath);
-                return JsonConvert.DeserializeObject<string>(await response.Content.ReadAsStringAsync());
-            }
-            File.Delete(filePath);
+            var response = await _httpClient.PostAsync($"{partialRoot}/common/upload", multipartContent);
+            response = await ValidateResponse(response);
 
-            throw new ValidationException(Messages.Val_FileTooLarge);
+            return JsonConvert.DeserializeObject<string>(await response.Content.ReadAsStringAsync());
         }
 
         #endregion
