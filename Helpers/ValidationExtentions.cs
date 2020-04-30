@@ -56,7 +56,7 @@ namespace CoviIDApiCore.Helpers
         public static string ValidateFileSize(this string filePath)
         {
             var fileInfo = new FileInfo(filePath);
-            if (fileInfo.Length <= 1048576) // 1 MB
+            if (fileInfo.Length <= 5242880) // 5 MB
                 return filePath;
             
             throw new ValidationException(Messages.Val_FileTooLarge);
