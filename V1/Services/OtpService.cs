@@ -20,7 +20,7 @@ namespace CoviIDApiCore.V1.Services
         private readonly ICredentialService _credentialService;
         private readonly IWalletRepository _walletRepository;
 
-        public OtpService(IOtpTokenRepository tokenRepository, IConfiguration configuration, IClickatellBroker clickatellBroker, 
+        public OtpService(IOtpTokenRepository tokenRepository, IConfiguration configuration, IClickatellBroker clickatellBroker,
             ICredentialService credentialService, IWalletRepository walletRepository)
         {
             _otpTokenRepository = tokenRepository;
@@ -47,7 +47,7 @@ namespace CoviIDApiCore.V1.Services
         {
             var wallet = await _walletRepository.GetByWalletIdentifier(payload.WalletId);
 
-            if(wallet == default)
+            if (wallet == default)
                 throw new NotFoundException();
 
             await GenerateAndSendOtpAsync(payload.MobileNumber.ToString(), wallet);
@@ -55,7 +55,7 @@ namespace CoviIDApiCore.V1.Services
 
         private ClickatellTemplate ConstructMessage(string mobileNumber, int code, int validityPeriod, Wallet wallet)
         {
-            var recipient = new []
+            var recipient = new[]
             {
                 mobileNumber
             };
@@ -88,7 +88,7 @@ namespace CoviIDApiCore.V1.Services
         {
             var token = await _otpTokenRepository.GetUnusedByWalletIdAndMobileNumber(payload.WalletId, payload.Person.MobileNumber.ToString());
 
-            if(token == default || token.ExpireAt <= DateTime.UtcNow || token.Code != payload.Otp)
+            if (token == default || token.ExpireAt <= DateTime.UtcNow || token.Code != payload.Otp)
                 throw new ValidationException(Messages.Token_OTPNotExist);
 
             token.isUsed = true;

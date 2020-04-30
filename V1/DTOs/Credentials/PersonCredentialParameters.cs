@@ -1,6 +1,4 @@
-﻿using System;
-
-namespace CoviIDApiCore.V1.DTOs.Credentials
+﻿namespace CoviIDApiCore.V1.DTOs.Credentials
 {
     public class PersonCredentialParameters
     {
