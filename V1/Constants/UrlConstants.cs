@@ -11,7 +11,7 @@ namespace CoviIDApiCore.V1.Constants
             { Routes.Sendgrid, "v3/mail/send"},
             { Routes.ClickatellSend, "/messages"},
             { Routes.Organisation, "/api/organisation" },
-            { Routes.Health, "/api/health" }
+            { Routes.Health, "/" }
         };
 
         public enum Routes

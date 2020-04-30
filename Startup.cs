@@ -45,7 +45,7 @@ namespace CoviIDApiCore
                 .AddEnvironmentVariables()
                 .Build();
 
-            _environment = Environment.GetEnvironmentVariable("ASPNETCORE_ENVIRONMENT") ?? "Local";
+            _environment = _configuration.GetValue<string>("Environment");
             Console.WriteLine($"Environment: {_environment}");
             _connectionString = _configuration.GetConnectionString("DefaultConnection");
             ConfigureSentry();
@@ -77,7 +77,7 @@ namespace CoviIDApiCore
 
         public void Configure(IApplicationBuilder app, IHostingEnvironment env)
         {
-            if (!env.IsProduction())
+            if (_environment != "Production")
             {
                 app.UseHangfireDashboard();
                 app.UseDeveloperExceptionPage();

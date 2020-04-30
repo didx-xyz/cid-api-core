@@ -5,7 +5,7 @@ using Microsoft.AspNetCore.Mvc;
 namespace CoviIDApiCore.V1.Controllers
 {
     [EnableCors("AllowSpecificOrigin")]
-    [Route("")]
+    [Route("/")]
     [ApiController]
     public class HealthController : Controller
     {
