@@ -363,7 +363,7 @@ bin/
 obj/
 
 *.zip
-*.png
+upload-images/
 *.jpg
 
 # Merge Conflicts
