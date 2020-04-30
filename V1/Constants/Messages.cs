@@ -35,17 +35,19 @@
         public static readonly string Token_OTPFailed = $"OTP is invalid.";
         #endregion
 
+        #region Credentials
+        public static readonly string Cred_NotFound = $"Could not find any credentials for this wallet.";
+        public static readonly string Cred_OfferedNotFound = $"Could not find any offered credentials for this wallet.";
+        public static readonly string Cred_RequestedNotFound = $"Could not find any Requested credentials for this wallet.";
+        public static readonly string Cred_VerifidPersonNotFound = $"Could not find the verified person credentials.";
+        #endregion
+
         #region Validation
         public static readonly string Val_Length = $"Invalid length.";
         public static readonly string Val_MobileNumber = $"Invalid mobile number.";
         public static readonly string Val_Identification = $"Invalid Identification number.";
         public static readonly string Val_DateNotInPast = $"Invalid Date, date must be in the past";
         public static readonly string Val_FileTooLarge = $"The File size is to large.";
-
-        #endregion
-
-        #region Attributes
-        public const string Mobile_NumberInvalid = "The mobile number entered is invalid.";
         #endregion
     }
 }

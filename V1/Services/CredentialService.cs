@@ -1,5 +1,6 @@
 ﻿using CoviIDApiCore.Helpers;
 using CoviIDApiCore.Models.Database;
+using CoviIDApiCore.V1.Constants;
 using CoviIDApiCore.V1.DTOs.Connection;
 using CoviIDApiCore.V1.DTOs.Credentials;
 using CoviIDApiCore.V1.Interfaces.Brokers;
@@ -7,6 +8,7 @@ using CoviIDApiCore.V1.Interfaces.Repositories;
 using CoviIDApiCore.V1.Interfaces.Services;
 using System;
 using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations;
 using System.Linq;
 using System.Threading.Tasks;
 using static CoviIDApiCore.V1.Constants.DefinitionConstants;
@@ -105,7 +107,12 @@ namespace CoviIDApiCore.V1.Services
             var covidTestCredentials = await CreateCovidTest(agentInvitation.ConnectionId, covidTest, walletId);
 
             var userCredentials = await _custodianBroker.GetCredentials(walletId);
-            var offeredCredentials = userCredentials.Where(x => x.State == CredentialsState.Offered);
+            if (userCredentials == null)
+                throw new ValidationException(Messages.Cred_NotFound);
+
+            var offeredCredentials = userCredentials?.Where(x => x.State == CredentialsState.Offered);
+            if (offeredCredentials == null)
+                throw new ValidationException(Messages.Cred_OfferedNotFound);
 
             if (offeredCredentials != null)
             {
@@ -120,13 +127,19 @@ namespace CoviIDApiCore.V1.Services
 
         public async Task<CoviIDCredentialContract> GetCoviIDCredentials(string walletId)
         {
-            var testCredentials = new CovidTestCredentialParameters();
+            var covidTestCredentials = new CovidTestCredentialParameters();
 
             var allCredentials = await _custodianBroker.GetCredentials(walletId);
-            var offeredCredentials = allCredentials.Where(x => x.State == CredentialsState.Requested).ToList();
+            if (allCredentials == null)
+                throw new ValidationException(Messages.Cred_NotFound);
 
-            var verifiedPerson = offeredCredentials.FirstOrDefault(p => p.DefinitionId == DefinitionIds[Schemas.Person]);
-            var covidTest = offeredCredentials.Where(c => c.DefinitionId == DefinitionIds[Schemas.CovidTest])
+            var offeredCredentials = allCredentials?.Where(x => x.State == CredentialsState.Requested).ToList();
+            if (offeredCredentials == null)
+                throw new ValidationException(Messages.Cred_RequestedNotFound);
+
+
+            var verifiedPerson = offeredCredentials?.FirstOrDefault(p => p.DefinitionId == DefinitionIds[Schemas.Person]);
+            var covidTest = offeredCredentials?.Where(c => c.DefinitionId == DefinitionIds[Schemas.CovidTest])
                 .OrderBy(c => c.Values.TryGetValue(Attributes.DateIssued, out var dateIssued)).ToList().FirstOrDefault();
 
             if (verifiedPerson != null)
@@ -138,6 +151,8 @@ namespace CoviIDApiCore.V1.Services
                 verifiedPerson.Values.TryGetValue(Attributes.MobileNumber, out string mobileNumber);
                 verifiedPerson.Values.TryGetValue(Attributes.IdentificationType, out string identificationTypeStr);
                 verifiedPerson.Values.TryGetValue(Attributes.IdentificationValue, out string identificationValue);
+
+                var identificationType = (IdentificationTypes)Enum.Parse(typeof(IdentificationTypes), identificationTypeStr);
 
                 if (covidTest != null)
                 {
@@ -151,29 +166,28 @@ namespace CoviIDApiCore.V1.Services
                     var laboratory = (Laboratory)Enum.Parse(typeof(Laboratory), laboratoryStr);
                     var covidStatus = (CovidStatus)Enum.Parse(typeof(CovidStatus), covidStatusStr);
 
-                    testCredentials.DateIssued = DateTime.Parse(dateIssued);
-                    testCredentials.DateTested = DateTime.Parse(dateTested);
-                    testCredentials.Laboratory = laboratory;
-                    testCredentials.ReferenceNumber = referenceNumber;
-                    testCredentials.CovidStatus = covidStatus;
+                    covidTestCredentials.DateIssued = DateTime.Parse(dateIssued);
+                    covidTestCredentials.DateTested = DateTime.Parse(dateTested);
+                    covidTestCredentials.Laboratory = laboratory;
+                    covidTestCredentials.ReferenceNumber = referenceNumber;
+                    covidTestCredentials.CovidStatus = covidStatus;
                 }
 
                 return new CoviIDCredentialContract
                 {
-                    CovidTestCredentials = testCredentials,
+                    CovidTestCredentials = covidTestCredentials,
                     PersonCredentials = new PersonCredentialParameters
                     {
                         FirstName = firstName,
                         LastName = lastName,
-                        IdentificationType = (IdentificationTypes)Enum.Parse(typeof(IdentificationTypes), identificationTypeStr),
+                        IdentificationType = identificationType,
                         IdentificationValue = identificationValue,
                         MobileNumber = long.Parse(mobileNumber),
                         Photo = photo
                     }
                 };
             }
-            //TODO : throw exception/handle
-            return null;
+            throw new ValidationException(Messages.Cred_VerifidPersonNotFound);
         }
         private async void StoreCoviIDCredentials(CovidTestCredentialParameters covidTestParameters, string walletId)
         {
