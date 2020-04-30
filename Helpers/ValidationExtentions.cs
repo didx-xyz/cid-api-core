@@ -2,6 +2,7 @@
 using CoviIDApiCore.V1.Constants;
 using CoviIDApiCore.V1.DTOs.Credentials;
 using System;
+using System.IO;
 
 namespace CoviIDApiCore.Helpers
 {
@@ -44,14 +45,21 @@ namespace CoviIDApiCore.Helpers
             throw new ValidationException(Messages.Val_Identification);
         }
 
-        public static DateTime ValidateIsInPast(this DateTime date)
+        public static DateTime IsInPast(this DateTime date)
         {
-            var test = new DateTime();
-            if (date > DateTime.Today && date == test)
-                throw new ValidationException(Messages.Val_DateInPast);
-
-            return date;
+            var defaultDate = new DateTime();
+            if (date < DateTime.Today && date != defaultDate)
+                return date;
+            throw new ValidationException(Messages.Val_DateNotInPast);
         }
 
+        public static string ValidateFileSize(this string filePath)
+        {
+            var fileInfo = new FileInfo(filePath);
+            if (fileInfo.Length <= 1048576) // 1 MB
+                return filePath;
+            
+            throw new ValidationException(Messages.Val_FileTooLarge);
+        }
     }
 }

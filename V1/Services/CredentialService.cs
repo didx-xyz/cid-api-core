@@ -76,7 +76,7 @@ namespace CoviIDApiCore.V1.Services
                     {
                         { Attributes.ReferenceNumber , covidTestCredential.ReferenceNumber.ValidateLength() },
                         { Attributes.Laboratory , covidTestCredential.Laboratory.ToString() },
-                        { Attributes.DateTested , covidTestCredential.DateTested.ValidateIsInPast().ToString() },
+                        { Attributes.DateTested , covidTestCredential.DateTested.IsInPast().ToString() },
                         { Attributes.DateIssued, covidTestCredential.DateIssued.ToString() },
                         { Attributes.CovidStatus, covidTestCredential.CovidStatus.ToString() },
                     }

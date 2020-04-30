@@ -11,6 +11,7 @@ using System.Threading.Tasks;
 using CoviIDApiCore.V1.Constants;
 using CoviIDApiCore.V1.DTOs.Verifications;
 using CoviIDApiCore.V1.DTOs.VerificationPolicy;
+using CoviIDApiCore.Helpers;
 
 namespace CoviIDApiCore.V1.Brokers
 {
@@ -30,7 +31,7 @@ namespace CoviIDApiCore.V1.Brokers
         public async Task<string> UploadFiles(string file, string fileName)
         {
             var base64Array = Convert.FromBase64String(file);
-            var filePath = Path.Combine($"{Environment.CurrentDirectory}/{fileName}.png");
+            var filePath = Path.Combine($"{Environment.CurrentDirectory}/{fileName}.png").ValidateFileSize();
             File.WriteAllBytes(filePath, base64Array);
 
             var multipartContent = new MultipartFormDataContent

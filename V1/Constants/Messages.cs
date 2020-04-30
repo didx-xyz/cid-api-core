@@ -39,7 +39,9 @@
         public static readonly string Val_Length = $"Invalid length.";
         public static readonly string Val_MobileNumber = $"Invalid mobile number.";
         public static readonly string Val_Identification = $"Invalid Identification number.";
-        public static readonly string Val_DateInPast = $"Invalid Date, date must be in the past";
+        public static readonly string Val_DateNotInPast = $"Invalid Date, date must be in the past";
+        public static readonly string Val_FileTooLarge = $"The File size is to large.";
+
         #endregion
 
         #region Attributes
