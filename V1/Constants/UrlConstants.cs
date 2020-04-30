@@ -10,7 +10,8 @@ namespace CoviIDApiCore.V1.Constants
             { Routes.Custodian, "custodian/v1/api/" },
             { Routes.Sendgrid, "v3/mail/send"},
             { Routes.ClickatellSend, "/messages"},
-            { Routes.Organisation, "/api/organisation" }
+            { Routes.Organisation, "/api/organisation" },
+            { Routes.Health, "/" }
         };
 
         public enum Routes
@@ -19,7 +20,8 @@ namespace CoviIDApiCore.V1.Constants
             Custodian,
             Sendgrid,
             ClickatellSend,
-            Organisation
+            Organisation,
+            Health
         }
     }
 }

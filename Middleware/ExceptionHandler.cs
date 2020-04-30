@@ -26,7 +26,9 @@ namespace CoviIDApiCore.Middleware
         {
             try
             {
-                if (!_authentication.IsAuthorized(context.Request.Headers["x-api-key"]) && context.Request.Path != UrlConstants.PartialRoutes[UrlConstants.Routes.Organisation])
+                if (!_authentication.IsAuthorized(context.Request.Headers["x-api-key"]) 
+                    && context.Request.Path != UrlConstants.PartialRoutes[UrlConstants.Routes.Organisation]
+                    && context.Request.Path != UrlConstants.PartialRoutes[UrlConstants.Routes.Health])
                     throw new UnauthorizedAccessException();
 
                 await _next(context);
