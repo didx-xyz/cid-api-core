@@ -1,6 +1,5 @@
 ﻿using System.Net.Http;
 using System.Threading.Tasks;
-
 using CoviIDApiCore.Exceptions;
 using CoviIDApiCore.V1.Constants;
 using CoviIDApiCore.V1.Interfaces.Brokers;
@@ -21,7 +20,7 @@ namespace CoviIDApiCore.V1.Brokers
         {
             var response = await _httpClient.PostAsJsonAsync(_sendPartialRoot, payload);
 
-            if(!response.IsSuccessStatusCode)
+            if (!response.IsSuccessStatusCode)
                 throw new ClickatellException(await response.Content.ReadAsStringAsync());
         }
     }

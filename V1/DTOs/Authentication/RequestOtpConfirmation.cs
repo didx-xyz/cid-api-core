@@ -9,7 +9,6 @@ namespace CoviIDApiCore.V1.DTOs.Authentication
         public int Otp { get; set; }
         [Required]
         public string WalletId { get; set; }
-
         public CovidTestCredentialParameters CovidTest { get; set; }
         public PersonCredentialParameters Person { get; set; }
     }

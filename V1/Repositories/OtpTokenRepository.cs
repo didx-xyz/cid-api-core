@@ -1,12 +1,12 @@
-﻿﻿using Microsoft.EntityFrameworkCore;
+﻿using Microsoft.EntityFrameworkCore;
 using System;
- using System.Linq;
- using System.Threading.Tasks;
- using CoviIDApiCore.Data;
- using CoviIDApiCore.Models.Database;
- using CoviIDApiCore.V1.Interfaces.Repositories;
+using System.Linq;
+using System.Threading.Tasks;
+using CoviIDApiCore.Data;
+using CoviIDApiCore.Models.Database;
+using CoviIDApiCore.V1.Interfaces.Repositories;
 
- namespace CoviIDApiCore.V1.Repositories
+namespace CoviIDApiCore.V1.Repositories
 {
     public class OtpTokenRepository : BaseRepository<OtpToken, long>, IOtpTokenRepository
     {

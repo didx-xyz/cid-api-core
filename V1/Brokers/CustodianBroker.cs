@@ -93,7 +93,7 @@ namespace CoviIDApiCore.V1.Brokers
         public async Task AcceptVerification(string walletId, string verificationId)
         {
             var response = await _httpClient.GetAsync($"{_partialRoot}{walletId}/verifications/{verificationId}/autoSelect");
-            
+
             response = await ValidateResponse(response);
             return;
         }
@@ -115,7 +115,6 @@ namespace CoviIDApiCore.V1.Brokers
             if (response.IsSuccessStatusCode)
                 return response;
 
-            //TODO: log the broker response
             var message = await response.Content.ReadAsStringAsync();
             throw new StreetCredBrokerException($"{message} Broker status code: {response.StatusCode}");
         }
