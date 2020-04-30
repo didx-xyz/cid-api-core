@@ -22,12 +22,28 @@
         public static readonly string Org_NotExists = $"Organisation does not exist.";
         public static readonly string Org_PayloadInvalid = $"Payload is invalid.";
         public static readonly string Org_NegBalance = $"Balance can not be less than 0.";
-
         public static readonly string Org_EmailEmpty = $"Organisation email is empty.";
         #endregion
 
         #region QRCode
         public static readonly string QR_Failed = $"QR code generation failed.";
+        #endregion
+
+        #region Tokens
+        public static readonly string Token_OTPNotExist = $"OTP could not be found.";
+        public static readonly string Token_OTPExpired = $"OTP has expired.";
+        public static readonly string Token_OTPFailed = $"OTP is invalid.";
+        #endregion
+
+        #region Validation
+        public static readonly string Val_Length = $"Invalid length.";
+        public static readonly string Val_MobileNumber = $"Invalid mobile number.";
+        public static readonly string Val_Identification = $"Invalid Identification number.";
+        public static readonly string Val_DateInPast = $"Invalid Date, date must be in the past";
+        #endregion
+
+        #region Attributes
+        public const string Mobile_NumberInvalid = "The mobile number entered is invalid.";
         #endregion
     }
 }

@@ -67,7 +67,7 @@ namespace CoviIDApiCore.V1.Brokers
         #region Credentials
         public async Task<CredentialsContract> GetCredential(string credentialId)
         {
-            var response = await _httpClient.GetAsync($"{partialRoot}/credentials?{credentialId}");
+            var response = await _httpClient.GetAsync($"{partialRoot}credentials?{credentialId}");
             response = await ValidateResponse(response);
             return JsonConvert.DeserializeObject<CredentialsContract>(await response.Content.ReadAsStringAsync());
         }
@@ -76,7 +76,7 @@ namespace CoviIDApiCore.V1.Brokers
         {
             var content = new StringContent(JsonConvert.SerializeObject(credentials), Encoding.UTF8, applicationJson);
 
-            var response = await _httpClient.PostAsync($"{partialRoot}/credentials", content);
+            var response = await _httpClient.PostAsync($"{partialRoot}credentials", content);
             response = await ValidateResponse(response);
 
             return JsonConvert.DeserializeObject<CredentialsContract>(await response.Content.ReadAsStringAsync());

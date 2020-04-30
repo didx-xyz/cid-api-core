@@ -8,17 +8,30 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <Compile Remove="Migrations\20200423102855_dbo_OtpTable.cs" />
+    <Compile Remove="Migrations\20200423102855_dbo_OtpTable.Designer.cs" />
+    <Compile Remove="Migrations\20200423103439_dbo_OtpTable.cs" />
+    <Compile Remove="Migrations\20200423103439_dbo_OtpTable.Designer.cs" />
+    <Compile Remove="Migrations\20200423140407_dbo_WalletTable.cs" />
+    <Compile Remove="Migrations\20200423140407_dbo_WalletTable.Designer.cs" />
+  </ItemGroup>
+
+  <ItemGroup>
     <Content Remove="appsettings.Development.json" />
     <Content Remove="appsettings.Local.json" />
   </ItemGroup>
 
   <ItemGroup>
-    <PackageReference Include="BarCode" Version="2020.5.0" />
+    <PackageReference Include="Hangfire.AspNetCore" Version="1.7.11" />
+    <PackageReference Include="Hangfire.Core" Version="1.7.11" />
+    <PackageReference Include="Hangfire.SqlServer" Version="1.7.11" />
     <PackageReference Include="Microsoft.AspNetCore.App" />
     <PackageReference Include="Microsoft.AspNetCore.Razor.Design" Version="2.2.0" PrivateAssets="All" />
     <PackageReference Include="Microsoft.EntityFrameworkCore" Version="2.2.6" />
     <PackageReference Include="Microsoft.VisualStudio.Azure.Containers.Tools.Targets" Version="1.10.8" />
     <PackageReference Include="Microsoft.VisualStudio.Web.CodeGeneration.Design" Version="2.2.4" />
+    <PackageReference Include="Sentry.AspNetCore" Version="2.1.1" />
+    <PackageReference Include="QRCoder" Version="1.3.9" />
     <PackageReference Include="Swashbuckle.AspNetCore.Swagger" Version="4.0.1" />
     <PackageReference Include="Swashbuckle.AspNetCore.SwaggerGen" Version="4.0.1" />
     <PackageReference Include="Swashbuckle.AspNetCore.SwaggerUI" Version="4.0.1" />

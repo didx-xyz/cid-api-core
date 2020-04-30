@@ -1,24 +1,30 @@
-﻿using System;
-using System.IO;
-using CoviIDApiCore.Exceptions;
-using CoviIDApiCore.V1.Constants;
+﻿using CoviIDApiCore.V1.Constants;
 using CoviIDApiCore.V1.Interfaces.Services;
-using IronBarCode;
+using Microsoft.Extensions.Configuration;
+using QRCoder;
 
 namespace CoviIDApiCore.V1.Services
 {
     public class QRCodeService : IQRCodeService
     {
+        private readonly IConfiguration _configuration;
+
+        public QRCodeService(IConfiguration configuration)
+        {
+            _configuration = configuration;
+        }
+
         public string GenerateQRCode(string id)
         {
-            var qrCode = QRCodeWriter.CreateQrCode(id, 400, QRCodeWriter.QrErrorCorrectionLevel.Medium);
+            var baseUrl = _configuration.GetValue<string>("CoviIDBaseUrl");
 
-            if(!qrCode.Verify())
-                throw new QRException(Messages.QR_Failed);
+            var qrGenerator = new QRCodeGenerator();
 
-            var binaryData = qrCode.ToPngBinaryData();
+            var qrCodeData = qrGenerator.CreateQrCode($"{baseUrl}{UrlConstants.PartialRoutes[UrlConstants.Routes.Organisation]}/{id}", QRCodeGenerator.ECCLevel.Q);
 
-            return $"data:image/png;base64, {Convert.ToBase64String(binaryData)}";
+            var qrCode = new Base64QRCode(qrCodeData);
+
+            return $"{qrCode.GetGraphic(20)}";
         }
     }
 }
