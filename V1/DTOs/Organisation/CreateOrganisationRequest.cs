@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations;
 using Newtonsoft.Json;
 
 namespace CoviIDApiCore.V1.DTOs.Organisation
@@ -62,7 +63,8 @@ namespace CoviIDApiCore.V1.DTOs.Organisation
     {
         [JsonProperty("type")] 
         public string Type { get; set; }
-        [JsonProperty("text")] 
+        [JsonProperty("text")]
+        [StringLength(200)]
         public string Text { get; set; }
         [JsonProperty("field")] 
         public AnswerFields Field { get; set; }
