@@ -10,7 +10,6 @@ using System.Threading.Tasks;
 using CoviIDApiCore.Models.Database;
 using CoviIDApiCore.V1.Interfaces.Repositories;
 using Microsoft.Extensions.Configuration;
-using Hangfire;
 using static CoviIDApiCore.V1.Constants.DefinitionConstants;
 
 namespace CoviIDApiCore.V1.Services
@@ -52,7 +51,7 @@ namespace CoviIDApiCore.V1.Services
         {
             var wallet = new WalletParameters
             {
-                OwnerName = $"{coviIdWalletParameters.FirstName.Trim()}-{coviIdWalletParameters.LastName.Trim()}"
+                OwnerName = $"{coviIdWalletParameters.FirstName?.Trim()}-{coviIdWalletParameters.LastName?.Trim()}"
             };
 
             var response = await _custodianBroker.CreateWallet(wallet);
@@ -71,21 +70,6 @@ namespace CoviIDApiCore.V1.Services
             };
 
             return contract;
-        }
-
-        private async Task<Wallet> SaveNewWalletAsync(string walletId)
-        {
-            var newWallet = new Wallet()
-            {
-                WalletIdentifier = walletId,
-                CreatedAt = DateTime.UtcNow
-            };
-
-            await _walletRepository.AddAsync(newWallet);
-
-            await _walletRepository.SaveAsync();
-
-            return newWallet;
         }
 
         /// <summary>
@@ -129,5 +113,22 @@ namespace CoviIDApiCore.V1.Services
                 await _custodianBroker.DeleteWallet(wallet.WalletId);
             }
         }
+
+        #region Private Methods
+        private async Task<Wallet> SaveNewWalletAsync(string walletId)
+        {
+            var newWallet = new Wallet()
+            {
+                WalletIdentifier = walletId,
+                CreatedAt = DateTime.UtcNow
+            };
+
+            await _walletRepository.AddAsync(newWallet);
+
+            await _walletRepository.SaveAsync();
+
+            return newWallet;
+        }
+        #endregion
     }
 }
