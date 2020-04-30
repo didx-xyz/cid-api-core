@@ -53,13 +53,13 @@ namespace CoviIDApiCore.Helpers
             throw new ValidationException(Messages.Val_DateNotInPast);
         }
 
-        public static string ValidateFileSize(this string filePath)
+        public static bool IsAppropriateSize(this string filePath)
         {
             var fileInfo = new FileInfo(filePath);
             if (fileInfo.Length <= 5242880) // 5 MB
-                return filePath;
-            
-            throw new ValidationException(Messages.Val_FileTooLarge);
+                return true;
+         
+            return false;
         }
     }
 }
