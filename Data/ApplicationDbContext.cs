@@ -32,6 +32,7 @@ namespace CoviIDApiCore.Data
                    v => v.ToString().ToLower(),
                    v => (Laboratory)Enum.Parse(typeof(Laboratory), v)
                );
+
             modelBuilder
                .Entity<CovidTest>()
                .Property(e => e.CovidStatus)
@@ -39,6 +40,7 @@ namespace CoviIDApiCore.Data
                    v => v.ToString().ToLower(),
                    v => (CovidStatus)Enum.Parse(typeof(CovidStatus), v)
                );
+
             modelBuilder
              .Entity<CovidTest>()
              .Property(e => e.CredentialIndicator)
@@ -46,6 +48,14 @@ namespace CoviIDApiCore.Data
                  v => v.ToString().ToLower(),
                  v => (CredentialIndicator)Enum.Parse(typeof(CredentialIndicator), v)
              );
+
+            modelBuilder
+                .Entity<OrganisationCounter>()
+                .Property(e => e.ScanType)
+                .HasConversion(
+                    v => v.ToString().ToLower(),
+                    v => (ScanType) Enum.Parse(typeof(ScanType), v)
+                );
         }
     }
 }

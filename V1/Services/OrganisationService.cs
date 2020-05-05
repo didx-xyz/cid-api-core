@@ -66,11 +66,13 @@ namespace CoviIDApiCore.V1.Services
             return new Response(new OrganisationDTO(organisation, orgCounter, totalScans), HttpStatusCode.OK);
         }
 
-        public async Task UpdateCountAsync(string id, string deviceId, UpdateType updateType)
+        public async Task<int> UpdateCountAsync(UpdateCountRequest payload, ScanType scanType)
         {
             var balance = 0;
 
-            var organisation = await _organisationRepository.GetAsync(Guid.Parse(id));
+            //TODO: Check coviid
+
+            var organisation = await _organisationRepository.GetAsync(Guid.Parse(payload.OrganisationId));
 
             if (organisation == default)
                 throw new NotFoundException(Messages.Org_NotExists);
@@ -79,24 +81,35 @@ namespace CoviIDApiCore.V1.Services
 
             balance = lastCount?.Balance ?? 0;
 
-            if (balance < 1 && updateType == UpdateType.Subtraction)
+            if (balance < 1 && scanType == ScanType.CheckOut)
                 throw new ValidationException(Messages.Org_NegBalance);
+
+            switch (scanType)
+            {
+                case ScanType.CheckIn:
+                    balance += 1;
+                    break;
+                case ScanType.CheckOut:
+                    balance -= 1;
+                    break;
+                default:
+                    throw new ArgumentOutOfRangeException(nameof(scanType), scanType, null);
+            }
 
             var newCount = new OrganisationCounter()
             {
+                //TODO: Add in Coviid
                 Organisation = organisation,
                 Date = DateTime.UtcNow,
-                Movement = updateType == UpdateType.Addition
-                    ? 1
-                    : -1,
-                Balance = updateType == UpdateType.Addition
-                    ? balance + 1
-                    : balance - 1
+                ScanType = scanType,
+                Balance = balance
             };
 
             await _organisationCounterRepository.AddAsync(newCount);
 
             await _organisationCounterRepository.SaveAsync();
+
+            return balance;
         }
 
         private async Task NotifyOrganisation(string companyName, CreateOrganisationRequest payload, Organisation organisation)

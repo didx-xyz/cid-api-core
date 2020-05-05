@@ -2,12 +2,9 @@
 {
     public class UpdateCountRequest
     {
-        public int Movement { get; set; }
-        public string DeviceIdentifier { get; set; }
-
-        public bool isValid()
-        {
-            return !(Movement > 1 || Movement < -1);
-        }
+        public string CoviId { get; set; }
+        public string OrganisationId { get; set; }
+        public decimal Longitude { get; set; }
+        public decimal Latitude { get; set; }
     }
 }

@@ -1,5 +1,6 @@
 ﻿using System.Net;
 using System.Threading.Tasks;
+using CoviIDApiCore.Models.Database;
 using CoviIDApiCore.V1.Constants;
 using CoviIDApiCore.V1.DTOs.Organisation;
 using CoviIDApiCore.V1.DTOs.System;
@@ -37,6 +38,17 @@ namespace CoviIDApiCore.V1.Controllers
             var resp = await _organisationService.GetAsync(id);
 
             return StatusCode(resp.Meta.Code, resp);
+        }
+
+        [HttpPut("check_in")]
+        public async Task<IActionResult> CheckIn([FromBody] UpdateCountRequest payload)
+        {
+            return StatusCode(StatusCodes.Status200OK,
+                new Response(
+                    await _organisationService.UpdateCountAsync(payload, ScanType.CheckIn),
+                    true,
+                    HttpStatusCode.OK,
+                    Messages.Misc_Success));
         }
 
         [HttpPut("subtract/{id}")]
