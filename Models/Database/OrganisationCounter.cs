@@ -8,10 +8,19 @@ namespace CoviIDApiCore.Models.Database
         public DateTime Date { get; set; }
         public int Movement { get; set; }
         public int Balance { get; set; }
-        public string DeviceIdentifier { get; set; }
+
+        public string GeoLocation { get; set; }
+        public ScanType ScanType { get; set; }
 
         public OrganisationCounter()
         {
         }
+    }
+
+    public enum ScanType
+    {
+        CheckIn,
+        CheckOut,
+        Denied
     }
 }

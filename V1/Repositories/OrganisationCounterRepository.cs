@@ -27,5 +27,10 @@ namespace CoviIDApiCore.V1.Repositories
                 .OrderByDescending(t => t.Date)
                 .FirstOrDefaultAsync();
         }
+
+        public async Task<int> CountToday(Organisation organisation)
+        {
+            return await _dbSet.CountAsync(t => t.Organisation == organisation && t.Date.Date == DateTime.UtcNow.Date);
+        }
     }
 }

@@ -92,8 +92,6 @@ namespace CoviIDApiCore.V1.Services
                 Balance = updateType == UpdateType.Addition
                     ? balance + 1
                     : balance - 1
-                ,
-                DeviceIdentifier = deviceId
             };
 
             await _organisationCounterRepository.AddAsync(newCount);
