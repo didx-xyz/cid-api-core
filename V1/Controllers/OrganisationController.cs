@@ -44,22 +44,21 @@ namespace CoviIDApiCore.V1.Controllers
         public async Task<IActionResult> CheckIn([FromBody] UpdateCountRequest payload)
         {
             return StatusCode(StatusCodes.Status200OK,
-                new Response(
-                    await _organisationService.UpdateCountAsync(payload, ScanType.CheckIn),
-                    true,
-                    HttpStatusCode.OK,
-                    Messages.Misc_Success));
+                await _organisationService.UpdateCountAsync(payload, ScanType.CheckIn));
         }
 
         [HttpPut("check_out")]
         public async Task<IActionResult> CheckOut([FromBody] UpdateCountRequest payload)
         {
             return StatusCode(StatusCodes.Status200OK,
-                new Response(
-                    await _organisationService.UpdateCountAsync(payload, ScanType.CheckOut),
-                    true,
-                    HttpStatusCode.OK,
-                    Messages.Misc_Success));
+                await _organisationService.UpdateCountAsync(payload, ScanType.CheckOut));
+        }
+
+        [HttpPut("denied")]
+        public async Task<IActionResult> AccessDenied([FromBody] UpdateCountRequest payload)
+        {
+            return StatusCode(StatusCodes.Status200OK,
+                await _organisationService.UpdateCountAsync(payload, ScanType.Denied));
         }
     }
 }

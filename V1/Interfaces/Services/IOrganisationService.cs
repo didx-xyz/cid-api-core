@@ -10,6 +10,6 @@ namespace CoviIDApiCore.V1.Interfaces.Services
     {
         Task CreateAsync(CreateOrganisationRequest payload);
         Task<Response> GetAsync(string id);
-        Task<int> UpdateCountAsync(UpdateCountRequest payload, ScanType scanType);
+        Task<Response> UpdateCountAsync(UpdateCountRequest payload, ScanType scanType);
     }
 }

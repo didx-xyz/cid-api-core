@@ -66,7 +66,7 @@ namespace CoviIDApiCore.V1.Services
             return new Response(new OrganisationDTO(organisation, orgCounter, totalScans), HttpStatusCode.OK);
         }
 
-        public async Task<int> UpdateCountAsync(UpdateCountRequest payload, ScanType scanType)
+        public async Task<Response> UpdateCountAsync(UpdateCountRequest payload, ScanType scanType)
         {
             var balance = 0;
 
@@ -109,7 +109,13 @@ namespace CoviIDApiCore.V1.Services
 
             await _organisationCounterRepository.SaveAsync();
 
-            return balance;
+            return new Response(
+                new UpdateCountResponse()
+                {
+                    Balance = balance
+                },
+                true,
+                HttpStatusCode.OK);
         }
 
         private async Task NotifyOrganisation(string companyName, CreateOrganisationRequest payload, Organisation organisation)
