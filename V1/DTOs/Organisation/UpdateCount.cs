@@ -1,10 +1,12 @@
-﻿namespace CoviIDApiCore.V1.DTOs.Organisation
+﻿using Newtonsoft.Json;
+
+namespace CoviIDApiCore.V1.DTOs.Organisation
 {
     public class UpdateCountRequest
     {
         public string CoviId { get; set; }
-        public decimal Longitude { get; set; }
-        public decimal Latitude { get; set; }
+        [JsonProperty("long")] public decimal Longitude { get; set; }
+        [JsonProperty("lat")]public decimal Latitude { get; set; }
     }
 
     public class UpdateCountResponse
