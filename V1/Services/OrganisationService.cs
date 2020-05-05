@@ -66,13 +66,13 @@ namespace CoviIDApiCore.V1.Services
             return new Response(new OrganisationDTO(organisation, orgCounter, totalScans), HttpStatusCode.OK);
         }
 
-        public async Task<Response> UpdateCountAsync(UpdateCountRequest payload, ScanType scanType)
+        public async Task<Response> UpdateCountAsync(string id, UpdateCountRequest payload, ScanType scanType)
         {
             var balance = 0;
 
             //TODO: Check coviid
 
-            var organisation = await _organisationRepository.GetAsync(Guid.Parse(payload.OrganisationId));
+            var organisation = await _organisationRepository.GetAsync(Guid.Parse(id));
 
             if (organisation == default)
                 throw new NotFoundException(Messages.Org_NotExists);

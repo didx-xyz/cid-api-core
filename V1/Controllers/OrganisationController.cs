@@ -13,7 +13,7 @@ using Microsoft.AspNetCore.Mvc;
 namespace CoviIDApiCore.V1.Controllers
 {
     [EnableCors("AllowSpecificOrigin")]
-    [Route("api/organisation")]
+    [Route("api/organisations")]
     [ApiController]
     public class OrganisationController : Controller
     {
@@ -25,7 +25,7 @@ namespace CoviIDApiCore.V1.Controllers
         }
 
         [HttpPost]
-        public async Task<IActionResult> CreateOrganisation([FromBody] CreateOrganisationRequest payload)
+        public IActionResult CreateOrganisation([FromBody] CreateOrganisationRequest payload)
         {
             BackgroundJob.Enqueue(() => _organisationService.CreateAsync(payload));
 
@@ -40,25 +40,25 @@ namespace CoviIDApiCore.V1.Controllers
             return StatusCode(resp.Meta.Code, resp);
         }
 
-        [HttpPut("check_in")]
-        public async Task<IActionResult> CheckIn([FromBody] UpdateCountRequest payload)
+        [HttpPost("{id}/check_in")]
+        public async Task<IActionResult> CheckIn(string id, [FromBody] UpdateCountRequest payload)
         {
             return StatusCode(StatusCodes.Status200OK,
-                await _organisationService.UpdateCountAsync(payload, ScanType.CheckIn));
+                await _organisationService.UpdateCountAsync(id, payload, ScanType.CheckIn));
         }
 
-        [HttpPut("check_out")]
-        public async Task<IActionResult> CheckOut([FromBody] UpdateCountRequest payload)
+        [HttpPost("{id}/check_out")]
+        public async Task<IActionResult> CheckOut(string id, [FromBody] UpdateCountRequest payload)
         {
             return StatusCode(StatusCodes.Status200OK,
-                await _organisationService.UpdateCountAsync(payload, ScanType.CheckOut));
+                await _organisationService.UpdateCountAsync(id, payload, ScanType.CheckOut));
         }
 
-        [HttpPut("denied")]
-        public async Task<IActionResult> AccessDenied([FromBody] UpdateCountRequest payload)
+        [HttpPost("{id}/denied")]
+        public async Task<IActionResult> AccessDenied(string id, [FromBody] UpdateCountRequest payload)
         {
             return StatusCode(StatusCodes.Status200OK,
-                await _organisationService.UpdateCountAsync(payload, ScanType.Denied));
+                await _organisationService.UpdateCountAsync(id, payload, ScanType.Denied));
         }
     }
 }
