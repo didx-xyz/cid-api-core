@@ -51,13 +51,15 @@ namespace CoviIDApiCore.V1.Controllers
                     Messages.Misc_Success));
         }
 
-        [HttpPut("subtract/{id}")]
-        public async Task<IActionResult> UpdateCount(string id, string deviceIdentifier)
+        [HttpPut("check_out")]
+        public async Task<IActionResult> CheckOut([FromBody] UpdateCountRequest payload)
         {
-            await _organisationService.UpdateCountAsync(id, deviceIdentifier, UpdateType.Subtraction);
-
             return StatusCode(StatusCodes.Status200OK,
-                new Response(true, HttpStatusCode.OK, Messages.Misc_Success));
+                new Response(
+                    await _organisationService.UpdateCountAsync(payload, ScanType.CheckOut),
+                    true,
+                    HttpStatusCode.OK,
+                    Messages.Misc_Success));
         }
     }
 }
