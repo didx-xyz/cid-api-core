@@ -92,6 +92,11 @@ namespace CoviIDApiCore.V1.Repositories
             }
         }
 
+        public void Update(TEntity entity)
+        {
+            _context.Update(entity);
+        }
+
         public int Count()
         {
             return _entitySet.Count();

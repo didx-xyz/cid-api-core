@@ -1,10 +1,10 @@
-﻿﻿using Microsoft.EntityFrameworkCore;
+﻿using Microsoft.EntityFrameworkCore;
 using System;
- using CoviIDApiCore.Data;
- using CoviIDApiCore.Models.Database;
- using CoviIDApiCore.V1.Interfaces.Repositories;
+using CoviIDApiCore.Data;
+using CoviIDApiCore.Models.Database;
+using CoviIDApiCore.V1.Interfaces.Repositories;
 
- namespace CoviIDApiCore.V1.Repositories
+namespace CoviIDApiCore.V1.Repositories
 {
     public class OrganisationRepository : BaseRepository<Organisation, Guid>, IOrganisationRepository
     {

@@ -11,6 +11,7 @@ using System.Threading.Tasks;
 using CoviIDApiCore.V1.Constants;
 using CoviIDApiCore.V1.DTOs.Verifications;
 using CoviIDApiCore.V1.DTOs.VerificationPolicy;
+using CoviIDApiCore.Helpers;
 
 namespace CoviIDApiCore.V1.Brokers
 {
@@ -30,23 +31,20 @@ namespace CoviIDApiCore.V1.Brokers
         public async Task<string> UploadFiles(string file, string fileName)
         {
             var base64Array = Convert.FromBase64String(file);
-            var filePath = Path.Combine($"{Environment.CurrentDirectory}/{fileName}.png");
-            File.WriteAllBytes(filePath, base64Array);
 
             var multipartContent = new MultipartFormDataContent
             {
                 {
-                    new ByteArrayContent(File.ReadAllBytes(filePath)),
-                    "uploadedFiles", Path.GetFileName(filePath)
+                    new ByteArrayContent(base64Array),
+                    "uploadedFiles", Path.GetFileName(fileName)
                 },
                 {new StringContent(fileName), "filename"},
                 {new StringContent("image/png"), "contentType"}
             };
 
-            File.Delete(filePath);
-
             var response = await _httpClient.PostAsync($"{partialRoot}/common/upload", multipartContent);
             response = await ValidateResponse(response);
+
             return JsonConvert.DeserializeObject<string>(await response.Content.ReadAsStringAsync());
         }
 
@@ -56,7 +54,7 @@ namespace CoviIDApiCore.V1.Brokers
         public async Task<ConnectionContract> CreateInvitation(ConnectionParameters connectionParameters)
         {
             var content = new StringContent(JsonConvert.SerializeObject(connectionParameters), Encoding.UTF8, applicationJson);
-            
+
             var response = await _httpClient.PostAsync($"{partialRoot}connections", content);
             response = await ValidateResponse(response);
 
@@ -108,8 +106,7 @@ namespace CoviIDApiCore.V1.Brokers
         {
             if (response.IsSuccessStatusCode)
                 return response;
-            
-            //TODO: log the broker response
+
             var message = await response.Content.ReadAsStringAsync();
             throw new StreetCredBrokerException($"{message} Broker status code: {response.StatusCode}");
         }

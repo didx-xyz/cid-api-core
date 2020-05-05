@@ -26,6 +26,7 @@ using CoviIDApiCore.V1.Repositories;
 using CoviIDApiCore.V1.Services;
 using Hangfire;
 using Hangfire.SqlServer;
+using Sentry;
 
 namespace CoviIDApiCore
 {
@@ -33,14 +34,22 @@ namespace CoviIDApiCore
     {
         private readonly IConfiguration _configuration;
         private readonly string _environment, _connectionString, _applicationName;
+        private const string _applicationJson = "application/json";
 
         public Startup(IConfiguration configuration)
         {
             _applicationName = Assembly.GetExecutingAssembly().GetName().Name;
-            _environment = Environment.GetEnvironmentVariable("ASPNETCORE_ENVIRONMENT") ?? "Local";
+
+            _configuration = new ConfigurationBuilder()
+                .SetBasePath(Directory.GetCurrentDirectory())
+                .AddJsonFile($"appsettings.json", optional: false, reloadOnChange: true)
+                .AddEnvironmentVariables()
+                .Build();
+
+            _environment = _configuration.GetValue<string>("Environment");
             Console.WriteLine($"Environment: {_environment}");
-            _configuration = configuration;
             _connectionString = _configuration.GetConnectionString("DefaultConnection");
+            ConfigureSentry();
         }
 
         public void ConfigureServices(IServiceCollection services)
@@ -70,11 +79,11 @@ namespace CoviIDApiCore
 
         public void Configure(IApplicationBuilder app, IHostingEnvironment env)
         {
-            if (!env.IsProduction())
+            if (_environment != "Production")
             {
                 app.UseHangfireDashboard();
                 app.UseDeveloperExceptionPage();
-                app.UseSwagger();              
+                app.UseSwagger();
                 app.UseSwaggerUI(swagger =>
                 {
                     swagger.SwaggerEndpoint("/swagger/v1/swagger.json", $"Cov-ID Core {_applicationName}");
@@ -83,22 +92,20 @@ namespace CoviIDApiCore
             }
             else
                 app.UseHsts();
-            
+
             app.UseCors("AllowSpecificOrigin");
             app.UseAuthentication();
             ConfigureDefaultResponses(app);
             app.UseMiddleware<ExceptionHandler>();
             app.UseHttpsRedirection();
             app.UseMvc();
-        }       
+        }
 
         #region Private Configuration Methods
 
         private void ConfigureDatabaseContext(IServiceCollection services)
         {
-            var connectionString = _configuration.GetConnectionString("DefaultConnection");
-
-            var connection = new SqlConnectionStringBuilder(connectionString)
+            var connection = new SqlConnectionStringBuilder(_connectionString)
             {
                 ConnectRetryInterval = 3,
                 MinPoolSize = 3
@@ -135,7 +142,8 @@ namespace CoviIDApiCore
             services.AddCors(options =>
             {
                 options.AddPolicy("AllowSpecificOrigin",
-                    builder => {
+                    builder =>
+                    {
                         builder
                         .AllowAnyOrigin()
                         .AllowAnyHeader()
@@ -155,17 +163,22 @@ namespace CoviIDApiCore
             services.AddScoped<IEmailService, EmailService>();
             services.AddSingleton<IAuthenticationService, AuthenticationService>();
             services.AddTransient<IQRCodeService, QRCodeService>();
+            services.AddScoped<IOtpService, OtpService>();
             #endregion
 
             #region Repository Layer
             services.AddScoped<IOrganisationRepository, OrganisationRepository>();
             services.AddScoped<IOrganisationCounterRepository, OrganisationCounterRepository>();
+            services.AddScoped<IOtpTokenRepository, OtpTokenRepository>();
+            services.AddScoped<IWalletRepository, WalletRepository>();
+            services.AddScoped<ICovidTestRepository, CovidTestRepository>();
             #endregion
 
             #region Broker Layer
             services.AddTransient<IAgencyBroker, AgencyBroker>();
             services.AddTransient<ICustodianBroker, CustodianBroker>();
             services.AddTransient<ISendGridBroker, SendGridBroker>();
+            services.AddTransient<IClickatellBroker, ClickatellBroker>();
             #endregion
         }
 
@@ -180,9 +193,11 @@ namespace CoviIDApiCore
             var streetCredCredentials = new StreetCredCredentials();
             _configuration.Bind(nameof(StreetCredCredentials), streetCredCredentials);
 
+            var clickatellCredentials = new ClickatellCredentials();
+            _configuration.Bind(nameof(ClickatellCredentials), clickatellCredentials);
+
             services.AddHttpClient<IAgencyBroker, AgencyBroker>(client =>
             {
-                
                 client.BaseAddress = new Uri(agencyApiBaseUrl);
                 client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", streetCredCredentials.AuthorizationToken);
                 client.DefaultRequestHeaders.Add("X-Streetcred-Subscription-Key", streetCredCredentials.SubscriptionKey);
@@ -201,6 +216,15 @@ namespace CoviIDApiCore
                 {
                     client.BaseAddress = new Uri(sendGridCredentials.BaseUrl);
                     client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", sendGridCredentials.Key);
+                    client.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue(_applicationJson));
+                }
+            );
+
+            services.AddHttpClient<IClickatellBroker, ClickatellBroker>(client =>
+                {
+                    client.BaseAddress = new Uri(clickatellCredentials.BaseUrl);
+                    client.DefaultRequestHeaders.TryAddWithoutValidation("Authorization", clickatellCredentials.Key);
+                    client.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue(_applicationJson));
                 }
             );
         }
@@ -235,7 +259,7 @@ namespace CoviIDApiCore
                 if (context.HttpContext.Response.StatusCode == (int)HttpStatusCode.Unauthorized)
                 {
                     await context.HttpContext.Response.WriteAsync(
-                        JsonConvert.SerializeObject(new V1.DTOs.System.Response(false, HttpStatusCode.Unauthorized, 
+                        JsonConvert.SerializeObject(new V1.DTOs.System.Response(false, HttpStatusCode.Unauthorized,
                         "Unauthorised")));
                 }
             });
@@ -250,6 +274,17 @@ namespace CoviIDApiCore
             services.AddSingleton<IRateLimitCounterStore, DistributedCacheRateLimitCounterStore>();
             services.AddSingleton<IHttpContextAccessor, HttpContextAccessor>();
             services.AddSingleton<IRateLimitConfiguration, RateLimitConfiguration>();
+        }
+        
+        private void ConfigureSentry()
+        {
+            var url = _configuration?.GetSection("Sentry")?.GetSection("Url").Value ?? throw new Exception("Failed to setup sentry.");
+            SentrySdk.Init(
+                x =>
+                {
+                    x.Environment = _environment;
+                    x.Dsn = new Dsn(url);
+                });
         }
         #endregion Private Configuration Methods
     }

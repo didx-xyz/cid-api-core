@@ -7,6 +7,7 @@ using CoviIDApiCore.Exceptions;
 using CoviIDApiCore.V1.Constants;
 using CoviIDApiCore.V1.DTOs.System;
 using CoviIDApiCore.V1.Interfaces.Services;
+using Sentry;
 
 namespace CoviIDApiCore.Middleware
 {
@@ -25,7 +26,9 @@ namespace CoviIDApiCore.Middleware
         {
             try
             {
-                if (!_authentication.IsAuthorized(context.Request.Headers["x-api-key"]))
+                if (!_authentication.IsAuthorized(context.Request.Headers["x-api-key"]) 
+                    && context.Request.Path != UrlConstants.PartialRoutes[UrlConstants.Routes.Organisation]
+                    && context.Request.Path != UrlConstants.PartialRoutes[UrlConstants.Routes.Health])
                     throw new UnauthorizedAccessException();
 
                 await _next(context);
@@ -45,6 +48,10 @@ namespace CoviIDApiCore.Middleware
             catch (SendGridException e)
             {
                 await HandleSendGridException(context, e);
+            }
+            catch (ClickatellException e)
+            {
+                await HandleClickatellException(context, e);
             }
             catch (QRException e)
             {
@@ -87,6 +94,8 @@ namespace CoviIDApiCore.Middleware
 
         private Task HandleStreetCredBrokerException(HttpContext context, StreetCredBrokerException e)
         {
+            SentrySdk.CaptureException(e);
+
             var statusCode = HttpStatusCode.InternalServerError;
             context.Response.ContentType = "application/json";
             context.Response.StatusCode = (int)statusCode;
@@ -101,6 +110,24 @@ namespace CoviIDApiCore.Middleware
 
         private Task HandleSendGridException(HttpContext context, SendGridException e)
         {
+            SentrySdk.CaptureException(e);
+
+            var statusCode = HttpStatusCode.InternalServerError;
+            context.Response.ContentType = "application/json";
+            context.Response.StatusCode = (int)statusCode;
+            var message = Messages.Misc_ThirdParty;
+
+            #if DEBUG
+            message = e.Message;
+            #endif
+            var rsp = new Response(false, statusCode, message);
+            return context.Response.WriteAsync(JsonConvert.SerializeObject(rsp));
+        }
+
+        private Task HandleClickatellException(HttpContext context, ClickatellException e)
+        {
+            SentrySdk.CaptureException(e);
+
             var statusCode = HttpStatusCode.InternalServerError;
             context.Response.ContentType = "application/json";
             context.Response.StatusCode = (int)statusCode;
@@ -115,6 +142,8 @@ namespace CoviIDApiCore.Middleware
 
         private static Task HandleUnexpectedException(HttpContext context, Exception e)
         {
+            SentrySdk.CaptureException(e);
+
             var code = HttpStatusCode.InternalServerError;
 
             context.Response.ContentType = "application/json";
@@ -131,6 +160,8 @@ namespace CoviIDApiCore.Middleware
 
         private static Task HandleQRException(HttpContext context, Exception e)
         {
+            SentrySdk.CaptureException(e);
+
             var code = HttpStatusCode.InternalServerError;
 
             context.Response.ContentType = "application/json";
@@ -141,7 +172,7 @@ namespace CoviIDApiCore.Middleware
             var rsp = new Response(false, code, message);
             return context.Response.WriteAsync(JsonConvert.SerializeObject(rsp));
         }
-        
+
         private static Task HandleUnauthorisedException(HttpContext context, Exception e)
         {
             var code = HttpStatusCode.Unauthorized;

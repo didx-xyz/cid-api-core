@@ -1,10 +1,12 @@
-﻿using System;
+﻿using System.ComponentModel.DataAnnotations;
 
 namespace CoviIDApiCore.V1.DTOs.Credentials
 {
     public class PersonCredentialParameters
     {
+        [StringLength(50)]
         public string FirstName { get; set; }
+        [StringLength(50)]
         public string LastName { get; set; }
         public string Photo { get; set; }
         public long MobileNumber { get; set; }
@@ -15,6 +17,7 @@ namespace CoviIDApiCore.V1.DTOs.Credentials
         /// <summary>
         /// Identification Value
         /// </summary>
+        [StringLength(50)]
         public string IdentificationValue { get; set; }
     }
 }

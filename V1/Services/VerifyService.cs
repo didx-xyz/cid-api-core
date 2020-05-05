@@ -1,92 +1,43 @@
-﻿using CoviIDApiCore.V1.DTOs.Credentials;
-using CoviIDApiCore.V1.DTOs.VerificationPolicy;
-using CoviIDApiCore.V1.DTOs.Verifications;
-using CoviIDApiCore.V1.DTOs.Verify;
-using CoviIDApiCore.V1.Interfaces.Brokers;
+﻿using CoviIDApiCore.V1.DTOs.Verify;
 using CoviIDApiCore.V1.Interfaces.Services;
-using System;
-using System.Collections.Generic;
-using System.Linq;
 using System.Threading.Tasks;
+using CoviIDApiCore.Exceptions;
 using CoviIDApiCore.V1.Constants;
+using CoviIDApiCore.V1.DTOs.Credentials;
 
 namespace CoviIDApiCore.V1.Services
 {
     public class VerifyService : IVerifyService
     {
-        private readonly ICustodianBroker _custodianBroker;
-        private readonly IAgencyBroker _agencyBroker;
         private readonly IOrganisationService _organisationService;
         private readonly ICredentialService _credentialService;
 
-        public VerifyService(ICustodianBroker custodianBroker, IAgencyBroker agencyBroker, IOrganisationService organisationService, ICredentialService credentialService)
+        public VerifyService(IOrganisationService organisationService, ICredentialService credentialService)
         {
-            _custodianBroker = custodianBroker;
-            _agencyBroker = agencyBroker;
             _organisationService = organisationService;
             _credentialService = credentialService;
         }
 
         public async Task<VerifyResult> GetCredentials(string walletId, string organisationId, string deviceIdentifier)
         {
-            var coviIDCredentials = await _credentialService.GetCoviIDCredentials(walletId);
+            var coviIdCredentials = await _credentialService.GetCoviIDCredentials(walletId);
 
-            if (!string.IsNullOrEmpty(organisationId))
+            if (coviIdCredentials.CovidTestCredentials == default)
+                throw new NotFoundException(Messages.Ver_CoviIDNotFound);
+
+            var covidStatus = coviIdCredentials.CovidTestCredentials.CovidStatus;
+
+            if (!string.IsNullOrEmpty(organisationId) && covidStatus != CovidStatus.Positive)
                 await _organisationService.UpdateCountAsync(organisationId, deviceIdentifier, UpdateType.Addition);
 
             return new VerifyResult
             {
-                Picture = coviIDCredentials.PersonCredentials.Photo,
-                Name = coviIDCredentials.PersonCredentials.FirstName,
-                Surname = coviIDCredentials.PersonCredentials.LastName,
-                Status = (int)coviIDCredentials.CovidTestCredentials.CovidStatus,
-                CovidStatus = coviIDCredentials.CovidTestCredentials.CovidStatus.ToString()
+                Picture = coviIdCredentials.PersonCredentials.Photo,
+                Name = coviIdCredentials.PersonCredentials.FirstName,
+                Surname = coviIdCredentials.PersonCredentials.LastName,
+                Status = (int)coviIdCredentials.CovidTestCredentials.CovidStatus,
+                CovidStatus = covidStatus.ToString()
             };
         }
-
-        public async Task VerifyCredentials(string walletId, string connectionId, string custodianConnectionId)
-        {
-            var verificationPolicyParameters = new VerificationPolicyParameters
-            {
-                Name = "CoviID",
-                Version = "1.0",
-                Attributes = new VerificationPolicyAttributeContract
-                {
-                    PolicyName = "CoviID Policy",
-                    AttributeNames = new List<string> {
-                        "Name",
-                        "Surname",
-                        "Id",
-                        "Picture",
-                        "CovidStatue",
-                        "TestDate",
-                        "ExpiryDate"
-                    }
-                },
-                RevocationRequirement = new RevocationRequirement
-                {
-                    ValidAt = DateTime.Now.AddMonths(1)
-                }
-            };
-
-            // 1. issue verification
-            var verificationContract = await _agencyBroker.SendVerification(verificationPolicyParameters, connectionId);
-
-            // 3. Lookup Verification id
-            var userVerificationsContract = await _custodianBroker.GetVerifications(walletId, custodianConnectionId);
-            var verificationItem = userVerificationsContract?.FirstOrDefault(v => v.State == ProofState.Requested);
-            if (verificationItem == null)
-            {
-                //todo throw error
-            }
-
-            // 2. user accepts verification
-            await _custodianBroker.AcceptVerification(walletId, verificationItem.VerificationId);
-
-            var verifications = await _agencyBroker.GetVerification(verificationContract.VerificationId);
-
-            // 4. verify agains ledger (get verification)
-        }
-
     }
 }

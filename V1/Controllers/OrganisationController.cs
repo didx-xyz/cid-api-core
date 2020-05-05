@@ -4,6 +4,7 @@ using CoviIDApiCore.V1.Constants;
 using CoviIDApiCore.V1.DTOs.Organisation;
 using CoviIDApiCore.V1.DTOs.System;
 using CoviIDApiCore.V1.Interfaces.Services;
+using Hangfire;
 using Microsoft.AspNetCore.Cors;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
@@ -25,7 +26,7 @@ namespace CoviIDApiCore.V1.Controllers
         [HttpPost]
         public async Task<IActionResult> CreateOrganisation([FromBody] CreateOrganisationRequest payload)
         {
-            await _organisationService.CreateAsync(payload);
+            BackgroundJob.Enqueue(() => _organisationService.CreateAsync(payload));
 
             return new OkResult();
         }

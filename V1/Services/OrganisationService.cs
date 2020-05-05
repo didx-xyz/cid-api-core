@@ -31,7 +31,7 @@ namespace CoviIDApiCore.V1.Services
         public async Task CreateAsync(CreateOrganisationRequest payload)
         {
             var companyNameRef = payload.FormResponse.Definition.Fields
-                .FirstOrDefault(t => string.Equals(t.Title, ParameterConstants.CompanyName, StringComparison.Ordinal))?
+                .FirstOrDefault(t => string.Equals(t.Title, DefinitionConstants.CompanyName, StringComparison.Ordinal))?
                 .Reference;
 
             var companyName = payload.FormResponse.Answers
@@ -56,13 +56,14 @@ namespace CoviIDApiCore.V1.Services
         {
             var organisation = await _organisationRepository.GetAsync(Guid.Parse(id));
 
+            if (organisation == default)
+                return new Response(false, HttpStatusCode.NotFound, Messages.Org_NotExists);
+
             var orgCounter = await _organisationCounterRepository.GetLastByOrganisation(organisation);
 
             var totalScans = _organisationCounterRepository.Count();
 
-            return organisation == default
-                ? new Response(false, HttpStatusCode.NotFound, Messages.Org_NotExists)
-                : new Response(new OrganisationDTO(organisation, orgCounter, totalScans), HttpStatusCode.OK);
+            return new Response(new OrganisationDTO(organisation, orgCounter, totalScans), HttpStatusCode.OK);
         }
 
         public async Task UpdateCountAsync(string id, string deviceId, UpdateType updateType)
@@ -78,7 +79,7 @@ namespace CoviIDApiCore.V1.Services
 
             balance = lastCount?.Balance ?? 0;
 
-            if(balance < 1 && updateType == UpdateType.Subtraction)
+            if (balance < 1 && updateType == UpdateType.Subtraction)
                 throw new ValidationException(Messages.Org_NegBalance);
 
             var newCount = new OrganisationCounter()
@@ -103,14 +104,14 @@ namespace CoviIDApiCore.V1.Services
         private async Task NotifyOrganisation(string companyName, CreateOrganisationRequest payload, Organisation organisation)
         {
             var emailAddressRef = payload.FormResponse.Definition.Fields
-                .FirstOrDefault(t => string.Equals(t.Title, ParameterConstants.EmailAdress, StringComparison.Ordinal))?
+                .FirstOrDefault(t => string.Equals(t.Title, DefinitionConstants.EmailAdress, StringComparison.Ordinal))?
                 .Reference;
 
             var emailAddress = payload.FormResponse.Answers
                 .FirstOrDefault(t => string.Equals(t.Field.Reference, emailAddressRef, StringComparison.Ordinal))?
                 .Email;
 
-            if(string.IsNullOrEmpty(emailAddress))
+            if (string.IsNullOrEmpty(emailAddress))
                 throw new ValidationException(Messages.Org_EmailEmpty);
 
             //TODO: Queueing
@@ -118,7 +119,7 @@ namespace CoviIDApiCore.V1.Services
                 emailAddress,
                 companyName,
                 _qrCodeService.GenerateQRCode(organisation.Id.ToString()),
-                ParameterConstants.EmailTemplates.OrganisationWelcome);
+                DefinitionConstants.EmailTemplates.OrganisationWelcome);
         }
     }
 }
