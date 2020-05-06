@@ -162,6 +162,7 @@ namespace CoviIDApiCore
             services.AddSingleton<IAuthenticationService, AuthenticationService>();
             services.AddTransient<IQRCodeService, QRCodeService>();
             services.AddScoped<IOtpService, OtpService>();
+            services.AddSingleton<IEncryptionService, EncryptionService>();
             #endregion
 
             #region Repository Layer
