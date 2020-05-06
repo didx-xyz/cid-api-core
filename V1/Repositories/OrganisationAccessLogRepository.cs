@@ -8,18 +8,18 @@ using CoviIDApiCore.V1.Interfaces.Repositories;
 
 namespace CoviIDApiCore.V1.Repositories
 {
-    public class OrganisationCounterRepository : BaseRepository<OrganisationCounter, Guid>, IOrganisationCounterRepository
+    public class OrganisationAccessLogRepository : BaseRepository<OrganisationAccessLog, Guid>, IOrganisationAccessLogRepository
     {
         private readonly ApplicationDbContext _context;
-        private readonly DbSet<OrganisationCounter> _dbSet;
+        private readonly DbSet<OrganisationAccessLog> _dbSet;
 
-        public OrganisationCounterRepository(ApplicationDbContext context) : base(context)
+        public OrganisationAccessLogRepository(ApplicationDbContext context) : base(context)
         {
             _context = context;
-            _dbSet = _context.OrganisationCounters;
+            _dbSet = _context.OrganisationAccessLogs;
         }
 
-        public async Task<OrganisationCounter> GetLastByOrganisation(Organisation organisation)
+        public async Task<OrganisationAccessLog> GetLastByOrganisation(Organisation organisation)
         {
             return await _dbSet
                 .Where(t => t.Organisation == organisation)

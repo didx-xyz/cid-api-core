@@ -16,14 +16,14 @@ namespace CoviIDApiCore.V1.Services
     public class OrganisationService : IOrganisationService
     {
         private readonly IOrganisationRepository _organisationRepository;
-        private readonly IOrganisationCounterRepository _organisationCounterRepository;
+        private readonly IOrganisationAccessLogRepository _organisationAccessLogRepository;
         private readonly IEmailService _emailService;
         private readonly IQRCodeService _qrCodeService;
 
-        public OrganisationService(IOrganisationRepository organisationRepository, IOrganisationCounterRepository organisationCounterRepository, IEmailService emailService, IQRCodeService qrCodeService)
+        public OrganisationService(IOrganisationRepository organisationRepository, IOrganisationAccessLogRepository organisationAccessLogRepository, IEmailService emailService, IQRCodeService qrCodeService)
         {
             _organisationRepository = organisationRepository;
-            _organisationCounterRepository = organisationCounterRepository;
+            _organisationAccessLogRepository = organisationAccessLogRepository;
             _emailService = emailService;
             _qrCodeService = qrCodeService;
         }
@@ -59,9 +59,9 @@ namespace CoviIDApiCore.V1.Services
             if (organisation == default)
                 return new Response(false, HttpStatusCode.NotFound, Messages.Org_NotExists);
 
-            var orgCounter = await _organisationCounterRepository.GetLastByOrganisation(organisation);
+            var orgCounter = await _organisationAccessLogRepository.GetLastByOrganisation(organisation);
 
-            var totalScans = _organisationCounterRepository.Count();
+            var totalScans = _organisationAccessLogRepository.Count();
 
             return new Response(new OrganisationDTO(organisation, orgCounter, totalScans), HttpStatusCode.OK);
         }
@@ -77,7 +77,7 @@ namespace CoviIDApiCore.V1.Services
             if (organisation == default)
                 throw new NotFoundException(Messages.Org_NotExists);
 
-            var lastCount = await _organisationCounterRepository.GetLastByOrganisation(organisation);
+            var lastCount = await _organisationAccessLogRepository.GetLastByOrganisation(organisation);
 
             balance = lastCount?.Balance ?? 0;
 
@@ -96,7 +96,7 @@ namespace CoviIDApiCore.V1.Services
                     throw new ArgumentOutOfRangeException(nameof(scanType), scanType, null);
             }
 
-            var newCount = new OrganisationCounter()
+            var newCount = new OrganisationAccessLog()
             {
                 //TODO: Add in Coviid
                 Organisation = organisation,
@@ -105,9 +105,9 @@ namespace CoviIDApiCore.V1.Services
                 Balance = balance
             };
 
-            await _organisationCounterRepository.AddAsync(newCount);
+            await _organisationAccessLogRepository.AddAsync(newCount);
 
-            await _organisationCounterRepository.SaveAsync();
+            await _organisationAccessLogRepository.SaveAsync();
 
             return new Response(
                 new UpdateCountResponse()
