@@ -17,6 +17,7 @@ using System.Reflection;
 using CoviIDApiCore.Models.AppSettings;
 using CoviIDApiCore.V1.Brokers;
 using System.Net.Http.Headers;
+using AspNetCoreRateLimit;
 using CoviIDApiCore.Data;
 using CoviIDApiCore.V1.Interfaces.Brokers;
 using CoviIDApiCore.V1.Interfaces.Repositories;
@@ -73,6 +74,7 @@ namespace CoviIDApiCore
             ConfigureDatabaseContext(services);
             ConfigureDependecyInjection(services);
             ConfigureHttpClients(services);
+            ConfigureRateLimiting(services);
         }        
 
         public void Configure(IApplicationBuilder app, IHostingEnvironment env)
@@ -263,6 +265,17 @@ namespace CoviIDApiCore
             });
         }
 
+        private void ConfigureRateLimiting(IServiceCollection services)
+        {
+            services.Configure<IpRateLimitOptions>(_configuration.GetSection("PlatformSettings:IpRateLimiting"));
+            services.Configure<IpRateLimitPolicies>(_configuration.GetSection("PlatformSettings:IpRateLimitPolicies"));
+
+            services.AddSingleton<IIpPolicyStore, DistributedCacheIpPolicyStore>();
+            services.AddSingleton<IRateLimitCounterStore, DistributedCacheRateLimitCounterStore>();
+            services.AddSingleton<IHttpContextAccessor, HttpContextAccessor>();
+            services.AddSingleton<IRateLimitConfiguration, RateLimitConfiguration>();
+        }
+        
         private void ConfigureSentry()
         {
             var url = _configuration?.GetSection("Sentry")?.GetSection("Url").Value ?? throw new Exception("Failed to setup sentry.");
