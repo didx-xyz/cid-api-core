@@ -60,7 +60,7 @@ namespace CoviIDApiCore.V1.Services
 
             var newWallet = await SaveNewWalletAsync(response.WalletId);
 
-            await _otpService.GenerateAndSendOtpAsync(coviIdWalletParameters.MobileNumber.ToString(), newWallet);
+            await _otpService.GenerateAndSendOtpAsync(newWallet.WalletIdentifier, coviIdWalletParameters.MobileNumber.ToString());
             
             var contract = new CoviIdWalletContract
             {

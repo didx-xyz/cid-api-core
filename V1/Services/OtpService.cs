@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Linq;
 using System.Threading.Tasks;
 using CoviIDApiCore.Exceptions;
 using CoviIDApiCore.Models.Database;
@@ -30,30 +31,51 @@ namespace CoviIDApiCore.V1.Services
             _walletRepository = walletRepository;
         }
 
-        public async Task GenerateAndSendOtpAsync(string mobileNumber, Wallet wallet)
+        public async Task<string> GenerateAndSendOtpAsync(string mobileNumber, string walletId)
         {
             var expiryTime = _configuration.GetValue<int>("OTPSettings:ValidityPeriod");
 
             var code = Utilities.Helpers.GenerateRandom4DigitNumber();
 
-            var message = ConstructMessage(mobileNumber, code, expiryTime, wallet);
+            var sessionId = Utilities.Helpers.GenerateSessionToken();
+
+            var message = ConstructMessage(mobileNumber, code, expiryTime);
 
             await _clickatellBroker.SendSms(message);
 
-            await SaveOtpAsync(mobileNumber, code, expiryTime, wallet);
+            await SaveOtpAsync(mobileNumber, sessionId, code, expiryTime);
+
+            return sessionId;
+        }
+
+        private async Task<bool> ValidateOtpCreationAsync(string mobileNumber)
+        {
+            var otps = await _otpTokenRepository.GetAllUnexpiredByMobileNumberAsync(mobileNumber);
+
+            if (!otps.Any())
+                return true;
+
+            var timeThreshold = _configuration.GetValue<int>("OTPSettings:TimeThreshold");
+
+            var amountThreshold = _configuration.GetValue<int>("OTPSettings:AmountThreshold");
+
+            return otps.Count(otp => otp.CreatedAt > DateTime.UtcNow.AddMinutes(-1 * timeThreshold)) <= amountThreshold;
         }
 
         public async Task ResendOtp(RequestResendOtp payload)
         {
+            if(!await ValidateOtpCreationAsync(payload.MobileNumber))
+                throw new ValidationException(Messages.Token_OTPThreshold);
+
             var wallet = await _walletRepository.GetByWalletIdentifier(payload.WalletId);
 
             if (wallet == default)
                 throw new NotFoundException();
 
-            await GenerateAndSendOtpAsync(payload.MobileNumber.ToString(), wallet);
+            await GenerateAndSendOtpAsync(payload.MobileNumber, payload.WalletId);
         }
 
-        private ClickatellTemplate ConstructMessage(string mobileNumber, int code, int validityPeriod, Wallet wallet)
+        private ClickatellTemplate ConstructMessage(string mobileNumber, int code, int validityPeriod)
         {
             var recipient = new[]
             {
@@ -67,16 +89,16 @@ namespace CoviIDApiCore.V1.Services
             };
         }
 
-        private async Task SaveOtpAsync(string mobileNumber, int code, int expiryTime, Wallet wallet)
+        private async Task SaveOtpAsync(string mobileNumber, string sessionId, int code, int expiryTime)
         {
             var newToken = new OtpToken()
             {
-                Wallet = wallet,
                 Code = code,
                 CreatedAt = DateTime.UtcNow,
                 ExpireAt = DateTime.UtcNow.AddMinutes(expiryTime),
                 isUsed = false,
-                MobileNumber = mobileNumber
+                MobileNumber = mobileNumber,
+                SessionId = sessionId
             };
 
             await _otpTokenRepository.AddAsync(newToken);
@@ -86,7 +108,7 @@ namespace CoviIDApiCore.V1.Services
 
         public async Task ConfirmOtpAsync(RequestOtpConfirmation payload)
         {
-            var token = await _otpTokenRepository.GetUnusedByWalletIdAndMobileNumber(payload.WalletId, payload.Person.MobileNumber.ToString());
+            var token = await _otpTokenRepository.GetBySessionId(payload.SessionId);
 
             if (token == default || token.ExpireAt <= DateTime.UtcNow || token.Code != payload.Otp)
                 throw new ValidationException(Messages.Token_OTPNotExist);
