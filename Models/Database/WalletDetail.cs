@@ -1,4 +1,4 @@
-﻿using CoviIDApiCore.V1.DTOs.Credentials;
+﻿using CoviIDApiCore.V1.DTOs.Wallet;
 using System;
 
 namespace CoviIDApiCore.Models.Database

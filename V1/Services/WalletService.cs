@@ -36,6 +36,7 @@ namespace CoviIDApiCore.V1.Services
             _credentialService = credentialService;
             _walletDetailRepository = walletDetailRepository;
             _otpService = otpService;
+            _walletRepository = walletRepository;
         }
 
         public async Task<List<WalletContract>> GetWallets()

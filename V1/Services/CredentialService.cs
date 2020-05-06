@@ -85,7 +85,7 @@ namespace CoviIDApiCore.V1.Services
                 };
 
                 credentials = await _agencyBroker.SendCredentials(credentialOffer);
-                StoreCoviIDCredentials(covidTestCredential, walletId);
+                //StoreCoviIDCredentials(covidTestCredential, walletId);
             }
             return credentials;
         }
@@ -189,27 +189,27 @@ namespace CoviIDApiCore.V1.Services
             }
             throw new ValidationException(Messages.Cred_VerifidPersonNotFound);
         }
-        private async void StoreCoviIDCredentials(CovidTestCredentialParameters covidTestParameters, string walletId)
-        {
-            if (covidTestParameters.HasConsent)
-            {
-                var covidTest = new WalletTestResult
-                {
-                    ResultStatus = covidTestParameters.CovidStatus,
-                    IssuedAt = covidTestParameters.DateIssued,
-                    TestedAt = covidTestParameters.DateTested,
-                    HasConsent = covidTestParameters.HasConsent,
-                    Laboratory = covidTestParameters.Laboratory,
-                    PermissionGrantedAt = DateTime.Now,
-                    ReferenceNumber = covidTestParameters.ReferenceNumber,
-                    //WalletId = walletId,
-                    LaboratoryStatus = LaboratoryStatus.Unsent
-                };
-                await _covidTestRepository.AddAsync(covidTest);
-                await _covidTestRepository.SaveAsync();
+        //private async void StoreCoviIDCredentials(CovidTestCredentialParameters covidTestParameters, string walletId)
+        //{
+        //    if (covidTestParameters.HasConsent)
+        //    {
+        //        var covidTest = new WalletTestResult
+        //        {
+        //            ResultStatus = covidTestParameters.CovidStatus,
+        //            IssuedAt = covidTestParameters.DateIssued,
+        //            TestedAt = covidTestParameters.DateTested,
+        //            HasConsent = covidTestParameters.HasConsent,
+        //            Laboratory = covidTestParameters.Laboratory,
+        //            PermissionGrantedAt = DateTime.Now,
+        //            ReferenceNumber = covidTestParameters.ReferenceNumber,
+        //            //WalletId = walletId,
+        //            LaboratoryStatus = LaboratoryStatus.Unsent
+        //        };
+        //        await _covidTestRepository.AddAsync(covidTest);
+        //        await _covidTestRepository.SaveAsync();
 
-            }
-            return;
-        }
+        //    }
+        //    return;
+        //}
     }
 }

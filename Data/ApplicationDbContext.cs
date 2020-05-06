@@ -1,5 +1,6 @@
 ﻿using CoviIDApiCore.Models.Database;
-using CoviIDApiCore.V1.DTOs.Credentials;
+using CoviIDApiCore.V1.DTOs.TestResult;
+using CoviIDApiCore.V1.DTOs.Wallet;
 using Microsoft.EntityFrameworkCore;
 using System;
 
@@ -47,6 +48,14 @@ namespace CoviIDApiCore.Data
              .HasConversion(
                  v => v.ToString().ToLower(),
                  v => (LaboratoryStatus)Enum.Parse(typeof(LaboratoryStatus), v)
+             );
+
+            modelBuilder
+             .Entity<WalletDetail>()
+             .Property(e => e.IdType)
+             .HasConversion(
+                 v => v.ToString().ToLower(),
+                 v => (IdType)Enum.Parse(typeof(IdType), v)
              );
         }
     }
