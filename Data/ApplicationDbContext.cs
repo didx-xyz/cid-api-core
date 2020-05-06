@@ -8,7 +8,7 @@ namespace CoviIDApiCore.Data
     public class ApplicationDbContext : DbContext
     {
         public DbSet<Organisation> Organisations { get; set; }
-        public DbSet<OrganisationCounter> OrganisationCounters { get; set; }
+        public DbSet<OrganisationAccessLog> OrganisationAccessLogs { get; set; }
         public DbSet<OtpToken> OtpTokens { get; set; }
         public DbSet<Wallet> Wallets { get; set; }
         public DbSet<CovidTest> CovidTests { get; set; }
@@ -50,7 +50,7 @@ namespace CoviIDApiCore.Data
              );
 
             modelBuilder
-                .Entity<OrganisationCounter>()
+                .Entity<OrganisationAccessLog>()
                 .Property(e => e.ScanType)
                 .HasConversion(
                     v => v.ToString().ToLower(),
