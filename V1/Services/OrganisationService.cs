@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Net;
 using System.Threading.Tasks;
@@ -19,13 +20,15 @@ namespace CoviIDApiCore.V1.Services
         private readonly IOrganisationAccessLogRepository _organisationAccessLogRepository;
         private readonly IEmailService _emailService;
         private readonly IQRCodeService _qrCodeService;
+        private readonly IWalletRepository _walletRepository;
 
-        public OrganisationService(IOrganisationRepository organisationRepository, IOrganisationAccessLogRepository organisationAccessLogRepository, IEmailService emailService, IQRCodeService qrCodeService)
+        public OrganisationService(IOrganisationRepository organisationRepository, IOrganisationAccessLogRepository organisationAccessLogRepository, IEmailService emailService, IQRCodeService qrCodeService, IWalletRepository walletRepository)
         {
             _organisationRepository = organisationRepository;
             _organisationAccessLogRepository = organisationAccessLogRepository;
             _emailService = emailService;
             _qrCodeService = qrCodeService;
+            _walletRepository = walletRepository;
         }
 
         public async Task CreateAsync(CreateOrganisationRequest payload)
@@ -59,63 +62,61 @@ namespace CoviIDApiCore.V1.Services
             if (organisation == default)
                 return new Response(false, HttpStatusCode.NotFound, Messages.Org_NotExists);
 
-            var orgCounter = await _organisationAccessLogRepository.GetLastByOrganisation(organisation);
+            var accessLogs = await _organisationAccessLogRepository.GetAllCurrentDayByOrganisation(organisation);
 
-            var totalScans = _organisationAccessLogRepository.Count();
+            var orgCounter = accessLogs
+                .Where(aol => aol.Organisation == organisation)
+                .Where(aol => aol.CreatedAt.Date == DateTime.UtcNow.Date)
+                .OrderByDescending(t => t.CreatedAt)
+                .FirstOrDefault();
 
-            return new Response(new OrganisationDTO(organisation, orgCounter, totalScans), HttpStatusCode.OK);
+            var totalScans = accessLogs.Count(aol => aol.Organisation == organisation && aol.CreatedAt.Date == DateTime.UtcNow.Date);
+
+            return new Response(new OrganisationDTO(organisation, orgCounter, totalScans, GetAccessLogBalance(accessLogs)), HttpStatusCode.OK);
         }
 
         public async Task<Response> UpdateCountAsync(string id, UpdateCountRequest payload, ScanType scanType)
         {
-            var balance = 0;
+            var wallet = await _walletRepository.GetAsync(Guid.Parse(payload.walletId));
 
-            //TODO: Check coviid
+            if(wallet == null)
+                throw new NotFoundException(Messages.Wallet_NotFound);
 
             var organisation = await _organisationRepository.GetAsync(Guid.Parse(id));
 
             if (organisation == default)
                 throw new NotFoundException(Messages.Org_NotExists);
 
-            var lastCount = await _organisationAccessLogRepository.GetLastByOrganisation(organisation);
-
-            balance = lastCount?.Balance ?? 0;
-
-            if (balance < 1 && scanType == ScanType.CheckOut)
-                throw new ValidationException(Messages.Org_NegBalance);
-
-            switch (scanType)
-            {
-                case ScanType.CheckIn:
-                    balance += 1;
-                    break;
-                case ScanType.CheckOut:
-                    balance -= 1;
-                    break;
-                default:
-                    throw new ArgumentOutOfRangeException(nameof(scanType), scanType, null);
-            }
-
             var newCount = new OrganisationAccessLog()
             {
-                //TODO: Add in Coviid
+                Wallet = wallet,
                 Organisation = organisation,
-                Date = DateTime.UtcNow,
-                ScanType = scanType,
-                Balance = balance
+                CreatedAt = DateTime.UtcNow,
+                ScanType = scanType
             };
 
             await _organisationAccessLogRepository.AddAsync(newCount);
 
             await _organisationAccessLogRepository.SaveAsync();
 
+            var logs = await _organisationAccessLogRepository.GetAllCurrentDayByOrganisation(organisation);
+
             return new Response(
                 new UpdateCountResponse()
                 {
-                    Balance = balance
+                    Balance = GetAccessLogBalance(logs)
                 },
                 true,
                 HttpStatusCode.OK);
+        }
+
+        private int GetAccessLogBalance(IReadOnlyCollection<OrganisationAccessLog> logs)
+        {
+            var checkIns = logs.Count(aol => aol.ScanType == ScanType.CheckIn);
+            var checkOuts = logs.Count(aol => aol.ScanType == ScanType.CheckOut);
+            var denies = logs.Count(aol => aol.ScanType == ScanType.Denied);
+
+            return checkIns - checkOuts - denies; //TODO: Maybe improve this?
         }
 
         private async Task NotifyOrganisation(string companyName, CreateOrganisationRequest payload, Organisation organisation)

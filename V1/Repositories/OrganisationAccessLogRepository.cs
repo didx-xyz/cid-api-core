@@ -1,5 +1,6 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using CoviIDApiCore.Data;
@@ -19,18 +20,12 @@ namespace CoviIDApiCore.V1.Repositories
             _dbSet = _context.OrganisationAccessLogs;
         }
 
-        public async Task<OrganisationAccessLog> GetLastByOrganisation(Organisation organisation)
+        public async Task<List<OrganisationAccessLog>> GetAllCurrentDayByOrganisation(Organisation organisation)
         {
             return await _dbSet
-                .Where(t => t.Organisation == organisation)
-                .Where(t => t.Date.Date == DateTime.UtcNow.Date)
-                .OrderByDescending(t => t.Date)
-                .FirstOrDefaultAsync();
-        }
-
-        public async Task<int> CountToday(Organisation organisation)
-        {
-            return await _dbSet.CountAsync(t => t.Organisation == organisation && t.Date.Date == DateTime.UtcNow.Date);
+                .Where(oal => oal.Organisation == organisation)
+                .Where(aol => aol.CreatedAt.Date == DateTime.UtcNow.Date)
+                .ToListAsync();
         }
     }
 }
