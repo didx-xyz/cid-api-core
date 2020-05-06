@@ -152,7 +152,7 @@ namespace CoviIDApiCore.V1.Services
                 verifiedPerson.Values.TryGetValue(Attributes.IdentificationType, out string identificationTypeStr);
                 verifiedPerson.Values.TryGetValue(Attributes.IdentificationValue, out string identificationValue);
 
-                var identificationType = (IdentificationTypes)Enum.Parse(typeof(IdentificationTypes), identificationTypeStr);
+                var identificationType = (IdType)Enum.Parse(typeof(IdType), identificationTypeStr);
 
                 if (covidTest != null)
                 {
@@ -164,7 +164,7 @@ namespace CoviIDApiCore.V1.Services
 
 
                     var laboratory = (Laboratory)Enum.Parse(typeof(Laboratory), laboratoryStr);
-                    var covidStatus = (CovidStatus)Enum.Parse(typeof(CovidStatus), covidStatusStr);
+                    var covidStatus = (ResultStatus)Enum.Parse(typeof(ResultStatus), covidStatusStr);
 
                     covidTestCredentials.DateIssued = DateTime.Parse(dateIssued);
                     covidTestCredentials.DateTested = DateTime.Parse(dateTested);
@@ -193,17 +193,17 @@ namespace CoviIDApiCore.V1.Services
         {
             if (covidTestParameters.HasConsent)
             {
-                var covidTest = new CovidTest
+                var covidTest = new WalletTestResult
                 {
-                    CovidStatus = covidTestParameters.CovidStatus,
-                    DateIssued = covidTestParameters.DateIssued,
-                    DateTested = covidTestParameters.DateTested,
+                    ResultStatus = covidTestParameters.CovidStatus,
+                    IssuedAt = covidTestParameters.DateIssued,
+                    TestedAt = covidTestParameters.DateTested,
                     HasConsent = covidTestParameters.HasConsent,
                     Laboratory = covidTestParameters.Laboratory,
                     PermissionGrantedAt = DateTime.Now,
                     ReferenceNumber = covidTestParameters.ReferenceNumber,
                     WalletId = walletId,
-                    CredentialIndicator = CredentialIndicator.Added
+                    LaboratoryStatus = LaboratoryStatus.Unsent
                 };
                 await _covidTestRepository.AddAsync(covidTest);
                 await _covidTestRepository.SaveAsync();
