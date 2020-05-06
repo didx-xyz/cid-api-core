@@ -202,7 +202,7 @@ namespace CoviIDApiCore.V1.Services
                     Laboratory = covidTestParameters.Laboratory,
                     PermissionGrantedAt = DateTime.Now,
                     ReferenceNumber = covidTestParameters.ReferenceNumber,
-                    WalletId = walletId,
+                    //WalletId = walletId,
                     LaboratoryStatus = LaboratoryStatus.Unsent
                 };
                 await _covidTestRepository.AddAsync(covidTest);

@@ -13,7 +13,7 @@ namespace CoviIDApiCore.V1.Repositories
         public CovidTestRepository(ApplicationDbContext context) :base(context)
         {
             _context = context;
-            _dbSet = context.CovidTests;
+            _dbSet = context.WalletTestResults;
         }
     }
 }

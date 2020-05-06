@@ -23,18 +23,19 @@ namespace CoviIDApiCore.V1.Services
         private readonly IConfiguration _configuration;
         private readonly IOtpService _otpService;
         private readonly IWalletRepository _walletRepository;
+        private readonly IWalletDetailRepository _walletDetailRepository;
         
         public WalletService(ICustodianBroker custodianBroker, IConnectionService connectionService, IAgencyBroker agencyBroker,
             IConfiguration configuration, IOtpService otpService, IWalletRepository walletRepository,
-            ICredentialService credentialService)
+            ICredentialService credentialService, IWalletDetailRepository walletDetailRepository)
         {
             _custodianBroker = custodianBroker;
             _connectionService = connectionService;
             _agencyBroker = agencyBroker;
             _configuration = configuration;
             _credentialService = credentialService;
+            _walletDetailRepository = walletDetailRepository;
             _otpService = otpService;
-            _walletRepository = walletRepository;
         }
 
         public async Task<List<WalletContract>> GetWallets()
@@ -42,9 +43,29 @@ namespace CoviIDApiCore.V1.Services
             return await _custodianBroker.GetWallets();
         }
 
-        public async Task<WalletContract> CreateWallet(WalletParameters walletParameters)
+        public async Task<WalletResponse> CreateWallet(CreateWalletRequest walletRequest)
         {
-            return await _custodianBroker.CreateWallet(walletParameters);
+            // TODO : Add photo to s3 bucket
+            var photoUrl = walletRequest.Photo;
+            
+            var wallet = new Wallet
+            {
+                CreatedAt = DateTime.UtcNow,
+                MobileNumber = walletRequest.MobileNumber,
+                MobileNumberReference = walletRequest.MobileNumberReference
+            };
+            await _walletRepository.AddAsync(wallet);
+            await _walletRepository.SaveAsync();
+
+            await _otpService.GenerateAndSendOtpAsync(walletRequest.MobileNumber, wallet);
+            
+            var response = new WalletResponse
+            {
+                WalletId = wallet.Id,
+                MobileNumber = walletRequest.MobileNumber,
+                PhotoUrl = photoUrl
+            };
+            return response;
         }
 
         public async Task<CoviIdWalletContract> CreateCoviIdWallet(CoviIdWalletParameters coviIdWalletParameters)
@@ -119,7 +140,7 @@ namespace CoviIDApiCore.V1.Services
         {
             var newWallet = new Wallet()
             {
-                WalletIdentifier = walletId,
+                //Id = walletId,
                 CreatedAt = DateTime.UtcNow
             };
 

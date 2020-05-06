@@ -8,7 +8,7 @@ namespace CoviIDApiCore.V1.Interfaces.Services
     public interface IWalletService
     {
         Task<List<WalletContract>> GetWallets();
-        Task<WalletContract> CreateWallet(WalletParameters walletParameters);
+        Task<WalletResponse> CreateWallet(CreateWalletRequest walletRequest);
         Task<CoviIdWalletContract> CreateCoviIdWallet(CoviIdWalletParameters coviIdWalletParameters);
         Task UpdateWallet(CovidTestCredentialParameters covidTest, string walletId);
         Task DeleteWallet(string walletId);
