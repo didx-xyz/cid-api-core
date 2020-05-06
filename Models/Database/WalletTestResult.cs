@@ -1,4 +1,4 @@
-﻿using CoviIDApiCore.V1.DTOs.Credentials;
+﻿using CoviIDApiCore.V1.DTOs.TestResult;
 using System;
 
 namespace CoviIDApiCore.Models.Database
@@ -14,12 +14,5 @@ namespace CoviIDApiCore.Models.Database
         public DateTime IssuedAt { get; set; }
         public DateTime PermissionGrantedAt { get; set; }
         public bool HasConsent { get; set; }
-    }
-
-    public enum LaboratoryStatus
-    {
-        Unsent = 0,
-        InProgress = 1,
-        Verified = 2
     }
 }

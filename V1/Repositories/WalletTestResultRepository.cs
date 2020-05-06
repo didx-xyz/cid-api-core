@@ -6,15 +6,15 @@ using System;
 
 namespace CoviIDApiCore.V1.Repositories
 {
-    public class WalletDetailRepository : BaseRepository<WalletDetail, Guid>, IWalletDetailRepository
+    public class WalletTestResultRepository : BaseRepository<WalletTestResult, Guid>, IWalletTestResultRepository
     {
         private readonly ApplicationDbContext _context;
-        private readonly DbSet<WalletDetail> _dbset;
+        private readonly DbSet<WalletTestResult> _dbset;
 
-        public WalletDetailRepository(ApplicationDbContext context) : base(context)
+        public WalletTestResultRepository(ApplicationDbContext context) : base(context)
         {
             _context = context;
-            _dbset = _context.WalletDetails;
+            _dbset = _context.WalletTestResults;
         }
 
     }
