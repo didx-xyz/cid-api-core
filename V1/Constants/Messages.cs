@@ -43,7 +43,7 @@
         #endregion
 
         #region Validation
-        public string Val_Length = $"Invalid lenght. Minimum length is 2 and maximum is 50";
+        public static string Val_Length = $"Invalid lenght. Minimum length is 2 and maximum is 50";
         public static string Val_Email = $"Invalid email address";
 
         public static readonly string Val_MobileNumber = $"Invalid mobile number.";
