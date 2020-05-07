@@ -1,17 +1,13 @@
 ﻿using System;
-using CoviIDApiCore.V1.DTOs.Connection;
 using CoviIDApiCore.V1.DTOs.Credentials;
 using CoviIDApiCore.V1.DTOs.Wallet;
 using CoviIDApiCore.V1.Interfaces.Brokers;
 using CoviIDApiCore.V1.Interfaces.Services;
-using System.Collections.Generic;
-using System.Linq;
 using System.Threading.Tasks;
 using CoviIDApiCore.Models.Database;
 using CoviIDApiCore.V1.DTOs.Authentication;
 using CoviIDApiCore.V1.Interfaces.Repositories;
 using Microsoft.Extensions.Configuration;
-using static CoviIDApiCore.V1.Constants.DefinitionConstants;
 
 namespace CoviIDApiCore.V1.Services
 {
@@ -104,48 +100,6 @@ namespace CoviIDApiCore.V1.Services
             };
 
             return contract;
-        }
-
-        /// <summary>
-        /// This will update the wallet with the newly added covid test results
-        /// </summary>
-        /// <returns></returns>
-        public async Task UpdateWallet(CovidTestCredentialParameters covidTest, string walletId)
-        {
-            var connectionParameters = new ConnectionParameters
-            {
-                ConnectionId = "", // Leave blank for auto generation
-                Multiparty = false,
-                Name = "CoviID", // This is the Agent name
-            };
-
-            var agentInvitation = await _connectionService.CreateInvitation(connectionParameters);
-            var custodianConnection = await _connectionService.AcceptInvitation(agentInvitation.Invitation, walletId);
-            var offer = await _credentialService.CreateCovidTest(agentInvitation.ConnectionId, covidTest, walletId);
-            var userCredentials = await _custodianBroker.GetCredentials(walletId);
-
-            var thisOffer = userCredentials.FirstOrDefault(c => c.State == CredentialsState.Offered && c.DefinitionId == DefinitionIds[Schemas.CovidTest]);
-            if (thisOffer != null)
-            {
-                await _custodianBroker.AcceptCredential(walletId, thisOffer.CredentialId);
-
-            }
-            // TODO : Throw exception
-
-            return;
-        }
-
-        public async Task DeleteWallet(string walletId)
-        {
-            await _custodianBroker.DeleteWallet(walletId);
-        }
-
-        public async Task DeleteWallets(List<WalletParameters> wallets)
-        {
-            foreach (var wallet in wallets)
-            {
-                await _custodianBroker.DeleteWallet(wallet.WalletId);
-            }
         }
 
         #region Private Methods
