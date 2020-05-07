@@ -152,7 +152,7 @@ namespace CoviIDApiCore.V1.Services
                 verifiedPerson.Values.TryGetValue(Attributes.IdentificationType, out string identificationTypeStr);
                 verifiedPerson.Values.TryGetValue(Attributes.IdentificationValue, out string identificationValue);
 
-                var identificationType = (IdType)Enum.Parse(typeof(IdType), identificationTypeStr);
+                var identificationType = (IdentificationTypes)Enum.Parse(typeof(IdentificationTypes), identificationTypeStr);
 
                 if (covidTest != null)
                 {
@@ -164,7 +164,7 @@ namespace CoviIDApiCore.V1.Services
 
 
                     var laboratory = (Laboratory)Enum.Parse(typeof(Laboratory), laboratoryStr);
-                    var covidStatus = (ResultStatus)Enum.Parse(typeof(ResultStatus), covidStatusStr);
+                    var covidStatus = (CovidStatus)Enum.Parse(typeof(CovidStatus), covidStatusStr);
 
                     covidTestCredentials.DateIssued = DateTime.Parse(dateIssued);
                     covidTestCredentials.DateTested = DateTime.Parse(dateTested);

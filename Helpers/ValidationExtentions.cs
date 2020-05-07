@@ -27,9 +27,9 @@ namespace CoviIDApiCore.Helpers
             throw new ValidationException(Messages.Val_MobileNumber);
         }
 
-        public static string ValidateIdentification(this string value, IdType identificationType)
+        public static string ValidateIdentification(this string value, IdentificationTypes identificationType)
         {
-            if (identificationType == IdType.Passport)
+            if (identificationType == IdentificationTypes.Passport)
             {
                 if (value.Length > 6)
                 {

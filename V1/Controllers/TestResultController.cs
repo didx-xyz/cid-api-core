@@ -23,9 +23,9 @@ namespace CoviIDApiCore.V1.Controllers
         [HttpPost]
         public async Task<IActionResult> AddTestResult([FromBody] TestResultRequest testResultRequest)
         {
-            var response = _testResultService.AddTestResult(testResultRequest);
+            await _testResultService.AddTestResult(testResultRequest);
 
-            return Ok(new Response(response, HttpStatusCode.OK));
+            return Ok(new Response(true, HttpStatusCode.OK));
         }
     }
 }

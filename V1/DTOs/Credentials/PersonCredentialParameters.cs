@@ -13,7 +13,7 @@ namespace CoviIDApiCore.V1.DTOs.Credentials
         /// <summary>
         /// Type of Identification. SA ID doc or Passport
         /// </summary>
-        public IdType IdentificationType { get; set; }
+        public IdentificationTypes IdentificationType { get; set; }
         /// <summary>
         /// Identification Value
         /// </summary>
