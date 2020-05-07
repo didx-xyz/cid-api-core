@@ -1,4 +1,4 @@
-﻿using CoviIDApiCore.V1.DTOs.TestResult;
+﻿using CoviIDApiCore.V1.DTOs.WalletTestResult;
 using System;
 using System.Threading.Tasks;
 

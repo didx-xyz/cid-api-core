@@ -1,5 +1,5 @@
 ﻿using CoviIDApiCore.Models.Database;
-using CoviIDApiCore.V1.DTOs.TestResult;
+using CoviIDApiCore.V1.DTOs.WalletTestResult;
 using CoviIDApiCore.V1.Interfaces.Repositories;
 using CoviIDApiCore.V1.Interfaces.Services;
 using System;
@@ -51,6 +51,7 @@ namespace CoviIDApiCore.V1.Services
                 TestedAt = testResultRequest.TestedAt,
                 ResultStatus = testResultRequest.ResultStatus,
                 LaboratoryStatus = LaboratoryStatus.Unsent,
+                TestType = testResultRequest.TestType,
                 HasConsent = testResultRequest.HasConsent,
                 PermissionGrantedAt = DateTime.UtcNow
             };

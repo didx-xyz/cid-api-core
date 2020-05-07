@@ -10,6 +10,7 @@ using CoviIDApiCore.V1.Interfaces.Brokers;
 using CoviIDApiCore.V1.Interfaces.Repositories;
 using CoviIDApiCore.V1.Interfaces.Services;
 using Microsoft.Extensions.Configuration;
+using Microsoft.VisualStudio.Web.CodeGeneration.Contracts.Messaging;
 
 namespace CoviIDApiCore.V1.Services
 {
@@ -31,7 +32,7 @@ namespace CoviIDApiCore.V1.Services
             _walletRepository = walletRepository;
         }
 
-        public async Task<string> GenerateAndSendOtpAsync(string mobileNumber, string walletId)
+        public async Task<string> GenerateAndSendOtpAsync(string mobileNumber)
         {
             var expiryTime = _configuration.GetValue<int>("OTPSettings:ValidityPeriod");
 
@@ -72,7 +73,7 @@ namespace CoviIDApiCore.V1.Services
             if (wallet == default)
                 throw new NotFoundException();
 
-            await GenerateAndSendOtpAsync(payload.MobileNumber, payload.WalletId);
+            await GenerateAndSendOtpAsync(payload.MobileNumber);
         }
 
         private ClickatellTemplate ConstructMessage(string mobileNumber, int code, int validityPeriod)
@@ -106,7 +107,7 @@ namespace CoviIDApiCore.V1.Services
             await _otpTokenRepository.SaveAsync();
         }
 
-        public async Task ConfirmOtpAsync(RequestOtpConfirmation payload)
+        public async Task<OtpConfirmationResponse> ConfirmOtpAsync(RequestOtpConfirmation payload)
         {
             var token = await _otpTokenRepository.GetBySessionId(payload.SessionId);
 
@@ -119,7 +120,25 @@ namespace CoviIDApiCore.V1.Services
 
             await _otpTokenRepository.SaveAsync();
 
-            await _credentialService.CreatePersonAndCovidTestCredentials(payload.CovidTest, payload.Person, payload.WalletId);
+            var wallet = await _walletRepository.GetByMobileNumber(token.MobileNumber);
+
+            if (wallet == null)
+                throw new NotFoundException(Messages.Wallet_NotFound);
+
+            wallet.MobileNumberVerifiedAt = DateTime.UtcNow;
+
+            _walletRepository.Update(wallet);
+
+            await _walletRepository.SaveAsync();
+
+            //TODO: Add details to wallet
+
+//            await _credentialService.CreatePersonAndCovidTestCredentials(payload.CovidTest, payload.Person, payload.WalletId);
+
+            return new OtpConfirmationResponse()
+            {
+                WalletId = wallet.Id.ToString()
+            };
         }
     }
 }

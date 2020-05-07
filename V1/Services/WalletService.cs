@@ -74,14 +74,10 @@ namespace CoviIDApiCore.V1.Services
 
             await _walletRepository.SaveAsync();
 
-            var sessionId = await _otpService.GenerateAndSendOtpAsync(walletRequest.MobileNumber, wallet.Id.ToString());
-
-            var response = new WalletResponse
+            return new WalletResponse
             {
-                SessionId = sessionId
+                SessionId = await _otpService.GenerateAndSendOtpAsync(walletRequest.MobileNumber)
             };
-
-            return response;
         }
 
         public async Task<CoviIdWalletContract> CreateCoviIdWallet(CoviIdWalletParameters coviIdWalletParameters)
@@ -97,7 +93,7 @@ namespace CoviIDApiCore.V1.Services
 
             var newWallet = await SaveNewWalletAsync(response.WalletId);
 
-            await _otpService.GenerateAndSendOtpAsync(newWallet.Id.ToString(), coviIdWalletParameters.MobileNumber.ToString());
+            await _otpService.GenerateAndSendOtpAsync(newWallet.Id.ToString());
             
             var contract = new CoviIdWalletContract
             {
