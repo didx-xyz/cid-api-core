@@ -10,7 +10,6 @@ using CoviIDApiCore.V1.Interfaces.Brokers;
 using CoviIDApiCore.V1.Interfaces.Repositories;
 using CoviIDApiCore.V1.Interfaces.Services;
 using Microsoft.Extensions.Configuration;
-using Microsoft.VisualStudio.Web.CodeGeneration.Contracts.Messaging;
 
 namespace CoviIDApiCore.V1.Services
 {
@@ -19,21 +18,21 @@ namespace CoviIDApiCore.V1.Services
         private readonly IConfiguration _configuration;
         private readonly IOtpTokenRepository _otpTokenRepository;
         private readonly IClickatellBroker _clickatellBroker;
-        private readonly ICredentialService _credentialService;
         private readonly IWalletRepository _walletRepository;
         private readonly ITestResultService _testResultService;
         private readonly IWalletDetailService _walletDetailService;
+        private readonly ICryptoService _cryptoService;
 
         public OtpService(IOtpTokenRepository tokenRepository, IConfiguration configuration, IClickatellBroker clickatellBroker,
-            ICredentialService credentialService, IWalletRepository walletRepository, ITestResultService testResultService, IWalletDetailService walletDetailService)
+            IWalletRepository walletRepository, ITestResultService testResultService, IWalletDetailService walletDetailService, ICryptoService cryptoService)
         {
             _otpTokenRepository = tokenRepository;
             _configuration = configuration;
             _clickatellBroker = clickatellBroker;
-            _credentialService = credentialService;
             _walletRepository = walletRepository;
             _testResultService = testResultService;
             _walletDetailService = walletDetailService;
+            _cryptoService = cryptoService;
         }
 
         public async Task<string> GenerateAndSendOtpAsync(string mobileNumber)
@@ -146,7 +145,8 @@ namespace CoviIDApiCore.V1.Services
 
             return new OtpConfirmationResponse()
             {
-                WalletId = wallet.Id.ToString()
+                WalletId = wallet.Id.ToString(),
+                Key = await _cryptoService.GenerateEncryptedSecretKey()
             };
         }
     }

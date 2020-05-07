@@ -17,6 +17,8 @@ namespace CoviIDApiCore.V1.Services
 
         public async Task AddWalletDetailsAsync(Wallet wallet, WalletDetailsRequest walletDetails)
         {
+            //TODO: Validation
+
             var details = new WalletDetail(walletDetails)
             {
                 Wallet = wallet

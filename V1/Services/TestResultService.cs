@@ -62,6 +62,8 @@ namespace CoviIDApiCore.V1.Services
 
         public async Task AddTestResult(Wallet wallet, TestResultRequest testResultRequest)
         {
+            //TODO: Validation
+
             var testResults = new WalletTestResult
             {
                 Wallet = wallet,
