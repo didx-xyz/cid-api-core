@@ -84,16 +84,55 @@ namespace CoviIDApiCore.V1.Services
             return encryptedProps;
         }
 
-        private string Encrypt (string plainText, string key)
-        {
-            // TODO
-            return plainText;
+        private string Encrypt (string plainText, string key) {
+            using (var aes = Aes.Create())
+            {
+                var iv = aes.IV;
+                using (var encryptor = aes.CreateEncryptor(Convert.FromBase64String(key), iv))
+                using (var ms = new MemoryStream())
+                {
+                    using (var cs = new CryptoStream(ms, encryptor, CryptoStreamMode.Write))
+                    using (var binaryWriter = new BinaryWriter(cs))
+                    {
+                        // prepend IV to data
+                        ms.Write(iv);
+                        binaryWriter.Write(plainText);
+                        cs.FlushFinalBlock();
+                    }
+
+                    return Convert.ToBase64String(ms.ToArray());
+                }
+            }
         }
 
         private string Decrypt (string cipherText, string key)
         {
-            // TODO
-            return cipherText;
+            var cipherBytes = Convert.FromBase64String(cipherText);
+            //get first 16 bytes of IV and use it to decrypt
+            var iv = new byte[16];
+            Array.Copy(cipherBytes, 0, iv, 0, iv.Length);
+
+            using (var aes = Aes.Create())
+            {
+                using (var ms = new MemoryStream())
+                {
+                    using (var cs = new CryptoStream(ms, aes.CreateDecryptor(Convert.FromBase64String(key), iv), CryptoStreamMode.Write))
+                    using (var binaryWriter = new BinaryWriter(cs))
+                    {
+                        binaryWriter.Write(cipherBytes, iv.Length, cipherBytes.Length - iv.Length);
+                    }
+
+                    // TODO: For some reason, this memory stream always starts
+                    // with one junk byte. We really need to find out what's
+                    // going on here, but for now, just get rid of it.
+
+                    var actualPlainText = ms.ToArray();
+                    var hackedPlainText = new byte[actualPlainText.Length - 1];
+                    Array.Copy(actualPlainText, 1, hackedPlainText, 0, actualPlainText.Length - 1);
+
+                    return Encoding.Default.GetString(hackedPlainText);
+                }
+            }
         }
     }
 }
