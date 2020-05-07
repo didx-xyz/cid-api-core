@@ -7,6 +7,7 @@ using CoviIDApiCore.V1.DTOs.Wallet;
 using CoviIDApiCore.V1.Interfaces.Services;
 using Microsoft.AspNetCore.Cors;
 using Microsoft.AspNetCore.Mvc;
+using System;
 
 namespace CoviIDApiCore.V1.Controllers
 {
@@ -22,18 +23,19 @@ namespace CoviIDApiCore.V1.Controllers
             _walletService = walletService;
         }
 
-        [HttpGet]
-        public async Task<IActionResult> GetWallet()
+        [HttpPost]
+        public async Task<IActionResult> CreateWallet(CreateWalletRequest walletParameters)
         {
-            var response = await _walletService.GetWallets();
+            var response = await _walletService.CreateWallet(walletParameters);
 
             return Ok(new Response(response, HttpStatusCode.OK));
         }
 
         [HttpPost]
-        public async Task<IActionResult> CreateWallet(WalletParameters walletParameters)
+        [Route("{walletId}/status")]
+        public async Task<IActionResult> GetWalletStatus(Guid walletId, [FromBody] string key)
         {
-            var response = await _walletService.CreateWallet(walletParameters);
+            var response = await _walletService.GetWalletStatus(walletId, key);
 
             return Ok(new Response(response, HttpStatusCode.OK));
         }
@@ -46,6 +48,14 @@ namespace CoviIDApiCore.V1.Controllers
 
             return Ok(new Response(response, HttpStatusCode.OK));
         }
+
+        //[HttpPut]
+        //[Route("{walletId}")]
+        //public async Task<IActionResult> UpdateWallet([FromBody])
+        //{
+        //    await _walletService.UpdateWallet(covidTest, walletId);
+        //    return Ok(new Response(true, HttpStatusCode.OK));
+        //}
 
         [HttpPut]
         [Route("{walletId}/coviid")]
