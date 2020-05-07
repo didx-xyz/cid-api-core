@@ -79,7 +79,6 @@ namespace CoviIDApiCore.V1.Services
 
             var response = new WalletResponse
             {
-                WalletId = wallet.Id,
                 SessionId = sessionId
             };
             return response;
