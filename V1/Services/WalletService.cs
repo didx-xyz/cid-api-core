@@ -8,6 +8,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using CoviIDApiCore.Models.Database;
+using CoviIDApiCore.V1.DTOs.Authentication;
 using CoviIDApiCore.V1.Interfaces.Repositories;
 using Microsoft.Extensions.Configuration;
 using static CoviIDApiCore.V1.Constants.DefinitionConstants;

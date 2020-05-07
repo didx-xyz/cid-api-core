@@ -21,15 +21,19 @@ namespace CoviIDApiCore.V1.Services
         private readonly IClickatellBroker _clickatellBroker;
         private readonly ICredentialService _credentialService;
         private readonly IWalletRepository _walletRepository;
+        private readonly ITestResultService _testResultService;
+        private readonly IWalletDetailService _walletDetailService;
 
         public OtpService(IOtpTokenRepository tokenRepository, IConfiguration configuration, IClickatellBroker clickatellBroker,
-            ICredentialService credentialService, IWalletRepository walletRepository)
+            ICredentialService credentialService, IWalletRepository walletRepository, ITestResultService testResultService, IWalletDetailService walletDetailService)
         {
             _otpTokenRepository = tokenRepository;
             _configuration = configuration;
             _clickatellBroker = clickatellBroker;
             _credentialService = credentialService;
             _walletRepository = walletRepository;
+            _testResultService = testResultService;
+            _walletDetailService = walletDetailService;
         }
 
         public async Task<string> GenerateAndSendOtpAsync(string mobileNumber)
@@ -107,6 +111,7 @@ namespace CoviIDApiCore.V1.Services
             await _otpTokenRepository.SaveAsync();
         }
 
+        //TODO: Improve this
         public async Task<OtpConfirmationResponse> ConfirmOtpAsync(RequestOtpConfirmation payload)
         {
             var token = await _otpTokenRepository.GetBySessionId(payload.SessionId);
@@ -131,9 +136,13 @@ namespace CoviIDApiCore.V1.Services
 
             await _walletRepository.SaveAsync();
 
-            //TODO: Add details to wallet
+            //TODO: Upload photo
 
-//            await _credentialService.CreatePersonAndCovidTestCredentials(payload.CovidTest, payload.Person, payload.WalletId);
+            payload.WalletDetails.Photo = "New photo URL";
+
+            await _walletDetailService.AddWalletDetailsAsync(wallet, payload.WalletDetails);
+
+            await _testResultService.AddTestResult(wallet, payload.TestResult);
 
             return new OtpConfirmationResponse()
             {
