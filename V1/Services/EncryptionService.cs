@@ -1,4 +1,3 @@
-using System;
 using System.Threading.Tasks;
 // TODO: All references to WalletContract below will change to reference the "new" version
 using CoviIDApiCore.V1.DTOs.Wallet;
@@ -19,10 +18,25 @@ namespace CoviIDApiCore.V1.Services
             serverKey = configuration.GetValue<string>("ServerKey");
         }
 
+
         public Task<string> GenerateEncryptedSecretKey ()
         {
             // TODO
             return Task.FromResult<string>("totally_encrypted_secret_key");
+        }
+
+        public Task<WalletContract> EncryptWallet(WalletContract plainTextWallet)
+        {
+            // TODO
+            var encryptedWallet = new WalletContract();
+            return Task.FromResult<WalletContract>(encryptedWallet);
+        }
+
+        public Task<WalletContract> DecryptWallet(WalletContract encryptedWallet)
+        {
+            // TODO
+            var plainTextWallet = new WalletContract();
+            return Task.FromResult<WalletContract>(plainTextWallet);
         }
 
         public Task<WalletContract> EncryptWalletDetails(WalletContract plainTextWallet, string encryptedSecretKey)

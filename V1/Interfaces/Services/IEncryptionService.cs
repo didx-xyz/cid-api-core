@@ -10,6 +10,14 @@ namespace CoviIDApiCore.V1.Interfaces.Services
     {
         Task<string> GenerateEncryptedSecretKey();
 
+        // These methods only really care about the mobile-number related
+        // fields, but we accept the full wallet type for consistency.
+        //
+        // NOTE: These don't take in an encryptedSecretKey, because they are
+        // encrypted using the serverKey only.
+        Task<WalletContract> EncryptWallet(WalletContract plainTextWallet);
+        Task<WalletContract> DecryptWallet(WalletContract encryptedWallet);
+
         Task<WalletContract> EncryptWalletDetails(WalletContract plainTextWallet, string encryptedSecretKey);
         Task<WalletContract> DecryptWalletDetails(WalletContract encryptedWallet, string encryptedSecretKey);
 
