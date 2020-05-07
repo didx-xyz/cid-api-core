@@ -1,7 +1,9 @@
 using System;
-using System.Reflection;
 using System.Collections.Generic;
-using System.Threading.Tasks;
+using System.IO;
+using System.Reflection;
+using System.Security.Cryptography;
+using System.Text;
 using CoviIDApiCore.V1.Interfaces.Services;
 using CoviIDApiCore.V1.Attributes;
 using Microsoft.Extensions.Configuration;
@@ -13,17 +15,20 @@ namespace CoviIDApiCore.V1.Services
     public class CryptoService : ICryptoService
     {
         private readonly string serverKey;
+        private readonly RNGCryptoServiceProvider rng;
 
         public CryptoService(IConfiguration configuration)
         {
             serverKey = configuration.GetValue<string>("ServerKey");
+            rng = new RNGCryptoServiceProvider();
         }
 
 
-        public Task<string> GenerateEncryptedSecretKey()
+        public string GenerateEncryptedSecretKey()
         {
-            // TODO
-            return Task.FromResult<string>("totally_encrypted_secret_key");
+            byte[] key = new byte[32]; // 256 bits
+            rng.GetBytes(key);
+            return Convert.ToBase64String(key);
         }
 
         public void EncryptAsServer<T>(T obj)
