@@ -72,15 +72,11 @@ namespace CoviIDApiCore.V1.Services
             await _walletRepository.AddAsync(wallet);
             await _walletRepository.SaveAsync();
 
-            // TODO : create better session
-            var sessionId = Guid.NewGuid();
-
             await _otpService.GenerateAndSendOtpAsync(walletRequest.MobileNumber, wallet);
 
             var response = new WalletResponse
             {
                 WalletId = wallet.Id,
-                SessionId = sessionId,
             };
             return response;
         }
