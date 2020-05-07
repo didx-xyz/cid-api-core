@@ -103,7 +103,7 @@ namespace CoviIDApiCore.V1.Services
                     {
                         // prepend IV to data
                         ms.Write(iv);
-                        binaryWriter.Write(plainText);
+                        binaryWriter.Write(Encoding.UTF8.GetBytes(plainText));
                         cs.FlushFinalBlock();
                     }
 
@@ -129,15 +129,7 @@ namespace CoviIDApiCore.V1.Services
                         binaryWriter.Write(cipherBytes, iv.Length, cipherBytes.Length - iv.Length);
                     }
 
-                    // TODO: For some reason, this memory stream always starts
-                    // with one junk byte. We really need to find out what's
-                    // going on here, but for now, just get rid of it.
-
-                    var actualPlainText = ms.ToArray();
-                    var hackedPlainText = new byte[actualPlainText.Length - 1];
-                    Array.Copy(actualPlainText, 1, hackedPlainText, 0, actualPlainText.Length - 1);
-
-                    return Encoding.Default.GetString(hackedPlainText);
+                    return Encoding.UTF8.GetString(ms.ToArray());
                 }
             }
         }
