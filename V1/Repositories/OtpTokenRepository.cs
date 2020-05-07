@@ -43,15 +43,5 @@ namespace CoviIDApiCore.V1.Repositories
                 .OrderByDescending(t => t.CreatedAt)
                 .ToListAsync();
         }
-
-//        public async Task<OtpToken> GetUnusedByWalletIdAndMobileNumber(string walletId, string mobileNumber)
-//        {
-//            return await _dbSet
-//                .Where(t => string.Equals(t.Wallet.WalletIdentifier, walletId, StringComparison.Ordinal))
-//                .Where(t => string.Equals(t.MobileNumber, mobileNumber, StringComparison.Ordinal))
-//                .Where(t => !t.isUsed)
-//                .OrderByDescending(t => t.CreatedAt)
-//                .FirstOrDefaultAsync();
-//        }
     }
 }

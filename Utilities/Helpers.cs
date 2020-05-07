@@ -14,7 +14,7 @@ namespace CoviIDApiCore.Utilities
 
         public static string GenerateSessionToken()
         {
-            return null; //TODO: Change
+            return Guid.NewGuid().ToString();
         }
     }
 }
