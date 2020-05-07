@@ -1,4 +1,6 @@
 ﻿using System;
+using System.Security.Cryptography;
+using System.Text;
 using System.Threading.Tasks;
 using CoviIDApiCore.Exceptions;
 using CoviIDApiCore.Models.Database;
@@ -51,6 +53,28 @@ namespace CoviIDApiCore.V1.Services
                 throw new NotFoundException();
 
             await GenerateAndSendOtpAsync(payload.MobileNumber.ToString(), wallet);
+        }
+
+        public async Task<string> GetSessionId(int numberBytes = 50)
+        {
+            // Generates a true random number
+            var rngProvider = new RNGCryptoServiceProvider();
+            var bytes = new byte[numberBytes];
+            rngProvider.GetBytes(bytes);
+
+            // Get the hash code 
+            var shaProvider = new SHA1CryptoServiceProvider();
+            var hash = shaProvider.ComputeHash(bytes);
+            var builder = new StringBuilder(hash.Length * 2);
+
+            // Format each byte to two hexadecimal characters
+            foreach (byte b in hash)
+            {
+                builder.Append(b.ToString("X2"));
+            }
+
+            var sessionId = builder.ToString();
+            return sessionId;
         }
 
         private ClickatellTemplate ConstructMessage(string mobileNumber, int code, int validityPeriod, Wallet wallet)

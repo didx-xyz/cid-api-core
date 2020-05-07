@@ -9,5 +9,6 @@ namespace CoviIDApiCore.V1.Interfaces.Services
         Task GenerateAndSendOtpAsync(string mobileNumber, Wallet wallet);
         Task ResendOtp(RequestResendOtp payload);
         Task ConfirmOtpAsync(RequestOtpConfirmation payload);
+        Task<string> GetSessionId(int numberBytes = 50);
     }
 }
