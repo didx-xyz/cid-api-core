@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace CoviIDApiCore.V1.Interfaces.Repositories
 {
-    public interface ICovidTestRepository : IBaseRepository<WalletTestResult, Guid>
+    public interface IWalletDetailRepository : IBaseRepository<WalletDetail, Guid>
     {
     }
 }

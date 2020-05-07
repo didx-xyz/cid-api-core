@@ -23,28 +23,65 @@ namespace CoviIDApiCore.V1.Services
         private readonly IConfiguration _configuration;
         private readonly IOtpService _otpService;
         private readonly IWalletRepository _walletRepository;
+        private readonly IWalletDetailRepository _walletDetailRepository;
+        private readonly ITestResultService _testResultService;
         
         public WalletService(ICustodianBroker custodianBroker, IConnectionService connectionService, IAgencyBroker agencyBroker,
             IConfiguration configuration, IOtpService otpService, IWalletRepository walletRepository,
-            ICredentialService credentialService)
+            ICredentialService credentialService, IWalletDetailRepository walletDetailRepository,
+            ITestResultService testResultService)
         {
             _custodianBroker = custodianBroker;
             _connectionService = connectionService;
             _agencyBroker = agencyBroker;
             _configuration = configuration;
             _credentialService = credentialService;
+            _walletDetailRepository = walletDetailRepository;
+            _testResultService = testResultService;
             _otpService = otpService;
             _walletRepository = walletRepository;
         }
 
-        public async Task<List<WalletContract>> GetWallets()
+        public async Task<WalletStatusResponse> GetWalletStatus(Guid walletId, string key)
         {
-            return await _custodianBroker.GetWallets();
+            // TODO : Handle decryption
+            // TODO : Make photo url secure
+
+            var wallet = await _walletDetailRepository.GetAsync(walletId);
+            var testResults = await _testResultService.GetTestResult(walletId);
+
+            var response = new WalletStatusResponse
+            {
+                FirstName = wallet.FirstName,
+                LastName = wallet.LastName,
+                PhotoUrl = wallet.PhotoUrl,
+                ResultStatus = testResults.ResultStatus.ToString(),
+                Status = (int)testResults.ResultStatus
+            };
+            return response;
         }
 
-        public async Task<WalletContract> CreateWallet(WalletParameters walletParameters)
+        public async Task<WalletResponse> CreateWallet(CreateWalletRequest walletRequest)
         {
-            return await _custodianBroker.CreateWallet(walletParameters);
+            var wallet = new Wallet
+            {
+                CreatedAt = DateTime.UtcNow,
+                MobileNumber = walletRequest.MobileNumber,
+                MobileNumberReference = walletRequest.MobileNumberReference
+            };
+
+            await _walletRepository.AddAsync(wallet);
+
+            await _walletRepository.SaveAsync();
+
+            var sessionId = await _otpService.GenerateAndSendOtpAsync(walletRequest.MobileNumber, wallet.Id.ToString());
+
+            var response = new WalletResponse
+            {
+                SessionId = sessionId
+            };
+
+            return response;
         }
 
         public async Task<CoviIdWalletContract> CreateCoviIdWallet(CoviIdWalletParameters coviIdWalletParameters)
@@ -60,7 +97,7 @@ namespace CoviIDApiCore.V1.Services
 
             var newWallet = await SaveNewWalletAsync(response.WalletId);
 
-            await _otpService.GenerateAndSendOtpAsync(newWallet.WalletIdentifier, coviIdWalletParameters.MobileNumber.ToString());
+            await _otpService.GenerateAndSendOtpAsync(newWallet.Id.ToString(), coviIdWalletParameters.MobileNumber.ToString());
             
             var contract = new CoviIdWalletContract
             {
@@ -119,7 +156,7 @@ namespace CoviIDApiCore.V1.Services
         {
             var newWallet = new Wallet()
             {
-                WalletIdentifier = walletId,
+                //Id = walletId,
                 CreatedAt = DateTime.UtcNow
             };
 
