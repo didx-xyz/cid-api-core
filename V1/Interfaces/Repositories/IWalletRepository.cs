@@ -8,5 +8,6 @@ namespace CoviIDApiCore.V1.Interfaces.Repositories
     {
         Task<Wallet> GetByWalletIdentifier(string identifier);
         Task<Wallet> GetByMobileNumber(string mobileNumber);
+        Task<Wallet> GetBySessionId(string sessionId);
     }
 }

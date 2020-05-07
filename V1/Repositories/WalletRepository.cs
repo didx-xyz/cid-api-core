@@ -33,5 +33,12 @@ namespace CoviIDApiCore.V1.Repositories
                 .Where(t => string.Equals(t.MobileNumber, mobileNumber))
                 .FirstOrDefaultAsync();
         }
+
+        public async Task<Wallet> GetBySessionId(string sessionId)
+        {
+            return await _dbSet
+                .Where(t => string.Equals(t.SessionId, sessionId))
+                .SingleOrDefaultAsync();
+        }
     }
 }

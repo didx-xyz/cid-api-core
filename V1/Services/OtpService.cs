@@ -124,7 +124,7 @@ namespace CoviIDApiCore.V1.Services
 
             await _otpTokenRepository.SaveAsync();
 
-            var wallet = await _walletRepository.GetByMobileNumber(token.MobileNumber);
+            var wallet = await _walletRepository.GetBySessionId(payload.SessionId);
 
             if (wallet == null)
                 throw new NotFoundException(Messages.Wallet_NotFound);
