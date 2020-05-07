@@ -20,7 +20,7 @@ namespace CoviIDApiCore.V1.Services
 
         public CryptoService(IConfiguration configuration)
         {
-            serverKey = configuration.GetValue<string>("ServerKey");
+            serverKey = configuration["ServerKey"];
             rng = new RNGCryptoServiceProvider();
         }
 
