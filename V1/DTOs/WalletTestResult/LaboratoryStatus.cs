@@ -1,11 +1,9 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
-
-namespace CoviIDApiCore.V1.DTOs.TestResult
+﻿namespace CoviIDApiCore.V1.DTOs.TestResult
 {
-    public class LaboratoryStatus
+    public enum LaboratoryStatus
     {
+        Unsent,
+        InProgress,
+        Verified
     }
 }
