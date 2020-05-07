@@ -50,12 +50,12 @@ namespace CoviIDApiCore.V1.Services
                 AutomaticIssuance = false,
                 CredentialValues = new Dictionary<string, string>
                 {
-                    { Attributes.FirstName , personCredential.FirstName.ValidateLength() },
-                    { Attributes.LastName, personCredential.LastName.ValidateLength() },
-                    { Attributes.Photo, personCredential.Photo },
-                    { Attributes.MobileNumber , personCredential.MobileNumber.ValidateMobileNumber().ToString() },
-                    { Attributes.IdentificationType , personCredential.IdentificationType.ToString() },
-                    { Attributes.IdentificationValue, personCredential.IdentificationValue.ValidateIdentification(personCredential.IdentificationType) }
+                    { SchemaAttributes.FirstName , personCredential.FirstName.ValidateLength() },
+                    { SchemaAttributes.LastName, personCredential.LastName.ValidateLength() },
+                    { SchemaAttributes.Photo, personCredential.Photo },
+                    { SchemaAttributes.MobileNumber , personCredential.MobileNumber.ValidateMobileNumber().ToString() },
+                    { SchemaAttributes.IdentificationType , personCredential.IdentificationType.ToString() },
+                    { SchemaAttributes.IdentificationValue, personCredential.IdentificationValue.ValidateIdentification(personCredential.IdentificationType) }
                 }
             };
 
@@ -76,11 +76,11 @@ namespace CoviIDApiCore.V1.Services
                     AutomaticIssuance = false,
                     CredentialValues = new Dictionary<string, string>
                     {
-                        { Attributes.ReferenceNumber , covidTestCredential.ReferenceNumber.ValidateLength() },
-                        { Attributes.Laboratory , covidTestCredential.Laboratory.ToString() },
-                        { Attributes.DateTested , covidTestCredential.DateTested.IsInPast().ToString() },
-                        { Attributes.DateIssued, covidTestCredential.DateIssued.ToString() },
-                        { Attributes.CovidStatus, covidTestCredential.CovidStatus.ToString() },
+                        { SchemaAttributes.ReferenceNumber , covidTestCredential.ReferenceNumber.ValidateLength() },
+                        { SchemaAttributes.Laboratory , covidTestCredential.Laboratory.ToString() },
+                        { SchemaAttributes.DateTested , covidTestCredential.DateTested.IsInPast().ToString() },
+                        { SchemaAttributes.DateIssued, covidTestCredential.DateIssued.ToString() },
+                        { SchemaAttributes.CovidStatus, covidTestCredential.CovidStatus.ToString() },
                     }
                 };
 
@@ -140,27 +140,27 @@ namespace CoviIDApiCore.V1.Services
 
             var verifiedPerson = offeredCredentials?.FirstOrDefault(p => p.DefinitionId == DefinitionIds[Schemas.Person]);
             var covidTest = offeredCredentials?.Where(c => c.DefinitionId == DefinitionIds[Schemas.CovidTest])
-                .OrderBy(c => c.Values.TryGetValue(Attributes.DateIssued, out var dateIssued)).ToList().FirstOrDefault();
+                .OrderBy(c => c.Values.TryGetValue(SchemaAttributes.DateIssued, out var dateIssued)).ToList().FirstOrDefault();
 
             if (verifiedPerson != null)
             {
                 //TODO: Optimize
-                verifiedPerson.Values.TryGetValue(Attributes.FirstName, out string firstName);
-                verifiedPerson.Values.TryGetValue(Attributes.LastName, out string lastName);
-                verifiedPerson.Values.TryGetValue(Attributes.Photo, out string photo);
-                verifiedPerson.Values.TryGetValue(Attributes.MobileNumber, out string mobileNumber);
-                verifiedPerson.Values.TryGetValue(Attributes.IdentificationType, out string identificationTypeStr);
-                verifiedPerson.Values.TryGetValue(Attributes.IdentificationValue, out string identificationValue);
+                verifiedPerson.Values.TryGetValue(SchemaAttributes.FirstName, out string firstName);
+                verifiedPerson.Values.TryGetValue(SchemaAttributes.LastName, out string lastName);
+                verifiedPerson.Values.TryGetValue(SchemaAttributes.Photo, out string photo);
+                verifiedPerson.Values.TryGetValue(SchemaAttributes.MobileNumber, out string mobileNumber);
+                verifiedPerson.Values.TryGetValue(SchemaAttributes.IdentificationType, out string identificationTypeStr);
+                verifiedPerson.Values.TryGetValue(SchemaAttributes.IdentificationValue, out string identificationValue);
 
                 var identificationType = (IdentificationTypes)Enum.Parse(typeof(IdentificationTypes), identificationTypeStr);
 
                 if (covidTest != null)
                 {
-                    covidTest.Values.TryGetValue(Attributes.ReferenceNumber, out string referenceNumber);
-                    covidTest.Values.TryGetValue(Attributes.Laboratory, out string laboratoryStr);
-                    covidTest.Values.TryGetValue(Attributes.DateTested, out string dateTested);
-                    covidTest.Values.TryGetValue(Attributes.DateIssued, out string dateIssued);
-                    covidTest.Values.TryGetValue(Attributes.CovidStatus, out string covidStatusStr);
+                    covidTest.Values.TryGetValue(SchemaAttributes.ReferenceNumber, out string referenceNumber);
+                    covidTest.Values.TryGetValue(SchemaAttributes.Laboratory, out string laboratoryStr);
+                    covidTest.Values.TryGetValue(SchemaAttributes.DateTested, out string dateTested);
+                    covidTest.Values.TryGetValue(SchemaAttributes.DateIssued, out string dateIssued);
+                    covidTest.Values.TryGetValue(SchemaAttributes.CovidStatus, out string covidStatusStr);
 
 
                     var laboratory = (Laboratory)Enum.Parse(typeof(Laboratory), laboratoryStr);
