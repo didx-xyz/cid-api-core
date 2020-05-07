@@ -17,6 +17,29 @@ namespace CoviIDApiCore.V1.Services
             _walletTestResultRepository = walletTestResultRepository;
         }
 
+        public async Task<TestResultResponse> GetTestResult(Guid walletId)
+        {
+            var tests = await _walletTestResultRepository.GetTestResults(walletId);
+            var response = new TestResultResponse();
+
+            if (tests.Count > 1)
+            {
+                // TODO : Do calculation based on all test results
+
+            }
+            var test = tests.OrderBy(t => t.TestedAt).FirstOrDefault();
+            response.HasConsent = test.HasConsent;
+            response.IssuedAt = test.IssuedAt;
+            response.Laboratory = test.Laboratory;
+            response.LaboratoryStatus = test.LaboratoryStatus;
+            response.PermissionGrantedAt = test.PermissionGrantedAt;
+            response.ReferenceNumber = test.ReferenceNumber;
+            response.ResultStatus = test.ResultStatus;
+            response.TestedAt = test.TestedAt;
+
+            return response;
+        }
+
         public async Task AddTestResult(TestResultRequest testResultRequest)
         {
             // TODO : Get wallet via the secret key

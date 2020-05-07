@@ -24,10 +24,12 @@ namespace CoviIDApiCore.V1.Services
         private readonly IOtpService _otpService;
         private readonly IWalletRepository _walletRepository;
         private readonly IWalletDetailRepository _walletDetailRepository;
+        private readonly ITestResultService _testResultService;
         
         public WalletService(ICustodianBroker custodianBroker, IConnectionService connectionService, IAgencyBroker agencyBroker,
             IConfiguration configuration, IOtpService otpService, IWalletRepository walletRepository,
-            ICredentialService credentialService, IWalletDetailRepository walletDetailRepository)
+            ICredentialService credentialService, IWalletDetailRepository walletDetailRepository,
+            ITestResultService testResultService)
         {
             _custodianBroker = custodianBroker;
             _connectionService = connectionService;
@@ -35,13 +37,28 @@ namespace CoviIDApiCore.V1.Services
             _configuration = configuration;
             _credentialService = credentialService;
             _walletDetailRepository = walletDetailRepository;
+            _testResultService = testResultService;
             _otpService = otpService;
             _walletRepository = walletRepository;
         }
 
-        public async Task<List<WalletContract>> GetWallets()
+        public async Task<WalletStatusResponse> GetWalletStatus(Guid walletId, string key)
         {
-            return await _custodianBroker.GetWallets();
+            // TODO : Handle decryption
+            // TODO : Make photo url secure
+
+            var wallet = await _walletDetailRepository.GetAsync(walletId);
+            var testResults = await _testResultService.GetTestResult(walletId);
+
+            var response = new WalletStatusResponse
+            {
+                FirstName = wallet.FirstName,
+                LastName = wallet.LastName,
+                PhotoUrl = wallet.PhotoUrl,
+                ResultStatus = testResults.ResultStatus.ToString(),
+                Status = (int)testResults.ResultStatus
+            };
+            return response;
         }
 
         public async Task<WalletResponse> CreateWallet(CreateWalletRequest walletRequest)
