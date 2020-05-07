@@ -10,7 +10,7 @@ namespace CoviIDApiCore.V1.Constants
         public static readonly string AgentName = "CoviID";
         #endregion
 
-        public class Attributes
+        public class SchemaAttributes
         {
             // Covid Test Schema
             public static readonly string ReferenceNumber = "testReferenceNumber";

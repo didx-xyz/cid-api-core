@@ -22,7 +22,7 @@ namespace CoviIDApiCore.V1.Repositories
         public async Task<Wallet> GetByWalletIdentifier(string identifier)
         {
             return await _dbSet
-                .Where(t => string.Equals(t.WalletIdentifier, identifier))
+                .Where(t => string.Equals(t.Id, identifier))
                 .OrderByDescending(t => t.CreatedAt)
                 .FirstOrDefaultAsync();
         }
