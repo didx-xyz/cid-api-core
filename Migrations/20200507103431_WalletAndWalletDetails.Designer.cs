@@ -10,8 +10,8 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace CoviIDApiCore.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    [Migration("20200506170845_WalletDetialTableAndWalletTestResult")]
-    partial class WalletDetialTableAndWalletTestResult
+    [Migration("20200507103431_WalletAndWalletDetails")]
+    partial class WalletAndWalletDetails
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
@@ -20,6 +20,35 @@ namespace CoviIDApiCore.Migrations
                 .HasAnnotation("ProductVersion", "2.2.6-servicing-10079")
                 .HasAnnotation("Relational:MaxIdentifierLength", 128)
                 .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
+
+            modelBuilder.Entity("CoviIDApiCore.Models.Database.CovidTest", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd();
+
+                    b.Property<string>("CovidStatus")
+                        .IsRequired();
+
+                    b.Property<string>("CredentialIndicator")
+                        .IsRequired();
+
+                    b.Property<DateTime>("DateTested");
+
+                    b.Property<bool>("HasConsent");
+
+                    b.Property<string>("Laboratory")
+                        .IsRequired();
+
+                    b.Property<DateTime>("PermissionGrantedAt");
+
+                    b.Property<string>("ReferenceNumber");
+
+                    b.Property<string>("WalletId");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("CovidTests");
+                });
 
             modelBuilder.Entity("CoviIDApiCore.Models.Database.Organisation", b =>
                 {

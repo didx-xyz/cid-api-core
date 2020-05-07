@@ -19,6 +19,35 @@ namespace CoviIDApiCore.Migrations
                 .HasAnnotation("Relational:MaxIdentifierLength", 128)
                 .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
 
+            modelBuilder.Entity("CoviIDApiCore.Models.Database.CovidTest", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd();
+
+                    b.Property<string>("CovidStatus")
+                        .IsRequired();
+
+                    b.Property<string>("CredentialIndicator")
+                        .IsRequired();
+
+                    b.Property<DateTime>("DateTested");
+
+                    b.Property<bool>("HasConsent");
+
+                    b.Property<string>("Laboratory")
+                        .IsRequired();
+
+                    b.Property<DateTime>("PermissionGrantedAt");
+
+                    b.Property<string>("ReferenceNumber");
+
+                    b.Property<string>("WalletId");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("CovidTests");
+                });
+
             modelBuilder.Entity("CoviIDApiCore.Models.Database.Organisation", b =>
                 {
                     b.Property<Guid>("Id")

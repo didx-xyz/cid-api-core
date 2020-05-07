@@ -3,13 +3,10 @@ using Microsoft.EntityFrameworkCore.Migrations;
 
 namespace CoviIDApiCore.Migrations
 {
-    public partial class WalletDetialTableAndWalletTestResult : Migration
+    public partial class WalletAndWalletDetails : Migration
     {
         protected override void Up(MigrationBuilder migrationBuilder)
         {
-            migrationBuilder.DropTable(
-                name: "CovidTests");
-
             migrationBuilder.RenameColumn(
                 name: "WalletIdentifier",
                 table: "Wallets",
@@ -107,25 +104,6 @@ namespace CoviIDApiCore.Migrations
                 name: "MobileNumberReference",
                 table: "Wallets",
                 newName: "WalletIdentifier");
-
-            migrationBuilder.CreateTable(
-                name: "CovidTests",
-                columns: table => new
-                {
-                    Id = table.Column<Guid>(nullable: false),
-                    CovidStatus = table.Column<string>(nullable: false),
-                    CredentialIndicator = table.Column<string>(nullable: false),
-                    DateTested = table.Column<DateTime>(nullable: false),
-                    HasConsent = table.Column<bool>(nullable: false),
-                    Laboratory = table.Column<string>(nullable: false),
-                    PermissionGrantedAt = table.Column<DateTime>(nullable: false),
-                    ReferenceNumber = table.Column<string>(nullable: true),
-                    WalletId = table.Column<string>(nullable: true)
-                },
-                constraints: table =>
-                {
-                    table.PrimaryKey("PK_CovidTests", x => x.Id);
-                });
         }
     }
 }
