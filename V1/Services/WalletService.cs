@@ -73,7 +73,7 @@ namespace CoviIDApiCore.V1.Services
             await _walletRepository.SaveAsync();
 
             // TODO : Generate session ID 
-            var sessionId = Guid.NewGuid();
+            var sessionId = Guid.NewGuid().ToString();
 
             await _otpService.GenerateAndSendOtpAsync(walletRequest.MobileNumber, wallet);
 
