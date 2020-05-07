@@ -3,7 +3,6 @@ using CoviIDApiCore.V1.Interfaces.Services;
 using System.Threading.Tasks;
 using CoviIDApiCore.Exceptions;
 using CoviIDApiCore.V1.Constants;
-using CoviIDApiCore.V1.DTOs.Credentials;
 
 namespace CoviIDApiCore.V1.Services
 {

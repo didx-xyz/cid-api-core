@@ -1,6 +1,5 @@
 ﻿using System.Net;
 using System.Threading.Tasks;
-using System.Collections.Generic;
 using CoviIDApiCore.V1.DTOs.Credentials;
 using CoviIDApiCore.V1.DTOs.System;
 using CoviIDApiCore.V1.DTOs.Wallet;
@@ -49,37 +48,5 @@ namespace CoviIDApiCore.V1.Controllers
             return Ok(new Response(response, HttpStatusCode.OK));
         }
 
-        //[HttpPut]
-        //[Route("{walletId}")]
-        //public async Task<IActionResult> UpdateWallet([FromBody])
-        //{
-        //    await _walletService.UpdateWallet(covidTest, walletId);
-        //    return Ok(new Response(true, HttpStatusCode.OK));
-        //}
-
-        [HttpPut]
-        [Route("{walletId}/coviid")]
-        public async Task<IActionResult> UpdateWallet([FromBody] CovidTestCredentialParameters covidTest, string walletId)
-        {
-            await _walletService.UpdateWallet(covidTest, walletId);
-            return Ok(new Response(true, HttpStatusCode.OK));
-        }
-
-        [HttpDelete]
-        [Route("{walletId}")]
-        public async Task<IActionResult> DeleteWallet(string walletId)
-        {
-            await _walletService.DeleteWallet(walletId);
-
-            return Ok();
-        }
-
-        [HttpDelete]
-        public async Task<IActionResult> DeleteWallets(List<WalletParameters> wallets)
-        {
-            await _walletService.DeleteWallets(wallets);
-
-            return Ok();
-        }
     }
 }

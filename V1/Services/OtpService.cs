@@ -97,7 +97,7 @@ namespace CoviIDApiCore.V1.Services
 
             await _otpTokenRepository.SaveAsync();
 
-            await _credentialService.CreatePersonAndCovidTestCredentials(payload.CovidTest, payload.Person, payload.WalletId);
+            //await _credentialService.CreatePersonAndCovidTestCredentials(payload.CovidTest, payload.Person, payload.WalletId);
         }
     }
 }
