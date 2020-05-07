@@ -2,7 +2,6 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Numerics;
 using System.Threading.Tasks;
 using CoviIDApiCore.Data;
 using CoviIDApiCore.Models.Database;
@@ -10,7 +9,7 @@ using CoviIDApiCore.V1.Interfaces.Repositories;
 
 namespace CoviIDApiCore.V1.Repositories
 {
-    public class OtpTokenRepository : BaseRepository<OtpToken, BigInteger>, IOtpTokenRepository
+    public class OtpTokenRepository : BaseRepository<OtpToken, long>, IOtpTokenRepository
     {
         private readonly ApplicationDbContext _context;
         private readonly DbSet<OtpToken> _dbSet;

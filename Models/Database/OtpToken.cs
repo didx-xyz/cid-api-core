@@ -1,9 +1,8 @@
 ﻿using System;
-using System.Numerics;
 
 namespace CoviIDApiCore.Models.Database
 {
-    public class OtpToken : BaseModel<BigInteger>
+    public class OtpToken : BaseModel<long>
     {
         public string SessionId { get; set; }
         public int Code { get; set; }
