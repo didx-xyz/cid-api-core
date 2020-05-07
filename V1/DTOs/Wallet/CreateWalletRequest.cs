@@ -2,7 +2,6 @@
 {
     public class CreateWalletRequest
     {
-        public string Photo { get; set; }
         public string MobileNumber { get; set; }
         public string MobileNumberReference { get; set; }
     }

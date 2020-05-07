@@ -10,7 +10,7 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace CoviIDApiCore.V1.Controllers
 {
-    [Route("api/[controller]")]
+    [Route("api/test_result")]
     [ApiController]
     public class TestResultController : ControllerBase
     {

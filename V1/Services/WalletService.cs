@@ -63,9 +63,6 @@ namespace CoviIDApiCore.V1.Services
 
         public async Task<WalletResponse> CreateWallet(CreateWalletRequest walletRequest)
         {
-            // TODO : Add photo to s3 bucket
-            var photoUrl = walletRequest.Photo;
-            
             var wallet = new Wallet
             {
                 CreatedAt = DateTime.UtcNow,
@@ -75,13 +72,15 @@ namespace CoviIDApiCore.V1.Services
             await _walletRepository.AddAsync(wallet);
             await _walletRepository.SaveAsync();
 
+            // TODO : create better session
+            var sessionId = Guid.NewGuid();
+
             await _otpService.GenerateAndSendOtpAsync(walletRequest.MobileNumber, wallet);
-            
+
             var response = new WalletResponse
             {
                 WalletId = wallet.Id,
-                MobileNumber = walletRequest.MobileNumber,
-                PhotoUrl = photoUrl
+                SessionId = sessionId,
             };
             return response;
         }
