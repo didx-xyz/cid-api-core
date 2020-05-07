@@ -1,8 +1,4 @@
 using System.Threading.Tasks;
-// TODO: All references to WalletContract below will change to reference the "new" version
-using CoviIDApiCore.V1.DTOs.Wallet;
-// TODO: All references to CovidTestCredentialParameters below will change to reference the "new" version
-using CoviIDApiCore.V1.DTOs.Credentials;
 
 namespace CoviIDApiCore.V1.Interfaces.Services
 {
