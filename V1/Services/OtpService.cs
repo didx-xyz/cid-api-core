@@ -119,6 +119,9 @@ namespace CoviIDApiCore.V1.Services
         //TODO: Improve this
         public async Task<OtpConfirmationResponse> ConfirmOtpAsync(RequestOtpConfirmation payload)
         {
+            if (!payload.isValid())
+                throw new ValidationException(Messages.Token_InvaldPayload);
+
             var token = await _otpTokenRepository.GetBySessionId(payload.SessionId);
 
             if (token == default || token.ExpireAt <= DateTime.UtcNow || token.Code != payload.Otp)
