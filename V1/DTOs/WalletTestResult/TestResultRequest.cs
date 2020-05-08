@@ -11,5 +11,10 @@ namespace CoviIDApiCore.V1.DTOs.WalletTestResult
         public string ReferenceNumber { get; set; }
         public DateTime TestedAt { get; set; }
         public bool HasConsent { get; set; }
+
+        public bool isValid()
+        {
+            return TestedAt.Date > DateTime.UtcNow.Date;
+        }
     }
 }

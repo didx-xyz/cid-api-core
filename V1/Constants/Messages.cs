@@ -59,5 +59,9 @@
         #region Wallet
         public static readonly string Wallet_NotFound = $"Could not find wallet.";
         #endregion
+
+        #region TestResults
+        public static readonly string TestResult_Invalid = $"Test result is invalid."; //TODO: Copy change
+        #endregion
     }
 }

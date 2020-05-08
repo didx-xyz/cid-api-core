@@ -52,9 +52,9 @@ namespace CoviIDApiCore.V1.Services
             return sessionId;
         }
 
-        private async Task<bool> ValidateOtpCreationAsync(string mobileNumber)
+        private async Task<bool> ValidateOtpCreationAsync(string mobileNumberReference)
         {
-            var otps = await _otpTokenRepository.GetAllUnexpiredByMobileNumberAsync(mobileNumber);
+            var otps = await _otpTokenRepository.GetAllUnexpiredByMobileNumberAsync(mobileNumberReference);
 
             if (!otps.Any())
                 return true;
@@ -68,15 +68,21 @@ namespace CoviIDApiCore.V1.Services
 
         public async Task ResendOtp(RequestResendOtp payload)
         {
-            if(!await ValidateOtpCreationAsync(payload.MobileNumber))
+            if(!await ValidateOtpCreationAsync(payload.MobileNumberReference))
                 throw new ValidationException(Messages.Token_OTPThreshold);
 
-            var wallet = await _walletRepository.GetByWalletIdentifier(payload.WalletId);
+            var wallet = await _walletRepository.GetBySessionId(payload.SessionId);
 
             if (wallet == default)
-                throw new NotFoundException();
+                throw new NotFoundException(Messages.Wallet_NotFound);
 
-            await GenerateAndSendOtpAsync(payload.MobileNumber);
+            var sessionId = await GenerateAndSendOtpAsync(payload.MobileNumberReference);
+
+            wallet.SessionId = sessionId;
+
+            _walletRepository.Update(wallet);
+
+            await _walletRepository.SaveAsync();
         }
 
         private ClickatellTemplate ConstructMessage(string mobileNumber, int code, int validityPeriod)
@@ -141,7 +147,8 @@ namespace CoviIDApiCore.V1.Services
 
             await _walletDetailService.AddWalletDetailsAsync(wallet, payload.WalletDetails);
 
-            await _testResultService.AddTestResult(wallet, payload.TestResult);
+            if(payload.TestResult != null)
+                await _testResultService.AddTestResult(wallet, payload.TestResult);
 
             return new OtpConfirmationResponse()
             {

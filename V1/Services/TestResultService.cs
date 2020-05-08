@@ -5,6 +5,8 @@ using CoviIDApiCore.V1.Interfaces.Services;
 using System;
 using System.Linq;
 using System.Threading.Tasks;
+using CoviIDApiCore.Exceptions;
+using CoviIDApiCore.V1.Constants;
 
 namespace CoviIDApiCore.V1.Services
 {
@@ -61,7 +63,8 @@ namespace CoviIDApiCore.V1.Services
 
         public async Task AddTestResult(Wallet wallet, TestResultRequest testResultRequest)
         {
-            //TODO: Validation
+            if(!testResultRequest.isValid())
+                throw new ValidationException(Messages.TestResult_Invalid);
 
             var testResults = new WalletTestResult
             {
