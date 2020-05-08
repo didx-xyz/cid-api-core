@@ -81,6 +81,14 @@ namespace CoviIDApiCore.Data
                  v => v.ToString().ToLower(),
                  v => (IdType)Enum.Parse(typeof(IdType), v)
              );
+
+            modelBuilder
+                .Entity<WalletTestResult>()
+                .Property(e => e.TestType)
+                .HasConversion(
+                    v => v.ToString().ToLower(),
+                    v => (TestType)Enum.Parse(typeof(TestType), v)
+                );
         }
     }
 }

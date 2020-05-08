@@ -10,7 +10,6 @@ namespace CoviIDApiCore.V1.DTOs.WalletTestResult
         public Laboratory Laboratory { get; set; }
         public string ReferenceNumber { get; set; }
         public DateTime TestedAt { get; set; }
-        public DateTime IssuedAt { get; set; }
         public bool HasConsent { get; set; }
     }
 }

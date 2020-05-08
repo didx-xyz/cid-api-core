@@ -166,6 +166,7 @@ namespace CoviIDApiCore
             services.AddScoped<IOtpService, OtpService>();
             services.AddTransient<ITestResultService, TestResultService>();
             services.AddSingleton<ICryptoService, CryptoService>();
+            services.AddScoped<IWalletDetailService, WalletDetailService>();
             #endregion
 
             #region Repository Layer
@@ -176,7 +177,6 @@ namespace CoviIDApiCore
             services.AddScoped<ICovidTestRepository, CovidTestRepository>();
             services.AddScoped<IWalletDetailRepository, WalletDetailRepository>();
             services.AddScoped<IWalletTestResultRepository, WalletTestResultRepository>();
-            services.AddScoped<IWalletDetailService, WalletDetailService>();
             #endregion
 
             #region Broker Layer
