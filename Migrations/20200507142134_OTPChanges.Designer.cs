@@ -4,14 +4,16 @@ using CoviIDApiCore.Data;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 namespace CoviIDApiCore.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    partial class ApplicationDbContextModelSnapshot : ModelSnapshot
+    [Migration("20200507142134_OTPChanges")]
+    partial class OTPChanges
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -122,8 +124,6 @@ namespace CoviIDApiCore.Migrations
 
                     b.Property<DateTime>("MobileNumberVerifiedAt");
 
-                    b.Property<string>("SessionId");
-
                     b.HasKey("Id");
 
                     b.ToTable("Wallets");
@@ -176,9 +176,6 @@ namespace CoviIDApiCore.Migrations
                     b.Property<string>("ReferenceNumber");
 
                     b.Property<string>("ResultStatus")
-                        .IsRequired();
-
-                    b.Property<string>("TestType")
                         .IsRequired();
 
                     b.Property<DateTime>("TestedAt");
