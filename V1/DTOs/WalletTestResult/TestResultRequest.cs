@@ -14,7 +14,7 @@ namespace CoviIDApiCore.V1.DTOs.WalletTestResult
 
         public bool isValid()
         {
-            return TestedAt.Date > DateTime.UtcNow.Date;
+            return TestedAt.Date < DateTime.UtcNow.Date;
         }
     }
 }
