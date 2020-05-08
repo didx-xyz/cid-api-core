@@ -13,7 +13,7 @@ using Microsoft.AspNetCore.Mvc;
 namespace CoviIDApiCore.V1.Controllers
 {
     [EnableCors("AllowSpecificOrigin")]
-    [Route("api/organisations")]
+    [Route("api/")]
     [ApiController]
     public class OrganisationController : Controller
     {
@@ -32,7 +32,7 @@ namespace CoviIDApiCore.V1.Controllers
             return new OkResult();
         }
 
-        [HttpPut("subtract/{id}")]
+        [HttpPut("organisation/subtract/{id}")]
         public async Task<IActionResult> Subtract(string id)
         {
             var payload = new UpdateCountRequest()
@@ -44,7 +44,15 @@ namespace CoviIDApiCore.V1.Controllers
                 await _organisationService.UpdateCountAsync(id, payload, ScanType.CheckOut));
         }
 
-        [HttpGet("{id}")]
+        [HttpGet("organisation/{id}")]
+        public async Task<IActionResult> GetOrganisationOld(string id)
+        {
+            var resp = await _organisationService.GetAsync(id);
+
+            return StatusCode(resp.Meta.Code, resp);
+        }
+
+        [HttpGet("organisations/{id}")]
         public async Task<IActionResult> GetOrganisation(string id)
         {
             var resp = await _organisationService.GetAsync(id);
@@ -52,14 +60,14 @@ namespace CoviIDApiCore.V1.Controllers
             return StatusCode(resp.Meta.Code, resp);
         }
 
-        [HttpPost("{id}/check_in")]
+        [HttpPost("organisations/{id}/check_in")]
         public async Task<IActionResult> CheckIn(string id, [FromBody] UpdateCountRequest payload)
         {
             return StatusCode(StatusCodes.Status200OK,
                 await _organisationService.UpdateCountAsync(id, payload, ScanType.CheckIn));
         }
 
-        [HttpPost("{id}/check_out")]
+        [HttpPost("organisations/{id}/check_out")]
         public async Task<IActionResult> CheckOut(string id, [FromBody] UpdateCountRequest payload)
         {
             return StatusCode(StatusCodes.Status200OK,
