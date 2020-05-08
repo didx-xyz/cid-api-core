@@ -1,13 +1,8 @@
-﻿using CoviIDApiCore.Helpers;
-using CoviIDApiCore.Models.Database;
-using CoviIDApiCore.V1.Constants;
-using CoviIDApiCore.V1.DTOs.Connection;
+﻿using CoviIDApiCore.V1.Constants;
 using CoviIDApiCore.V1.DTOs.Credentials;
 using CoviIDApiCore.V1.Interfaces.Brokers;
-using CoviIDApiCore.V1.Interfaces.Repositories;
 using CoviIDApiCore.V1.Interfaces.Services;
 using System;
-using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.Linq;
 using System.Threading.Tasks;
@@ -21,108 +16,11 @@ namespace CoviIDApiCore.V1.Services
     /// </summary>
     public class CredentialService : ICredentialService
     {
-        private readonly IAgencyBroker _agencyBroker;
         private readonly ICustodianBroker _custodianBroker;
-        private readonly IConnectionService _connectionService;
-        private readonly ICovidTestRepository _covidTestRepository;
 
-        public CredentialService(IAgencyBroker agencyBroker, ICustodianBroker custodianBroker, IConnectionService connectionService,
-            ICovidTestRepository covidTestRepository)
+        public CredentialService(ICustodianBroker custodianBroker)
         {
-            _agencyBroker = agencyBroker;
             _custodianBroker = custodianBroker;
-            _connectionService = connectionService;
-            _covidTestRepository = covidTestRepository;
-        }
-
-        /// <summary>
-        /// Creates a verified person credentials with the relevant DefinitionID and attribute values.
-        /// </summary>
-        /// <param name="connectionId"></param>
-        /// <param name="personCredential"></param>
-        /// <returns></returns>
-        public async Task<CredentialsContract> CreatePerson(string connectionId, PersonCredentialParameters personCredential)
-        {
-            var credentialOffer = new CredentialOfferParameters
-            {
-                ConnectionId = connectionId,
-                DefinitionId = DefinitionIds[Schemas.Person],
-                AutomaticIssuance = false,
-                CredentialValues = new Dictionary<string, string>
-                {
-                    { SchemaAttributes.FirstName , personCredential.FirstName.ValidateLength() },
-                    { SchemaAttributes.LastName, personCredential.LastName.ValidateLength() },
-                    { SchemaAttributes.Photo, personCredential.Photo },
-                    { SchemaAttributes.MobileNumber , personCredential.MobileNumber.ValidateMobileNumber().ToString() },
-                    { SchemaAttributes.IdentificationType , personCredential.IdentificationType.ToString() },
-                    { SchemaAttributes.IdentificationValue, personCredential.IdentificationValue.ValidateIdentification(personCredential.IdentificationType) }
-                }
-            };
-
-            var credentials = await _agencyBroker.SendCredentials(credentialOffer);
-            return credentials;
-        }
-
-        public async Task<CredentialsContract> CreateCovidTest(string connectionId, CovidTestCredentialParameters covidTestCredential, string walletId)
-        {
-            CredentialsContract credentials = null;
-            if (covidTestCredential != null)
-            {
-                covidTestCredential.DateIssued = DateTime.UtcNow;
-                var credentialOffer = new CredentialOfferParameters
-                {
-                    ConnectionId = connectionId,
-                    DefinitionId = DefinitionIds[Schemas.CovidTest],
-                    AutomaticIssuance = false,
-                    CredentialValues = new Dictionary<string, string>
-                    {
-                        { SchemaAttributes.ReferenceNumber , covidTestCredential.ReferenceNumber.ValidateLength() },
-                        { SchemaAttributes.Laboratory , covidTestCredential.Laboratory.ToString() },
-                        { SchemaAttributes.DateTested , covidTestCredential.DateTested.IsInPast().ToString() },
-                        { SchemaAttributes.DateIssued, covidTestCredential.DateIssued.ToString() },
-                        { SchemaAttributes.CovidStatus, covidTestCredential.CovidStatus.ToString() },
-                    }
-                };
-
-                credentials = await _agencyBroker.SendCredentials(credentialOffer);
-                //StoreCoviIDCredentials(covidTestCredential, walletId);
-            }
-            return credentials;
-        }
-
-        public async Task CreatePersonAndCovidTestCredentials(CovidTestCredentialParameters covidTest, PersonCredentialParameters person, string walletId)
-        {
-            var connectionParameters = new ConnectionParameters
-            {
-                ConnectionId = "", // Leave blank for auto generation
-                Multiparty = false,
-                Name = AgentName
-            };
-
-            var agentInvitation = await _connectionService.CreateInvitation(connectionParameters);
-            var custodianConnection = await _connectionService.AcceptInvitation(agentInvitation.Invitation, walletId);
-
-            // Create the set of credentials
-            var personalDetialsCredentials = await CreatePerson(agentInvitation.ConnectionId, person);
-            var covidTestCredentials = await CreateCovidTest(agentInvitation.ConnectionId, covidTest, walletId);
-
-            var userCredentials = await _custodianBroker.GetCredentials(walletId);
-            if (userCredentials == null)
-                throw new ValidationException(Messages.Cred_NotFound);
-
-            var offeredCredentials = userCredentials?.Where(x => x.State == CredentialsState.Offered);
-            if (offeredCredentials == null)
-                throw new ValidationException(Messages.Cred_OfferedNotFound);
-
-            if (offeredCredentials != null)
-            {
-                // Accept all the credentials
-                foreach (var offer in offeredCredentials)
-                {
-                    await _custodianBroker.AcceptCredential(walletId, offer.CredentialId);
-                }
-            }
-            return;
         }
 
         public async Task<CoviIDCredentialContract> GetCoviIDCredentials(string walletId)
@@ -189,27 +87,5 @@ namespace CoviIDApiCore.V1.Services
             }
             throw new ValidationException(Messages.Cred_VerifidPersonNotFound);
         }
-        //private async void StoreCoviIDCredentials(CovidTestCredentialParameters covidTestParameters, string walletId)
-        //{
-        //    if (covidTestParameters.HasConsent)
-        //    {
-        //        var covidTest = new WalletTestResult
-        //        {
-        //            ResultStatus = covidTestParameters.CovidStatus,
-        //            IssuedAt = covidTestParameters.DateIssued,
-        //            TestedAt = covidTestParameters.DateTested,
-        //            HasConsent = covidTestParameters.HasConsent,
-        //            Laboratory = covidTestParameters.Laboratory,
-        //            PermissionGrantedAt = DateTime.Now,
-        //            ReferenceNumber = covidTestParameters.ReferenceNumber,
-        //            //WalletId = walletId,
-        //            LaboratoryStatus = LaboratoryStatus.Unsent
-        //        };
-        //        await _covidTestRepository.AddAsync(covidTest);
-        //        await _covidTestRepository.SaveAsync();
-
-        //    }
-        //    return;
-        //}
     }
 }
