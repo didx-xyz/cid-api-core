@@ -156,7 +156,7 @@ namespace CoviIDApiCore.V1.Services
             return new OtpConfirmationResponse()
             {
                 WalletId = wallet.Id.ToString(),
-                Key = await _cryptoService.GenerateEncryptedSecretKey()
+                Key = _cryptoService.GenerateEncryptedSecretKey()
             };
         }
     }
