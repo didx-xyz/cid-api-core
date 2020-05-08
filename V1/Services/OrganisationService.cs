@@ -133,7 +133,6 @@ namespace CoviIDApiCore.V1.Services
             if (string.IsNullOrEmpty(emailAddress))
                 throw new ValidationException(Messages.Org_EmailEmpty);
 
-            //TODO: Queueing
             await _emailService.SendEmail(
                 emailAddress,
                 companyName,
