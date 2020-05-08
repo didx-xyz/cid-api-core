@@ -28,7 +28,7 @@ namespace CoviIDApiCore.V1.Services
         {
             byte[] key = new byte[32]; // 256 bits
             rng.GetBytes(key);
-            return Convert.ToBase64String(key);
+            return Encrypt(Convert.ToBase64String(key), serverKey);
         }
 
         public void EncryptAsServer<T>(T obj)
@@ -43,12 +43,14 @@ namespace CoviIDApiCore.V1.Services
 
         public void EncryptAsUser<T>(T obj, string encryptedSecretKey)
         {
-            TransformObj(TransformDirection.ToCipher, obj, encryptedSecretKey, false);
+            var secretKey = Decrypt(encryptedSecretKey, serverKey);
+            TransformObj(TransformDirection.ToCipher, obj, secretKey, false);
         }
 
         public void DecryptAsUser<T>(T obj, string encryptedSecretKey)
         {
-            TransformObj(TransformDirection.FromCipher, obj, encryptedSecretKey, false);
+            var secretKey = Decrypt(encryptedSecretKey, serverKey);
+            TransformObj(TransformDirection.FromCipher, obj, secretKey, false);
         }
 
         private void TransformObj<T>(TransformDirection direction, T obj, string key, bool serverManaged = false)
