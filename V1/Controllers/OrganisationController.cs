@@ -32,6 +32,18 @@ namespace CoviIDApiCore.V1.Controllers
             return new OkResult();
         }
 
+        [HttpPut("subtract/{id}")]
+        public async Task<IActionResult> Subtract(string id)
+        {
+            var payload = new UpdateCountRequest()
+            {
+                Latitude = 0, Longitude = 0,
+            };
+
+            return StatusCode(StatusCodes.Status200OK,
+                await _organisationService.UpdateCountAsync(id, payload, ScanType.CheckOut));
+        }
+
         [HttpGet("{id}")]
         public async Task<IActionResult> GetOrganisation(string id)
         {

@@ -62,11 +62,11 @@ namespace CoviIDApiCore.V1.Services
             if (organisation == default)
                 return new Response(false, HttpStatusCode.NotFound, Messages.Org_NotExists);
 
-            var accessLogs = await _organisationAccessLogRepository.GetAllCurrentDayByOrganisation(organisation);
+            var accessLogs = await _organisationAccessLogRepository.GetByCurrentDayByOrganisation(organisation);
 
             var orgCounter = accessLogs
-                .Where(aol => aol.Organisation == organisation)
-                .Where(aol => aol.CreatedAt.Date == DateTime.UtcNow.Date)
+                .Where(oal => oal.Organisation == organisation)
+                .Where(oal => oal.CreatedAt.Date == DateTime.UtcNow.Date)
                 .OrderByDescending(t => t.CreatedAt)
                 .FirstOrDefault();
 
@@ -77,10 +77,15 @@ namespace CoviIDApiCore.V1.Services
 
         public async Task<Response> UpdateCountAsync(string id, UpdateCountRequest payload, ScanType scanType)
         {
-            var wallet = await _walletRepository.GetAsync(Guid.Parse(payload.WalletId));
+            Wallet wallet = null;
 
-            if(wallet == null)
-                throw new NotFoundException(Messages.Wallet_NotFound);
+            if (!string.IsNullOrEmpty(payload.WalletId))
+            {
+                wallet = await _walletRepository.GetAsync(Guid.Parse(payload.WalletId));
+
+                if(wallet == null)
+                    throw new NotFoundException(Messages.Wallet_NotFound);
+            }
 
             var organisation = await _organisationRepository.GetWithLogsAsync(Guid.Parse(id));
 

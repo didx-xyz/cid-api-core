@@ -20,11 +20,11 @@ namespace CoviIDApiCore.V1.Repositories
             _dbSet = _context.OrganisationAccessLogs;
         }
 
-        public async Task<List<OrganisationAccessLog>> GetAllCurrentDayByOrganisation(Organisation organisation)
+        public async Task<List<OrganisationAccessLog>> GetByCurrentDayByOrganisation(Organisation organisation)
         {
             return await _dbSet
                 .Where(oal => Equals(oal.Organisation, organisation))
-                .Where(aol => aol.CreatedAt.Date.Equals(DateTime.UtcNow.Date))
+                .Where(oal => oal.CreatedAt.Date.Equals(DateTime.UtcNow.Date))
                 .ToListAsync();
         }
     }
