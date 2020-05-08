@@ -68,7 +68,7 @@ namespace CoviIDApiCore.V1.Services
 
         public async Task ResendOtp(RequestResendOtp payload)
         {
-            if(!await ValidateOtpCreationAsync(payload.MobileNumberReference))
+            if(!await ValidateOtpCreationAsync(payload.MobileNumber))
                 throw new ValidationException(Messages.Token_OTPThreshold);
 
             var wallet = await _walletRepository.GetBySessionId(payload.SessionId);
@@ -76,7 +76,7 @@ namespace CoviIDApiCore.V1.Services
             if (wallet == default)
                 throw new NotFoundException(Messages.Wallet_NotFound);
 
-            var sessionId = await GenerateAndSendOtpAsync(payload.MobileNumberReference);
+            var sessionId = await GenerateAndSendOtpAsync(payload.MobileNumber);
 
             wallet.SessionId = sessionId;
 
