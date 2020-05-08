@@ -35,7 +35,7 @@ namespace CoviIDApiCore.Data
              .Property(e => e.Laboratory)
              .HasConversion(
                  v => v.ToString().ToLower(),
-                 v => (V1.DTOs.Credentials.Laboratory)Enum.Parse(typeof(V1.DTOs.Credentials.Laboratory), v)
+                 v => (V1.DTOs.Credentials.Laboratory)Enum.Parse(typeof(V1.DTOs.Credentials.Laboratory), v, true)
              );
 
             modelBuilder
@@ -43,7 +43,7 @@ namespace CoviIDApiCore.Data
                .Property(e => e.CovidStatus)
                .HasConversion(
                    v => v.ToString().ToLower(),
-                   v => (CovidStatus)Enum.Parse(typeof(CovidStatus), v)
+                   v => (CovidStatus)Enum.Parse(typeof(CovidStatus), v, true)
                );
 
             modelBuilder
@@ -51,7 +51,7 @@ namespace CoviIDApiCore.Data
              .Property(e => e.CredentialIndicator)
              .HasConversion(
                  v => v.ToString().ToLower(),
-                 v => (CredentialIndicator)Enum.Parse(typeof(CredentialIndicator), v)
+                 v => (CredentialIndicator)Enum.Parse(typeof(CredentialIndicator), v, true)
              );
 
             modelBuilder
@@ -59,21 +59,21 @@ namespace CoviIDApiCore.Data
                .Property(e => e.Laboratory)
                .HasConversion(
                    v => v.ToString().ToLower(),
-                   v => (V1.DTOs.WalletTestResult.Laboratory)Enum.Parse(typeof(V1.DTOs.WalletTestResult.Laboratory), v)
+                   v => (V1.DTOs.WalletTestResult.Laboratory)Enum.Parse(typeof(V1.DTOs.WalletTestResult.Laboratory), v, true)
                );
             modelBuilder
                .Entity<WalletTestResult>()
                .Property(e => e.ResultStatus)
                .HasConversion(
                    v => v.ToString().ToLower(),
-                   v => (ResultStatus)Enum.Parse(typeof(ResultStatus), v)
+                   v => (ResultStatus)Enum.Parse(typeof(ResultStatus), v, true)
                );
             modelBuilder
              .Entity<WalletTestResult>()
              .Property(e => e.LaboratoryStatus)
              .HasConversion(
                  v => v.ToString().ToLower(),
-                 v => (LaboratoryStatus)Enum.Parse(typeof(LaboratoryStatus), v)
+                 v => (LaboratoryStatus)Enum.Parse(typeof(LaboratoryStatus), v, true)
              );
 
             modelBuilder
@@ -81,7 +81,7 @@ namespace CoviIDApiCore.Data
              .Property(e => e.IdType)
              .HasConversion(
                  v => v.ToString().ToLower(),
-                 v => (IdType)Enum.Parse(typeof(IdType), v)
+                 v => (IdType)Enum.Parse(typeof(IdType), v, true)
              );
 
             modelBuilder
@@ -89,15 +89,15 @@ namespace CoviIDApiCore.Data
                 .Property(e => e.ScanType)
                 .HasConversion(
                     v => v.ToString().ToLower(),
-                    v => (ScanType) Enum.Parse(typeof(ScanType), v)
+                    v => (ScanType) Enum.Parse(typeof(ScanType), v, true)
                 );
                 
-             modelBuilder
+            modelBuilder
                 .Entity<WalletTestResult>()
                 .Property(e => e.TestType)
                 .HasConversion(
                     v => v.ToString().ToLower(),
-                    v => (TestType)Enum.Parse(typeof(TestType), v)
+                    v => (TestType)Enum.Parse(typeof(TestType), v, true)
                 );
         }
     }

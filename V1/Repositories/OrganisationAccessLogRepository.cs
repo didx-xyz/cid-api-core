@@ -23,8 +23,8 @@ namespace CoviIDApiCore.V1.Repositories
         public async Task<List<OrganisationAccessLog>> GetAllCurrentDayByOrganisation(Organisation organisation)
         {
             return await _dbSet
-                .Where(oal => oal.Organisation == organisation)
-                .Where(aol => aol.CreatedAt.Date == DateTime.UtcNow.Date)
+                .Where(oal => Equals(oal.Organisation, organisation))
+                .Where(aol => aol.CreatedAt.Date.Equals(DateTime.UtcNow.Date))
                 .ToListAsync();
         }
     }

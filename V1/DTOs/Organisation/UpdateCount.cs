@@ -4,9 +4,9 @@ namespace CoviIDApiCore.V1.DTOs.Organisation
 {
     public class UpdateCountRequest
     {
-        public string walletId { get; set; }
+        public string WalletId { get; set; }
         [JsonProperty("long")] public decimal Longitude { get; set; }
-        [JsonProperty("lat")]public decimal Latitude { get; set; }
+        [JsonProperty("lat")] public decimal Latitude { get; set; }
     }
 
     public class UpdateCountResponse

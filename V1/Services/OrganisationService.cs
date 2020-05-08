@@ -77,12 +77,12 @@ namespace CoviIDApiCore.V1.Services
 
         public async Task<Response> UpdateCountAsync(string id, UpdateCountRequest payload, ScanType scanType)
         {
-            var wallet = await _walletRepository.GetAsync(Guid.Parse(payload.walletId));
+            var wallet = await _walletRepository.GetAsync(Guid.Parse(payload.WalletId));
 
             if(wallet == null)
                 throw new NotFoundException(Messages.Wallet_NotFound);
 
-            var organisation = await _organisationRepository.GetAsync(Guid.Parse(id));
+            var organisation = await _organisationRepository.GetWithLogsAsync(Guid.Parse(id));
 
             if (organisation == default)
                 throw new NotFoundException(Messages.Org_NotExists);
@@ -99,24 +99,25 @@ namespace CoviIDApiCore.V1.Services
 
             await _organisationAccessLogRepository.SaveAsync();
 
-            var logs = await _organisationAccessLogRepository.GetAllCurrentDayByOrganisation(organisation);
+            var logs = organisation.AccessLogs
+                .Where(aol => aol.CreatedAt.Date.Equals(DateTime.UtcNow.Date))
+                .ToList();
 
             return new Response(
                 new UpdateCountResponse()
                 {
-                    Balance = GetAccessLogBalance(logs)
+                    Balance = logs.Count == 0 ? 0 : GetAccessLogBalance(logs)
                 },
                 true,
                 HttpStatusCode.OK);
         }
 
-        private int GetAccessLogBalance(IReadOnlyCollection<OrganisationAccessLog> logs)
+        private int GetAccessLogBalance(List<OrganisationAccessLog> logs)
         {
             var checkIns = logs.Count(aol => aol.ScanType == ScanType.CheckIn);
             var checkOuts = logs.Count(aol => aol.ScanType == ScanType.CheckOut);
-            var denies = logs.Count(aol => aol.ScanType == ScanType.Denied);
 
-            return checkIns - checkOuts - denies; //TODO: Maybe improve this?
+            return checkIns - checkOuts; //TODO: Maybe improve this?
         }
 
         private async Task NotifyOrganisation(string companyName, CreateOrganisationRequest payload, Organisation organisation)
