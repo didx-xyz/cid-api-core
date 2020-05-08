@@ -54,7 +54,6 @@
 
         #region Verifier
         public static readonly string Ver_CoviIDNotFound = $"Could not find the CoviID for the wallet";
-
         #endregion
 
         #region Wallet

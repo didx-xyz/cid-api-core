@@ -171,7 +171,7 @@ namespace CoviIDApiCore
 
             #region Repository Layer
             services.AddScoped<IOrganisationRepository, OrganisationRepository>();
-            services.AddScoped<IOrganisationCounterRepository, OrganisationCounterRepository>();
+            services.AddScoped<IOrganisationAccessLogRepository, OrganisationAccessLogRepository>();
             services.AddScoped<IOtpTokenRepository, OtpTokenRepository>();
             services.AddScoped<IWalletRepository, WalletRepository>();
             services.AddScoped<ICovidTestRepository, CovidTestRepository>();

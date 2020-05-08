@@ -22,6 +22,8 @@
     <Compile Remove="Migrations\20200507100538_Add-Migration WalletAndTestResultTable.Designer.cs" />
     <Compile Remove="Migrations\20200508073119_ConverionofTestType.cs" />
     <Compile Remove="Migrations\20200508073119_ConverionofTestType.Designer.cs" />
+    <Compile Remove="Migrations\20200508110323_RenameCountersOnOrg.cs" />
+    <Compile Remove="Migrations\20200508110323_RenameCountersOnOrg.Designer.cs" />
   </ItemGroup>
 
   <ItemGroup>
